@@ -66,20 +66,17 @@
 
     <label for="service">Service of Interest</label>
     <select id="service">
-      <option value="">Select…</option>
-      <option>Microblading</option>
-      <option>Brow Shaping & Tinting</option>
-      <option>Other / Not Sure</option>
-    </select>
-
-    <label for="price">Price Point</label>
-    <select id="price">
-      <option value="">Select…</option>
-      <option>$500 – $999</option>
-      <option>$1,000 – $1,499</option>
-      <option>$1,500 – $1,999</option>
-      <option>$2,000 – $2,999</option>
-      <option>I'm not sure</option>
+      <option value="">Selectu2026</option>
+      <option value="Microblading u2014 $2,000">Microblading u2014 $2,000</option>
+      <option value="Microblading + Shading u2014 $2,500">Microblading + Shading u2014 $2,500</option>
+      <option value="Microblading Touch Up u2014 $500">Microblading Touch Up u2014 $500</option>
+      <option value="Annual Microblading Fill u2014 $1,000">Annual Microblading Fill u2014 $1,000</option>
+      <option value="Eyeliner u2014 from $2,000">Eyeliner u2014 from $2,000</option>
+      <option value="Eyeliner Touch Up">Eyeliner Touch Up</option>
+      <option value="Beard u2014 from $2,000">Beard u2014 from $2,000</option>
+      <option value="Hairline u2014 from $2,000">Hairline u2014 from $2,000</option>
+      <option value="Beard &amp; Hairline Touch Up u2014 $800">Beard &amp; Hairline Touch Up u2014 $800</option>
+      <option value="Not sure yet">Not sure yet</option>
     </select>
 
     <label for="lastVisit">Last Visit</label>
@@ -106,7 +103,7 @@
 
 <script>
 const SUPABASE_URL = "https://iarygyqjsdjhibtyhncb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ZnXy0Tb83kHlaiLKA1lj3w_5esN_PCX";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhcnlneXFqc2RqaGlidHlobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzgxMDMsImV4cCI6MjA5ODQxNDEwM30.BZmRug89XMlAlnJtSLmuIVsh_kQMkgb5pW_EOCZcCCk";
 
 const form = document.getElementById("intakeForm");
 const msg = document.getElementById("formMsg");
@@ -127,7 +124,7 @@ form.addEventListener("submit", async (e) => {
     occupation: document.getElementById("occupation").value.trim(),
     location: document.getElementById("location").value.trim(),
     last_service: document.getElementById("service").value,
-    price_point: document.getElementById("price").value,
+    price_point: "",
     last_visit: document.getElementById("lastVisit").value,
     stage: "lead",
     tags: "",
