@@ -66,16 +66,16 @@
 
     <label for="service">Service of Interest</label>
     <select id="service">
-      <option value="">Selectu2026</option>
-      <option value="Microblading u2014 $2,000">Microblading u2014 $2,000</option>
-      <option value="Microblading + Shading u2014 $2,500">Microblading + Shading u2014 $2,500</option>
-      <option value="Microblading Touch Up u2014 $500">Microblading Touch Up u2014 $500</option>
-      <option value="Annual Microblading Fill u2014 $1,000">Annual Microblading Fill u2014 $1,000</option>
-      <option value="Eyeliner u2014 from $2,000">Eyeliner u2014 from $2,000</option>
+      <option value="">Select…</option>
+      <option value="Microblading — $2,000">Microblading — $2,000</option>
+      <option value="Microblading + Shading — $2,500">Microblading + Shading — $2,500</option>
+      <option value="Microblading Touch Up — $500">Microblading Touch Up — $500</option>
+      <option value="Annual Microblading Fill — $1,000">Annual Microblading Fill — $1,000</option>
+      <option value="Eyeliner — from $2,000">Eyeliner — from $2,000</option>
       <option value="Eyeliner Touch Up">Eyeliner Touch Up</option>
-      <option value="Beard u2014 from $2,000">Beard u2014 from $2,000</option>
-      <option value="Hairline u2014 from $2,000">Hairline u2014 from $2,000</option>
-      <option value="Beard &amp; Hairline Touch Up u2014 $800">Beard &amp; Hairline Touch Up u2014 $800</option>
+      <option value="Beard — from $2,000">Beard — from $2,000</option>
+      <option value="Hairline — from $2,000">Hairline — from $2,000</option>
+      <option value="Beard &amp; Hairline Touch Up — $800">Beard &amp; Hairline Touch Up — $800</option>
       <option value="Not sure yet">Not sure yet</option>
     </select>
 
@@ -131,7 +131,7 @@ form.addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Clients`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
