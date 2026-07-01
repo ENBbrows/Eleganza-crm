@@ -101,7 +101,10 @@
   <p>Your details have been received. We'll reach out soon.</p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
+emailjs.init("4foLQZ3s5wcPOfbs4");
+
 const SUPABASE_URL = "https://iarygyqjsdjhibtyhncb.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhcnlneXFqc2RqaGlidHlobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzgxMDMsImV4cCI6MjA5ODQxNDEwM30.BZmRug89XMlAlnJtSLmuIVsh_kQMkgb5pW_EOCZcCCk";
 
@@ -142,6 +145,21 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(await res.text());
+
+    // Send post-care email via EmailJS
+    const clientEmail = document.getElementById("email").value.trim();
+    const clientName = document.getElementById("name").value.trim();
+    if (clientEmail) {
+      try {
+        await emailjs.send("service_wik9yvb", "template_egmgzho", {
+          to_email: clientEmail,
+          to_name: clientName,
+        });
+      } catch (emailErr) {
+        console.warn("Email send failed:", emailErr);
+      }
+    }
+
     document.getElementById("formScreen").style.display = "none";
     document.getElementById("successScreen").classList.add("show");
   } catch (err) {
