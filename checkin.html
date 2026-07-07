@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eleganza Naturally Beautiful — Client Check-In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root{
+    --ink:#171210;          /* deep espresso black */
+    --ink-soft:#241C18;     /* raised surface */
+    --line:#3A2F28;         /* hairline */
+    --gold:#C9A26B;         /* champagne gold */
+    --gold-bright:#E0BE8A;
+    --ivory:#F4EDE4;        /* primary text */
+    --ivory-dim:#B9AC9D;    /* secondary text */
+    --error:#D98E7E;
+    --ok:#A8C3A0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-weight:300;
+    letter-spacing:.01em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+    text-align:center;
+  }
+  /* ——— brand mark ——— */
+  .mark{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:76px;height:76px;
+    border:1px solid var(--gold);
+    border-radius:50%;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .mark::after{
+    content:"";
+    position:absolute;
+    inset:5px;
+    border:1px solid rgba(201,162,107,.35);
+    border-radius:50%;
+  }
+  .mark span{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:2.1rem;
+    color:var(--gold);
+    line-height:1;
+    transform:translateY(-2px);
+  }
+  .brand{
+    font-family:'Karla',sans-serif;
+    font-size:.72rem;
+    letter-spacing:.38em;
+    text-transform:uppercase;
+    color:var(--ivory-dim);
+    margin-bottom:6px;
+  }
+  .rule{
+    width:56px;height:1px;
+    background:var(--gold);
+    margin:22px auto;
+    position:relative;
+  }
+  .rule::before,.rule::after{
+    content:"";
+    position:absolute;top:-2px;
+    width:5px;height:5px;
+    background:var(--gold);
+    transform:rotate(45deg);
+  }
+  .rule::before{left:-12px}
+  .rule::after{right:-12px}
+
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:300;
+    font-size:clamp(1.7rem,6vw,2.3rem);
+    line-height:1.2;
+    color:var(--ivory);
+  }
+  h1 em{font-style:italic;color:var(--gold-bright)}
+  .sub{
+    color:var(--ivory-dim);
+    font-size:.95rem;
+    line-height:1.6;
+    margin-top:12px;
+  }
+
+  /* ——— screens ——— */
+  .screen{display:none;animation:rise .45s ease both}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .screen{animation:none}
+  }
+
+  /* ——— form ——— */
+  form{margin-top:26px;text-align:left}
+  label{
+    display:block;
+    font-size:.68rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:18px 0 8px;
+  }
+  input,select{
+    width:100%;
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:2px;
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-size:1.05rem;
+    font-weight:300;
+    padding:15px 16px;
+    outline:none;
+    transition:border-color .2s;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  input:focus,select:focus{border-color:var(--gold)}
+  input::placeholder{color:#6E6259}
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A26B' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+  }
+  .hint{font-size:.8rem;color:var(--ivory-dim);margin-top:8px}
+
+  .btn{
+    display:block;
+    width:100%;
+    margin-top:28px;
+    padding:17px;
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:2px;
+    font-family:'Karla',sans-serif;
+    font-size:.8rem;
+    font-weight:600;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .2s, transform .1s;
+  }
+  .btn:hover{background:var(--gold-bright)}
+  .btn:active{transform:scale(.99)}
+  .btn:disabled{opacity:.45;cursor:wait}
+  .btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
+  .btn-ghost{
+    background:transparent;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    margin-top:14px;
+  }
+  .btn-ghost:hover{background:rgba(201,162,107,.08)}
+  .linkline{
+    display:inline-block;
+    margin-top:22px;
+    background:none;border:none;
+    color:var(--ivory-dim);
+    font-family:'Karla',sans-serif;
+    font-size:.85rem;
+    letter-spacing:.04em;
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:4px;
+  }
+  .linkline:hover{color:var(--ivory)}
+
+  .banner{
+    display:none;
+    margin-top:20px;
+    padding:13px 16px;
+    border:1px solid var(--error);
+    color:var(--error);
+    font-size:.88rem;
+    text-align:left;
+    border-radius:2px;
+  }
+  .banner.show{display:block}
+
+  /* ——— welcome-back monogram ——— */
+  .monogram{
+    width:96px;height:96px;
+    margin:0 auto 20px;
+    border:1px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .monogram::after{content:"";position:absolute;inset:6px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
+  .monogram span{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:3rem;
+    font-weight:300;
+    color:var(--gold-bright);
+    transform:translateY(-3px);
+  }
+  .visits{
+    font-size:.72rem;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:16px;
+  }
+
+  /* ——— review buttons ——— */
+  .review-row{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+  .review-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:16px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:.82rem;
+    font-weight:500;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    transition:background .2s;
+  }
+  .review-btn:hover{background:rgba(201,162,107,.1)}
+  .review-btn svg{flex:none}
+  .stars{
+    font-family:'Fraunces',serif;
+    color:var(--gold);
+    font-size:1.3rem;
+    letter-spacing:.35em;
+    margin-top:18px;
+  }
+  .email-note{
+    margin-top:24px;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    font-size:.86rem;
+    color:var(--ivory-dim);
+    line-height:1.6;
+  }
+  .email-note strong{color:var(--ivory);font-weight:500}
+</style>
+</head>
+<body>
+<main class="card">
+
+  <!-- ═══ SCREEN 1 · LOOKUP ═══ -->
+  <section class="screen active" id="screen-lookup" aria-label="Check in">
+    <div class="mark"><span>E</span></div>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Welcome, <em>beautiful</em></h1>
+    <p class="sub">Enter your phone number to check in.</p>
+    <form id="form-lookup" novalidate>
+      <label for="lookup-phone">Phone number</label>
+      <input id="lookup-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 868-555-1234" required />
+      <button class="btn" id="btn-lookup" type="submit">Check In</button>
+    </form>
+    <div class="banner" id="lookup-error" role="alert"></div>
+  </section>
+
+  <!-- ═══ SCREEN 2 · RETURNING CLIENT ═══ -->
+  <section class="screen" id="screen-welcome" aria-label="Welcome back">
+    <div class="monogram"><span id="welcome-initial">A</span></div>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Welcome back, <em id="welcome-name">love</em></h1>
+    <p class="visits" id="welcome-visits"></p>
+    <form id="form-welcome" novalidate>
+      <div id="welcome-email-wrap" style="display:none">
+        <label for="welcome-email">Email for your aftercare instructions</label>
+        <input id="welcome-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+      </div>
+      <label for="welcome-service">Today's service</label>
+      <select id="welcome-service">
+        <option>Microblading</option>
+        <option>Combo Brows</option>
+        <option>Powder / Ombré Brows</option>
+        <option>Touch-Up</option>
+        <option>Consultation</option>
+        <option>Other</option>
+      </select>
+      <button class="btn" id="btn-welcome" type="submit">Complete Check-In</button>
+    </form>
+    <button class="linkline" type="button" onclick="app.reset()">Not you? Start over</button>
+    <div class="banner" id="welcome-error" role="alert"></div>
+  </section>
+
+  <!-- ═══ SCREEN 3 · NEW CLIENT ═══ -->
+  <section class="screen" id="screen-register" aria-label="New client registration">
+    <div class="mark"><span>E</span></div>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Lovely to <em>meet you</em></h1>
+    <p class="sub">Let's get you registered — it takes 30 seconds.</p>
+    <form id="form-register" novalidate>
+      <label for="reg-name">Full name</label>
+      <input id="reg-name" type="text" autocomplete="name" placeholder="Your name" required />
+      <label for="reg-phone">Phone number</label>
+      <input id="reg-phone" type="tel" inputmode="tel" autocomplete="tel" required />
+      <label for="reg-email">Email</label>
+      <input id="reg-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+      <label for="reg-birthday">Birthday <span style="color:var(--ivory-dim);text-transform:none;letter-spacing:0">(for a little annual love — optional)</span></label>
+      <input id="reg-birthday" type="date" />
+      <label for="reg-service">Today's service</label>
+      <select id="reg-service">
+        <option>Microblading</option>
+        <option>Combo Brows</option>
+        <option>Powder / Ombré Brows</option>
+        <option>Touch-Up</option>
+        <option>Consultation</option>
+        <option>Other</option>
+      </select>
+      <button class="btn" id="btn-register" type="submit">Complete Check-In</button>
+    </form>
+    <button class="linkline" type="button" onclick="app.reset()">Back</button>
+    <div class="banner" id="register-error" role="alert"></div>
+  </section>
+
+  <!-- ═══ SCREEN 4 · DONE + REVIEWS ═══ -->
+  <section class="screen" id="screen-done" aria-label="Checked in">
+    <div class="mark"><span>✓</span></div>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>All done, <em id="done-name">love</em></h1>
+    <p class="stars" aria-hidden="true">★ ★ ★ ★ ★</p>
+    <p class="sub">Loved your experience? A review takes 30 seconds and means the world to a small studio.</p>
+    <div class="review-row">
+      <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+        Review us on Google
+      </a>
+      <a class="review-btn" id="btn-facebook" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+        Review us on Facebook
+      </a>
+    </div>
+    <div class="email-note" id="done-email-note" style="display:none">
+      Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
+    </div>
+    <button class="linkline" type="button" onclick="app.reset()">Check in the next client</button>
+  </section>
+
+</main>
+
+<script>
+/* ═════════════════════════════════════════════════════════
+   CONFIG — the only section you need to edit
+   ═════════════════════════════════════════════════════════ */
+const CONFIG = {
+  SUPABASE_URL: "https://iarygyqjsdjhibtyhncb.supabase.co",
+  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE",   // copy from your intake form's code
+  TABLE: "Clients",
+
+  EMAILJS_PUBLIC_KEY: "4foLQZ3s5wcPOfbs4",
+  EMAILJS_SERVICE: "service_wik9yvb",
+  EMAILJS_TEMPLATE: "template_egmgzho",             // your post-care template
+
+  GOOGLE_REVIEW_URL: "PASTE_YOUR_GOOGLE_REVIEW_LINK",
+  FACEBOOK_REVIEW_URL: "PASTE_YOUR_FACEBOOK_REVIEWS_PAGE_LINK",
+
+  /* If your Clients table uses different column names,
+     change the right-hand values here to match. */
+  COLUMNS: {
+    name: "name",
+    phone: "phone",
+    email: "email",
+    birthday: "birthday",
+    service: "service",
+    lastVisit: "last_visit",
+    visitCount: "visit_count"
+  }
+};
+/* ═════════════════════════════════════════════════════════ */
+
+emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
+
+const C = CONFIG.COLUMNS;
+const HEADERS = {
+  "apikey": CONFIG.SUPABASE_ANON_KEY,
+  "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY,
+  "Content-Type": "application/json"
+};
+const REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONFIG.TABLE);
+
+const $ = id => document.getElementById(id);
+const digits = s => (s || "").replace(/\D/g, "");
+const last7 = s => digits(s).slice(-7);
+
+const app = {
+  current: null,   // matched client record
+  phoneEntered: "",
+
+  show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  },
+
+  reset() {
+    this.current = null;
+    this.phoneEntered = "";
+    $("form-lookup").reset();
+    $("form-register").reset();
+    document.querySelectorAll(".banner").forEach(b => b.classList.remove("show"));
+    this.show("screen-lookup");
+    $("lookup-phone").focus();
+  },
+
+  error(id, msg) {
+    const el = $(id);
+    el.textContent = msg;
+    el.classList.add("show");
+  },
+
+  busy(btnId, on, label) {
+    const b = $(btnId);
+    b.disabled = on;
+    b.textContent = on ? "One moment…" : label;
+  },
+
+  /* ── 1 · LOOKUP ───────────────────────────── */
+  async lookup(e) {
+    e.preventDefault();
+    $("lookup-error").classList.remove("show");
+    const phone = $("lookup-phone").value.trim();
+    if (last7(phone).length < 7) {
+      return this.error("lookup-error", "Please enter your full phone number.");
+    }
+    this.phoneEntered = phone;
+    this.busy("btn-lookup", true, "Check In");
+    try {
+      const res = await fetch(
+        `${REST}?select=id,${C.name},${C.phone},${C.email},${C.visitCount}&limit=1000`,
+        { headers: HEADERS }
+      );
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      const rows = await res.json();
+      const key = last7(phone);
+      const match = rows.find(r => last7(r[C.phone]) === key);
+      if (match) {
+        this.current = match;
+        this.showWelcome(match);
+      } else {
+        $("reg-phone").value = phone;
+        this.show("screen-register");
+        $("reg-name").focus();
+      }
+    } catch (err) {
+      console.error(err);
+      this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
+    } finally {
+      this.busy("btn-lookup", false, "Check In");
+    }
+  },
+
+  showWelcome(client) {
+    const name = client[C.name] || "love";
+    const first = name.split(" ")[0];
+    $("welcome-name").textContent = first;
+    $("welcome-initial").textContent = (first[0] || "E").toUpperCase();
+    const visits = Number(client[C.visitCount]) || 0;
+    $("welcome-visits").textContent = visits > 0
+      ? `Visit nº ${visits + 1}`
+      : "So glad you're back";
+    $("welcome-email-wrap").style.display = client[C.email] ? "none" : "block";
+    this.show("screen-welcome");
+  },
+
+  /* ── 2 · RETURNING CLIENT CHECK-IN ────────── */
+  async checkinReturning(e) {
+    e.preventDefault();
+    $("welcome-error").classList.remove("show");
+    const client = this.current;
+    let email = client[C.email] || $("welcome-email").value.trim();
+    this.busy("btn-welcome", true, "Complete Check-In");
+    try {
+      const patch = {
+        [C.lastVisit]: new Date().toISOString(),
+        [C.visitCount]: (Number(client[C.visitCount]) || 0) + 1,
+        [C.service]: $("welcome-service").value
+      };
+      if (!client[C.email] && email) patch[C.email] = email;
+      const res = await fetch(`${REST}?id=eq.${client.id}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify(patch)
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      await this.finish(client[C.name], email);
+    } catch (err) {
+      console.error(err);
+      this.error("welcome-error", "Something went wrong saving your check-in. Please try again.");
+      this.busy("btn-welcome", false, "Complete Check-In");
+    }
+  },
+
+  /* ── 3 · NEW CLIENT REGISTRATION ──────────── */
+  async register(e) {
+    e.preventDefault();
+    $("register-error").classList.remove("show");
+    const name = $("reg-name").value.trim();
+    const phone = $("reg-phone").value.trim();
+    const email = $("reg-email").value.trim();
+    if (!name || last7(phone).length < 7 || !/.+@.+\..+/.test(email)) {
+      return this.error("register-error", "Please fill in your name, phone, and a valid email.");
+    }
+    this.busy("btn-register", true, "Complete Check-In");
+    try {
+      const row = {
+        [C.name]: name,
+        [C.phone]: phone,
+        [C.email]: email,
+        [C.service]: $("reg-service").value,
+        [C.lastVisit]: new Date().toISOString(),
+        [C.visitCount]: 1
+      };
+      const bday = $("reg-birthday").value;
+      if (bday) row[C.birthday] = bday;
+      const res = await fetch(REST, {
+        method: "POST",
+        headers: { ...HEADERS, "Prefer": "return=minimal" },
+        body: JSON.stringify(row)
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      await this.finish(name, email);
+    } catch (err) {
+      console.error(err);
+      this.error("register-error", "Something went wrong saving your details. Please try again.");
+      this.busy("btn-register", false, "Complete Check-In");
+    }
+  },
+
+  /* ── 4 · FINISH: email + review prompts ───── */
+  async finish(name, email) {
+    // Aftercare email with review links (won't block check-in if it fails)
+    if (email) {
+      try {
+        await emailjs.send(CONFIG.EMAILJS_SERVICE, CONFIG.EMAILJS_TEMPLATE, {
+          to_name: name,
+          name: name,
+          to_email: email,
+          email: email,
+          google_review_url: CONFIG.GOOGLE_REVIEW_URL,
+          facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL
+        });
+      } catch (err) {
+        console.error("EmailJS:", err);
+      }
+    }
+    $("done-name").textContent = (name || "love").split(" ")[0];
+    $("btn-google").href = CONFIG.GOOGLE_REVIEW_URL;
+    $("btn-facebook").href = CONFIG.FACEBOOK_REVIEW_URL;
+    if (email) {
+      $("done-email").textContent = email;
+      $("done-email-note").style.display = "block";
+    } else {
+      $("done-email-note").style.display = "none";
+    }
+    this.show("screen-done");
+  }
+};
+
+$("form-lookup").addEventListener("submit", e => app.lookup(e));
+$("form-welcome").addEventListener("submit", e => app.checkinReturning(e));
+$("form-register").addEventListener("submit", e => app.register(e));
+</script>
+</body>
+</html>
