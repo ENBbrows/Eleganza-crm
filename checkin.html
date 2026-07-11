@@ -487,6 +487,10 @@
     <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(201,162,107,.12)">
       ❋ My Aftercare Guide — the next 10 days
     </a>
+    <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener" style="margin-top:12px">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
+      WhatsApp My Aftercare To Me
+    </a>
     <div class="email-note" id="done-email-note" style="display:none">
       Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
     </div>
@@ -666,7 +670,8 @@ const app = {
         clientId: client.id,
         price: price,
         hadReward: hadReward,
-        service: $("welcome-service").value
+        service: $("welcome-service").value,
+        phone: client[C.phone] || this.phoneEntered
       });
     } catch (err) {
       console.error(err);
@@ -716,7 +721,8 @@ const app = {
         clientId: newId,
         price: price,
         hadReward: false,
-        service: $("reg-service").value
+        service: $("reg-service").value,
+        phone: phone
       });
     } catch (err) {
       console.error(err);
@@ -759,6 +765,23 @@ const app = {
     this.setLink("btn-youtube", CONFIG.YOUTUBE_URL);
     this.setLink("btn-instagram", CONFIG.INSTAGRAM_URL);
     this.setLink("btn-fbpage", CONFIG.FACEBOOK_PAGE_URL);
+
+    /* WhatsApp the aftercare guide to the client's own number */
+    const wa = $("btn-whatsapp");
+    const d = digits(this.ctx.phone || "");
+    let intl = "";
+    if (d.length === 7) intl = "1868" + d;
+    else if (d.length === 10 && d.indexOf("868") === 0) intl = "1" + d;
+    else if (d.length === 11 && d.indexOf("1868") === 0) intl = d;
+    else if (d.length >= 10) intl = d;
+    if (intl) {
+      const first = (name || "love").split(" ")[0];
+      const msg = "Hi " + first + "! \uD83E\uDD0D Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html\n\nWhat once was, is not all lost. \u2728";
+      wa.href = "https://wa.me/" + intl + "?text=" + encodeURIComponent(msg);
+      wa.style.display = "flex";
+    } else {
+      wa.style.display = "none";
+    }
 
     /* price + review reward */
     const price = Number(this.ctx.price) || 0;
