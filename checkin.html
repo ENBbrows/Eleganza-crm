@@ -40,31 +40,27 @@
     text-align:center;
   }
   /* ——— brand mark ——— */
-  .mark{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:76px;height:76px;
-    border:1px solid var(--gold);
+  .lotus{
+    display:block;
+    width:150px;
+    height:auto;
+    margin:0 auto 16px;
+  }
+  .host{
+    width:118px;height:118px;
+    margin:0 auto 18px;
     border-radius:50%;
-    margin-bottom:18px;
+    padding:5px;
+    border:1px solid var(--gold);
     position:relative;
   }
-  .mark::after{
-    content:"";
-    position:absolute;
-    inset:5px;
-    border:1px solid rgba(201,162,107,.35);
+  .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
+  .host img{
+    width:100%;height:100%;
     border-radius:50%;
-  }
-  .mark span{
-    font-family:'Fraunces',serif;
-    font-style:italic;
-    font-weight:400;
-    font-size:2.1rem;
-    color:var(--gold);
-    line-height:1;
-    transform:translateY(-2px);
+    object-fit:cover;
+    object-position:center 20%;
+    display:block;
   }
   .brand{
     font-family:'Karla',sans-serif;
@@ -73,6 +69,15 @@
     text-transform:uppercase;
     color:var(--ivory-dim);
     margin-bottom:6px;
+  }
+  .tagline{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:300;
+    font-size:.98rem;
+    color:var(--gold);
+    letter-spacing:.03em;
+    margin-bottom:14px;
   }
   .rule{
     width:56px;height:1px;
@@ -201,24 +206,6 @@
   }
   .banner.show{display:block}
 
-  /* ——— welcome-back monogram ——— */
-  .monogram{
-    width:96px;height:96px;
-    margin:0 auto 20px;
-    border:1px solid var(--gold);
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    position:relative;
-  }
-  .monogram::after{content:"";position:absolute;inset:6px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
-  .monogram span{
-    font-family:'Fraunces',serif;
-    font-style:italic;
-    font-size:3rem;
-    font-weight:300;
-    color:var(--gold-bright);
-    transform:translateY(-3px);
-  }
   .visits{
     font-size:.72rem;
     letter-spacing:.3em;
@@ -271,8 +258,9 @@
 
   <!-- ═══ SCREEN 1 · LOOKUP ═══ -->
   <section class="screen active" id="screen-lookup" aria-label="Check in">
-    <div class="mark"><span>E</span></div>
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
     <p class="brand">Eleganza Naturally Beautiful</p>
+    <p class="tagline">What once was, is not all lost</p>
     <h1>Welcome, <em>beautiful</em></h1>
     <p class="sub">Enter your phone number to check in.</p>
     <form id="form-lookup" novalidate>
@@ -285,7 +273,7 @@
 
   <!-- ═══ SCREEN 2 · RETURNING CLIENT ═══ -->
   <section class="screen" id="screen-welcome" aria-label="Welcome back">
-    <div class="monogram"><span id="welcome-initial">A</span></div>
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
     <p class="brand">Eleganza Naturally Beautiful</p>
     <h1>Welcome back, <em id="welcome-name">love</em></h1>
     <p class="visits" id="welcome-visits"></p>
@@ -311,7 +299,7 @@
 
   <!-- ═══ SCREEN 3 · NEW CLIENT ═══ -->
   <section class="screen" id="screen-register" aria-label="New client registration">
-    <div class="mark"><span>E</span></div>
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
     <p class="brand">Eleganza Naturally Beautiful</p>
     <h1>Lovely to <em>meet you</em></h1>
     <p class="sub">Let's get you registered — it takes 30 seconds.</p>
@@ -341,11 +329,12 @@
 
   <!-- ═══ SCREEN 4 · DONE + REVIEWS ═══ -->
   <section class="screen" id="screen-done" aria-label="Checked in">
-    <div class="mark"><span>✓</span></div>
+    <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
     <p class="brand">Eleganza Naturally Beautiful</p>
+    <p class="tagline">What once was, is not all lost</p>
     <h1>All done, <em id="done-name">love</em></h1>
     <p class="stars" aria-hidden="true">★ ★ ★ ★ ★</p>
-    <p class="sub">Loved your experience? A review takes 30 seconds and means the world to a small studio.</p>
+    <p class="sub">Thank you for trusting me with your brows — it means everything. If you loved your experience, a quick review helps this small studio bloom. <em style="color:var(--gold-bright)">— Amii</em></p>
     <div class="review-row">
       <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
@@ -370,16 +359,15 @@
    ═════════════════════════════════════════════════════════ */
 const CONFIG = {
   SUPABASE_URL: "https://iarygyqjsdjhibtyhncb.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhcnlneXFqc2RqaGlidHlobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzgxMDMsImV4cCI6MjA5ODQxNDEwM30.BZmRug89XMlAlnJtSLmuIVsh_kQMkgb5pW_EOCZcCCk";
-",   // copy from your intake form's code
+  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE",   // copy from your intake form's code
   TABLE: "Clients",
 
   EMAILJS_PUBLIC_KEY: "4foLQZ3s5wcPOfbs4",
   EMAILJS_SERVICE: "service_wik9yvb",
   EMAILJS_TEMPLATE: "template_egmgzho",             // your post-care template
 
-  GOOGLE_REVIEW_URL: "https://g.page/r/CX5CbuaQjUY5EAE/review",
-  FACEBOOK_REVIEW_URL: "https://www.facebook.com/eleganzanaturallybeautiful/reviews",
+  GOOGLE_REVIEW_URL: "PASTE_YOUR_GOOGLE_REVIEW_LINK",
+  FACEBOOK_REVIEW_URL: "PASTE_YOUR_FACEBOOK_REVIEWS_PAGE_LINK",
 
   /* If your Clients table uses different column names,
      change the right-hand values here to match. */
@@ -480,7 +468,6 @@ const app = {
     const name = client[C.name] || "love";
     const first = name.split(" ")[0];
     $("welcome-name").textContent = first;
-    $("welcome-initial").textContent = (first[0] || "E").toUpperCase();
     const visits = Number(client[C.visitCount]) || 0;
     $("welcome-visits").textContent = visits > 0
       ? `Visit nº ${visits + 1}`
