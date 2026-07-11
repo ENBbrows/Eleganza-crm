@@ -499,50 +499,9 @@
 
 </main>
 
+<script src="config.js"></script>
 <script>
-/* ═════════════════════════════════════════════════════════
-   CONFIG — the only section you need to edit
-   ═════════════════════════════════════════════════════════ */
-const CONFIG = {
-  SUPABASE_URL: "https://iarygyqjsdjhibtyhncb.supabase.co",
-  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE",   // copy from your intake form's code
-  TABLE: "Clients",
-
-  EMAILJS_PUBLIC_KEY: "4foLQZ3s5wcPOfbs4",
-  EMAILJS_SERVICE: "service_wik9yvb",
-  EMAILJS_TEMPLATE: "template_egmgzho",             // your post-care template
-
-  GOOGLE_REVIEW_URL: "PASTE_YOUR_GOOGLE_REVIEW_LINK",
-  FACEBOOK_REVIEW_URL: "PASTE_YOUR_FACEBOOK_REVIEWS_PAGE_LINK",
-
-  /* The Eleganza Effect — tune these to your market */
-  VALUE_MATH: {
-    pencilCost: 120,      /* TT$ per brow pencil/kit */
-    pencilsPerYear: 8,    /* how many they'd buy in a year */
-    minutesPerDay: 8      /* daily time spent penciling brows */
-  },
-
-  /* Where clients can learn brow tips & tricks */
-  YOUTUBE_URL: "PASTE_YOUR_YOUTUBE_CHANNEL_LINK",
-  INSTAGRAM_URL: "PASTE_YOUR_INSTAGRAM_LINK",
-  FACEBOOK_PAGE_URL: "PASTE_YOUR_FACEBOOK_PAGE_LINK",
-
-  /* If your Clients table uses different column names,
-     change the right-hand values here to match. */
-  COLUMNS: {
-    name: "name",
-    phone: "phone",
-    email: "email",
-    birthday: "birthday",
-    service: "service",
-    lastVisit: "last_visit",
-    visitCount: "visit_count",
-    price: "price",
-    totalSpent: "total_spent",
-    nextDiscount: "next_visit_discount"
-  }
-};
-/* ═════════════════════════════════════════════════════════ */
+/* Settings live in config.js — edit that file, not this one. */
 
 emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
 
