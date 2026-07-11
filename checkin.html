@@ -206,6 +206,19 @@
   }
   .banner.show{display:block}
 
+  .reward-badge{
+    display:none;
+    margin:14px auto 0;
+    padding:10px 18px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+    background:rgba(201,162,107,.1);
+    color:var(--gold-bright);
+    font-size:.82rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    max-width:fit-content;
+  }
   .visits{
     font-size:.72rem;
     letter-spacing:.3em;
@@ -251,6 +264,102 @@
     line-height:1.6;
   }
   .email-note strong{color:var(--ivory);font-weight:500}
+
+  /* ——— price + review discount ——— */
+  .price-box{
+    margin-top:24px;
+    padding:18px 16px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+  }
+  .price-line{
+    font-size:.95rem;
+    color:var(--ivory-dim);
+  }
+  .price-line strong{
+    font-family:'Fraunces',serif;
+    font-size:1.25rem;
+    color:var(--ivory);
+    font-weight:400;
+    letter-spacing:.02em;
+  }
+  .price-line strong.struck{
+    text-decoration:line-through;
+    color:var(--ivory-dim);
+    font-size:1rem;
+  }
+  .btn-discount{
+    display:block;
+    width:100%;
+    margin-top:14px;
+    padding:14px;
+    background:transparent;
+    border:1px dashed var(--gold);
+    border-radius:2px;
+    color:var(--gold);
+    font-family:'Karla',sans-serif;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .2s;
+  }
+  .btn-discount:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    border-style:dashed;
+  }
+  .btn-discount.ready{
+    border-style:solid;
+    background:var(--gold);
+    color:var(--ink);
+    opacity:1;
+  }
+  .discount-done{
+    display:none;
+    margin-top:14px;
+    font-size:.92rem;
+    color:var(--ok);
+    line-height:1.6;
+  }
+  .discount-done strong{
+    font-family:'Fraunces',serif;
+    font-size:1.35rem;
+    color:var(--gold-bright);
+    font-weight:400;
+  }
+  .value-box{
+    margin-top:18px;
+    padding:20px 16px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:rgba(201,162,107,.05);
+  }
+  .value-title{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:1.05rem;
+    color:var(--gold-bright);
+    margin-bottom:8px;
+  }
+  .value-line{
+    font-size:.85rem;
+    color:var(--ivory-dim);
+    line-height:1.6;
+  }
+  .value-nums{
+    margin-top:10px;
+    font-size:.9rem;
+    color:var(--ivory);
+    line-height:1.8;
+  }
+  .value-nums strong{
+    font-family:'Fraunces',serif;
+    font-size:1.3rem;
+    color:var(--gold-bright);
+    font-weight:400;
+  }
 </style>
 </head>
 <body>
@@ -277,6 +386,7 @@
     <p class="brand">Eleganza Naturally Beautiful</p>
     <h1>Welcome back, <em id="welcome-name">love</em></h1>
     <p class="visits" id="welcome-visits"></p>
+    <p class="reward-badge" id="reward-badge">🎁 Review reward — 5% off today's visit</p>
     <form id="form-welcome" novalidate>
       <div id="welcome-email-wrap" style="display:none">
         <label for="welcome-email">Email for your aftercare instructions</label>
@@ -291,6 +401,8 @@
         <option>Consultation</option>
         <option>Other</option>
       </select>
+      <label for="welcome-price">Today's price (TT$)</label>
+      <input id="welcome-price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 500" />
       <button class="btn" id="btn-welcome" type="submit">Complete Check-In</button>
     </form>
     <button class="linkline" type="button" onclick="app.reset()">Not you? Start over</button>
@@ -321,6 +433,8 @@
         <option>Consultation</option>
         <option>Other</option>
       </select>
+      <label for="reg-price">Today's price (TT$)</label>
+      <input id="reg-price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 500" />
       <button class="btn" id="btn-register" type="submit">Complete Check-In</button>
     </form>
     <button class="linkline" type="button" onclick="app.reset()">Back</button>
@@ -345,6 +459,31 @@
         Review us on Facebook
       </a>
     </div>
+    <div class="price-box" id="price-box" style="display:none">
+      <p class="price-line">Today's service · <strong id="price-original"></strong></p>
+      <button class="btn-discount" id="btn-discount" type="button" disabled>Leave a review above to unlock 5% off</button>
+      <p class="discount-done" id="discount-done">✓ Review reward applied — today's total is <strong id="price-final"></strong><br />Just show this screen at the counter. 🤍</p>
+    </div>
+    <div class="value-box" id="value-box" style="display:none">
+      <p class="value-title">The Eleganza Effect ✨</p>
+      <p class="value-line">You're walking out with more than beautiful brows — you're reclaiming your mornings. Over the next year, today's investment saves you roughly:</p>
+      <p class="value-nums"><strong id="save-money"></strong> in brow pencils &amp; fills<br /><strong id="save-time"></strong> of mirror time — mornings you wake up already done</p>
+    </div>
+    <p class="sub" style="margin-top:22px">Keep your results glowing — brow tips &amp; tricks live here:</p>
+    <div class="review-row" style="margin-top:12px">
+      <a class="review-btn" id="btn-youtube" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
+        YouTube — Tips &amp; Tricks
+      </a>
+      <a class="review-btn" id="btn-instagram" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
+        Instagram
+      </a>
+      <a class="review-btn" id="btn-fbpage" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+        Facebook
+      </a>
+    </div>
     <div class="email-note" id="done-email-note" style="display:none">
       Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
     </div>
@@ -359,15 +498,27 @@
    ═════════════════════════════════════════════════════════ */
 const CONFIG = {
   SUPABASE_URL: "https://iarygyqjsdjhibtyhncb.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhcnlneXFqc2RqaGlidHlobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzgxMDMsImV4cCI6MjA5ODQxNDEwM30.BZmRug89XMlAlnJtSLmuIVsh_kQMkgb5pW_EOCZcCCk",   // copy from your intake form's code
+  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE",   // copy from your intake form's code
   TABLE: "Clients",
 
   EMAILJS_PUBLIC_KEY: "4foLQZ3s5wcPOfbs4",
   EMAILJS_SERVICE: "service_wik9yvb",
   EMAILJS_TEMPLATE: "template_egmgzho",             // your post-care template
 
-  GOOGLE_REVIEW_URL: "https://g.page/r/CX5CbuaQjUY5EAE/review",
-  FACEBOOK_REVIEW_URL: "https://www.facebook.com/eleganzanaturallybeautiful/reviews",
+  GOOGLE_REVIEW_URL: "PASTE_YOUR_GOOGLE_REVIEW_LINK",
+  FACEBOOK_REVIEW_URL: "PASTE_YOUR_FACEBOOK_REVIEWS_PAGE_LINK",
+
+  /* The Eleganza Effect — tune these to your market */
+  VALUE_MATH: {
+    pencilCost: 120,      /* TT$ per brow pencil/kit */
+    pencilsPerYear: 8,    /* how many they'd buy in a year */
+    minutesPerDay: 8      /* daily time spent penciling brows */
+  },
+
+  /* Where clients can learn brow tips & tricks */
+  YOUTUBE_URL: "PASTE_YOUR_YOUTUBE_CHANNEL_LINK",
+  INSTAGRAM_URL: "PASTE_YOUR_INSTAGRAM_LINK",
+  FACEBOOK_PAGE_URL: "PASTE_YOUR_FACEBOOK_PAGE_LINK",
 
   /* If your Clients table uses different column names,
      change the right-hand values here to match. */
@@ -378,7 +529,10 @@ const CONFIG = {
     birthday: "birthday",
     service: "service",
     lastVisit: "last_visit",
-    visitCount: "visit_count"
+    visitCount: "visit_count",
+    price: "price",
+    totalSpent: "total_spent",
+    nextDiscount: "next_visit_discount"
   }
 };
 /* ═════════════════════════════════════════════════════════ */
@@ -441,7 +595,7 @@ const app = {
     this.busy("btn-lookup", true, "Check In");
     try {
       const res = await fetch(
-        `${REST}?select=id,${C.name},${C.phone},${C.email},${C.visitCount}&limit=1000`,
+        `${REST}?select=id,${C.name},${C.phone},${C.email},${C.visitCount},${C.totalSpent},${C.nextDiscount}&limit=1000`,
         { headers: HEADERS }
       );
       if (!res.ok) throw new Error("Supabase " + res.status);
@@ -473,6 +627,7 @@ const app = {
       ? `Visit nº ${visits + 1}`
       : "So glad you're back";
     $("welcome-email-wrap").style.display = client[C.email] ? "none" : "block";
+    $("reward-badge").style.display = client[C.nextDiscount] ? "block" : "none";
     this.show("screen-welcome");
   },
 
@@ -482,12 +637,20 @@ const app = {
     $("welcome-error").classList.remove("show");
     const client = this.current;
     let email = client[C.email] || $("welcome-email").value.trim();
+    const price = parseFloat($("welcome-price").value);
+    if (isNaN(price) || price < 0) {
+      return this.error("welcome-error", "Please enter today's price to lock in the visit.");
+    }
     this.busy("btn-welcome", true, "Complete Check-In");
     try {
+      const hadReward = !!client[C.nextDiscount];
       const patch = {
         [C.lastVisit]: new Date().toISOString(),
         [C.visitCount]: (Number(client[C.visitCount]) || 0) + 1,
-        [C.service]: $("welcome-service").value
+        [C.service]: $("welcome-service").value,
+        [C.price]: price,
+        [C.totalSpent]: (Number(client[C.totalSpent]) || 0) + price,
+        [C.nextDiscount]: false
       };
       if (!client[C.email] && email) patch[C.email] = email;
       const res = await fetch(`${REST}?id=eq.${client.id}`, {
@@ -496,7 +659,12 @@ const app = {
         body: JSON.stringify(patch)
       });
       if (!res.ok) throw new Error("Supabase " + res.status);
-      await this.finish(client[C.name], email);
+      await this.finish(client[C.name], email, {
+        clientId: client.id,
+        price: price,
+        hadReward: hadReward,
+        service: $("welcome-service").value
+      });
     } catch (err) {
       console.error(err);
       this.error("welcome-error", "Something went wrong saving your check-in. Please try again.");
@@ -511,8 +679,12 @@ const app = {
     const name = $("reg-name").value.trim();
     const phone = $("reg-phone").value.trim();
     const email = $("reg-email").value.trim();
+    const price = parseFloat($("reg-price").value);
     if (!name || last7(phone).length < 7 || !/.+@.+\..+/.test(email)) {
       return this.error("register-error", "Please fill in your name, phone, and a valid email.");
+    }
+    if (isNaN(price) || price < 0) {
+      return this.error("register-error", "Please enter today's price to lock in the visit.");
     }
     this.busy("btn-register", true, "Complete Check-In");
     try {
@@ -522,17 +694,27 @@ const app = {
         [C.email]: email,
         [C.service]: $("reg-service").value,
         [C.lastVisit]: new Date().toISOString(),
-        [C.visitCount]: 1
+        [C.visitCount]: 1,
+        [C.price]: price,
+        [C.totalSpent]: price,
+        [C.nextDiscount]: false
       };
       const bday = $("reg-birthday").value;
       if (bday) row[C.birthday] = bday;
       const res = await fetch(REST, {
         method: "POST",
-        headers: { ...HEADERS, "Prefer": "return=minimal" },
+        headers: { ...HEADERS, "Prefer": "return=representation" },
         body: JSON.stringify(row)
       });
       if (!res.ok) throw new Error("Supabase " + res.status);
-      await this.finish(name, email);
+      let newId = null;
+      try { const created = await res.json(); newId = created && created[0] && created[0].id; } catch (_) {}
+      await this.finish(name, email, {
+        clientId: newId,
+        price: price,
+        hadReward: false,
+        service: $("reg-service").value
+      });
     } catch (err) {
       console.error(err);
       this.error("register-error", "Something went wrong saving your details. Please try again.");
@@ -540,8 +722,18 @@ const app = {
     }
   },
 
-  /* ── 4 · FINISH: email + review prompts ───── */
-  async finish(name, email) {
+  /* ── 4 · FINISH: email, price, reward, value, socials ── */
+  fmt(n) { return "TT$" + (Math.round(n * 100) / 100).toLocaleString(); },
+
+  setLink(id, url) {
+    const el = $(id);
+    if (!url || url.indexOf("PASTE_") === 0) { el.style.display = "none"; }
+    else { el.href = url; }
+  },
+
+  async finish(name, email, ctx) {
+    this.ctx = ctx || {};
+    this.reviewClicked = false;
     // Aftercare email with review links (won't block check-in if it fails)
     if (email) {
       try {
@@ -550,6 +742,7 @@ const app = {
           name: name,
           to_email: email,
           email: email,
+          service: this.ctx.service || "",
           google_review_url: CONFIG.GOOGLE_REVIEW_URL,
           facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL
         });
@@ -560,6 +753,48 @@ const app = {
     $("done-name").textContent = (name || "love").split(" ")[0];
     $("btn-google").href = CONFIG.GOOGLE_REVIEW_URL;
     $("btn-facebook").href = CONFIG.FACEBOOK_REVIEW_URL;
+    this.setLink("btn-youtube", CONFIG.YOUTUBE_URL);
+    this.setLink("btn-instagram", CONFIG.INSTAGRAM_URL);
+    this.setLink("btn-fbpage", CONFIG.FACEBOOK_PAGE_URL);
+
+    /* price + review reward */
+    const price = Number(this.ctx.price) || 0;
+    const box = $("price-box"), btnD = $("btn-discount"), done = $("discount-done");
+    if (price > 0) {
+      box.style.display = "block";
+      if (this.ctx.hadReward) {
+        const final = price * 0.95;
+        $("price-original").innerHTML =
+          '<span class="struck" style="text-decoration:line-through;color:var(--ivory-dim);font-size:1rem">' +
+          this.fmt(price) + '</span> → ' + this.fmt(final);
+        btnD.style.display = "none";
+        done.innerHTML = '✓ Review reward applied — today\'s total is <strong>' + this.fmt(final) +
+          '</strong><br />Just show this screen at the counter. 🤍';
+        done.style.display = "block";
+      } else {
+        $("price-original").textContent = this.fmt(price);
+        btnD.style.display = "block";
+        btnD.disabled = true;
+        btnD.classList.remove("ready");
+        btnD.textContent = "Leave a review above to unlock 5% off your next visit";
+        done.style.display = "none";
+      }
+    } else {
+      box.style.display = "none";
+    }
+
+    /* The Eleganza Effect */
+    const vm = CONFIG.VALUE_MATH;
+    if ((this.ctx.service || "") !== "Consultation") {
+      const money = vm.pencilCost * vm.pencilsPerYear;
+      const hours = Math.round(vm.minutesPerDay * 365 / 60);
+      $("save-money").textContent = "≈ " + this.fmt(money);
+      $("save-time").textContent = "≈ " + hours + " hours";
+      $("value-box").style.display = "block";
+    } else {
+      $("value-box").style.display = "none";
+    }
+
     if (email) {
       $("done-email").textContent = email;
       $("done-email-note").style.display = "block";
@@ -567,12 +802,48 @@ const app = {
       $("done-email-note").style.display = "none";
     }
     this.show("screen-done");
+  },
+
+  /* review buttons unlock the next-visit reward */
+  unlockDiscount() {
+    if (this.reviewClicked || !this.ctx || !(Number(this.ctx.price) > 0) || this.ctx.hadReward) return;
+    this.reviewClicked = true;
+    const btnD = $("btn-discount");
+    if (!this.ctx.clientId) return; // can't save without a record id
+    btnD.disabled = false;
+    btnD.classList.add("ready");
+    btnD.textContent = "Claim 5% off my next visit";
+  },
+
+  async claimDiscount() {
+    if (!this.ctx || !this.ctx.clientId) return;
+    const btnD = $("btn-discount"), done = $("discount-done");
+    btnD.disabled = true;
+    btnD.textContent = "Saving…";
+    try {
+      const res = await fetch(`${REST}?id=eq.${this.ctx.clientId}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify({ [C.nextDiscount]: true })
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      btnD.style.display = "none";
+      done.innerHTML = '✓ Locked in! <strong>5% off</strong> is saved to your profile — we\'ll apply it automatically on your next visit. 🤍';
+      done.style.display = "block";
+    } catch (err) {
+      console.error(err);
+      btnD.disabled = false;
+      btnD.textContent = "Claim 5% off my next visit";
+    }
   }
 };
 
 $("form-lookup").addEventListener("submit", e => app.lookup(e));
 $("form-welcome").addEventListener("submit", e => app.checkinReturning(e));
 $("form-register").addEventListener("submit", e => app.register(e));
+$("btn-google").addEventListener("click", () => app.unlockDiscount());
+$("btn-facebook").addEventListener("click", () => app.unlockDiscount());
+$("btn-discount").addEventListener("click", () => app.claimDiscount());
 </script>
 </body>
 </html>
