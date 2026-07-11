@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eleganza Naturally Beautiful — Your Aftercare Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
+    --gold:#C9A26B; --gold-bright:#E0BE8A;
+    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-weight:300;
+    padding:40px 18px 60px;
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
+  }
+  .card{max-width:560px;margin:0 auto;text-align:center}
+  .host{
+    width:130px;height:130px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    padding:5px;
+    border:1px solid var(--gold);
+    position:relative;
+  }
+  .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
+  .host img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 20%;display:block}
+  .brand{font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:6px}
+  .tagline{font-family:'Fraunces',serif;font-style:italic;font-size:.98rem;color:var(--gold);margin-bottom:14px}
+  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.7rem,6vw,2.2rem);line-height:1.25}
+  h1 em{font-style:italic;color:var(--gold-bright)}
+  .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.7;margin-top:12px}
+  .rule{width:56px;height:1px;background:var(--gold);margin:28px auto;position:relative}
+  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
+  .rule::before{left:-12px}.rule::after{right:-12px}
+
+  section{
+    text-align:left;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:22px 20px;
+    margin-top:18px;
+  }
+  section.gold{border-color:var(--gold);background:rgba(201,162,107,.05)}
+  h2{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:1.15rem;
+    color:var(--gold-bright);
+    margin-bottom:12px;
+  }
+  .step{display:flex;gap:14px;margin-top:14px;align-items:flex-start}
+  .step:first-of-type{margin-top:4px}
+  .step-num{
+    flex:none;
+    width:30px;height:30px;
+    border:1px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--gold);
+    font-size:.95rem;
+  }
+  .step p{font-size:.92rem;line-height:1.65;color:var(--ivory)}
+  .step p strong{color:var(--gold-bright);font-weight:500}
+  .step p span{color:var(--ivory-dim)}
+  ul{list-style:none;margin-top:4px}
+  li{
+    font-size:.92rem;
+    line-height:1.65;
+    padding:7px 0 7px 26px;
+    position:relative;
+    color:var(--ivory);
+  }
+  li::before{
+    content:"✕";
+    position:absolute;left:2px;
+    color:#D98E7E;
+    font-size:.8rem;
+  }
+  li.do::before{content:"✓";color:var(--ok)}
+  .product{
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:14px 16px;
+    margin-top:12px;
+  }
+  .product .p-label{
+    font-size:.66rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:5px;
+  }
+  .product .p-name{
+    font-family:'Fraunces',serif;
+    font-size:1.05rem;
+    color:var(--ivory);
+  }
+  .product .p-note{font-size:.84rem;color:var(--ivory-dim);margin-top:5px;line-height:1.6}
+  .note{
+    margin-top:16px;
+    font-size:.85rem;
+    color:var(--ivory-dim);
+    line-height:1.65;
+    font-style:italic;
+  }
+  .sign{
+    margin-top:30px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:1.1rem;
+    color:var(--gold-bright);
+  }
+  .back{
+    display:inline-block;
+    margin-top:26px;
+    padding:15px 34px;
+    background:var(--gold);
+    color:var(--ink);
+    text-decoration:none;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    border-radius:2px;
+  }
+  .back:hover{background:var(--gold-bright)}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
+  <p class="brand">Eleganza Naturally Beautiful</p>
+  <p class="tagline">What once was, is not all lost</p>
+  <h1>Thank you, <em>beautiful</em></h1>
+  <p class="sub">Your new brows are an investment — and the next 5 days decide how gorgeously they heal. This is your guide, exactly as Amii teaches it. Follow it, and your color will settle soft, even, and true.</p>
+
+  <div class="rule"></div>
+
+  <section class="gold">
+    <h2>Your daily ritual · Days 1–5</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <p><strong>Gently wash or wipe your brows 3–5 times a day</strong> with cool water and a gentle, fragrance-free soap made for sensitive skin. <span>Soft fingertips only — no scrubbing.</span></p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <p><strong>After each wash, apply the cream provided</strong> at your appointment across both brows.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <p><strong>Repeat this ritual for the next 5 days.</strong> <span>Consistency is what heals your color soft, even, and true.</span></p>
+    </div>
+
+    <div class="product">
+      <p class="p-label">Your wash</p>
+      <p class="p-name">Gentle, fragrance-free soap for sensitive skin</p>
+      <p class="p-note">Cool water only. Nothing scented, nothing harsh.</p>
+    </div>
+    <div class="product">
+      <p class="p-label">Your healing cream</p>
+      <p class="p-name">The cream provided at your appointment</p>
+      <p class="p-note">Apply after every wash — this is the only product that touches your brows while they heal.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>While you heal — the don'ts</h2>
+    <ul>
+      <li>No sweating — and that means none. Skip the gym and anything that works up heat</li>
+      <li>No pool water, beach or river water, and no steamy hot showers</li>
+      <li>No direct sunlight on your brows</li>
+      <li>No makeup, creams, or any other products on the brow area — only your provided cream</li>
+      <li>No rubbing, scratching, or picking at your brows</li>
+    </ul>
+  </section>
+
+  <section class="gold">
+    <h2>The 4-week rule</h2>
+    <div class="step">
+      <div class="step-num">✦</div>
+      <p><strong>No procedures or applications to the brows until your 4-week healing process is complete.</strong> <span>Your skin needs the full four weeks to settle the color — protect it, and it will reward you.</span></p>
+    </div>
+  </section>
+
+  <p class="sign">Healing is part of the beauty. Trust it. — Amii</p>
+
+  <a class="back" href="checkin.html">← Back to the studio</a>
+</main>
+</body>
+</html>

@@ -21,16 +21,15 @@
     --ok:#A8C3A0;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%}
+  html{height:100%}
   body{
+    min-height:100%;
     background:var(--ink);
     color:var(--ivory);
     font-family:'Karla',sans-serif;
     font-weight:300;
     letter-spacing:.01em;
     display:flex;
-    align-items:center;
-    justify-content:center;
     padding:24px 16px;
     background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
   }
@@ -38,6 +37,7 @@
     width:100%;
     max-width:480px;
     text-align:center;
+    margin:auto;   /* safe centering — never clips tall content */
   }
   /* ——— brand mark ——— */
   .lotus{
@@ -484,6 +484,9 @@
         Facebook
       </a>
     </div>
+    <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(201,162,107,.12)">
+      ❋ My Aftercare Guide — the next 10 days
+    </a>
     <div class="email-note" id="done-email-note" style="display:none">
       Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
     </div>
@@ -498,15 +501,15 @@
    ═════════════════════════════════════════════════════════ */
 const CONFIG = {
   SUPABASE_URL: "https://iarygyqjsdjhibtyhncb.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhcnlneXFqc2RqaGlidHlobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzgxMDMsImV4cCI6MjA5ODQxNDEwM30.BZmRug89XMlAlnJtSLmuIVsh_kQMkgb5pW_EOCZcCCk",   // copy from your intake form's code
+  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE",   // copy from your intake form's code
   TABLE: "Clients",
 
   EMAILJS_PUBLIC_KEY: "4foLQZ3s5wcPOfbs4",
   EMAILJS_SERVICE: "service_wik9yvb",
   EMAILJS_TEMPLATE: "template_egmgzho",             // your post-care template
 
-  GOOGLE_REVIEW_URL: "https://g.page/r/CX5CbuaQjUY5EAE/review",
-  FACEBOOK_REVIEW_URL: "https://www.facebook.com/eleganzanaturallybeautiful/reviews",
+  GOOGLE_REVIEW_URL: "PASTE_YOUR_GOOGLE_REVIEW_LINK",
+  FACEBOOK_REVIEW_URL: "PASTE_YOUR_FACEBOOK_REVIEWS_PAGE_LINK",
 
   /* The Eleganza Effect — tune these to your market */
   VALUE_MATH: {
@@ -516,9 +519,9 @@ const CONFIG = {
   },
 
   /* Where clients can learn brow tips & tricks */
-  YOUTUBE_URL: "https://www.youtube.com/@amiileroux",
-  INSTAGRAM_URL: "https://www.instagram.com/enb._brows/",
-  FACEBOOK_PAGE_URL: "https://www.facebook.com/eleganzanaturallybeautiful",
+  YOUTUBE_URL: "PASTE_YOUR_YOUTUBE_CHANNEL_LINK",
+  INSTAGRAM_URL: "PASTE_YOUR_INSTAGRAM_LINK",
+  FACEBOOK_PAGE_URL: "PASTE_YOUR_FACEBOOK_PAGE_LINK",
 
   /* If your Clients table uses different column names,
      change the right-hand values here to match. */
