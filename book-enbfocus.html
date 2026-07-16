@@ -139,8 +139,8 @@ function mergeRanges(ranges) {
 
 function generateSlots(schedule, service, dateStr) {
   const dow = calendarDow(dateStr);
-  const rule = schedule.rules.find(r => r.day_of_week === dow);
-  let ranges = rule ? [[ttInstant(dateStr, rule.start_time.slice(0,5)), ttInstant(dateStr, rule.end_time.slice(0,5))]] : [];
+  const dayRules = schedule.rules.filter(r => r.day_of_week === dow && (r.category == null || r.category === service.category));
+  let ranges = dayRules.map(r => [ttInstant(dateStr, r.start_time.slice(0,5)), ttInstant(dateStr, r.end_time.slice(0,5))]);
   const blocks = schedule.blocks.filter(b => b.block_date === dateStr);
   if (blocks.some(b => b.is_closed && !b.start_time)) ranges = [];
   blocks.filter(b => !b.is_closed && b.start_time && b.end_time).forEach(b => {
@@ -172,9 +172,11 @@ function generateSlots(schedule, service, dateStr) {
 
 const state = { schedule: null, service: null, dateStr: null, slot: null };
 
+const BOOKING_HORIZON_DAYS = 35; // clients can book about a month out
+
 async function loadSchedule() {
   const from = new Date().toISOString().slice(0,10);
-  const to = new Date(Date.now() + 21*86400000).toISOString().slice(0,10);
+  const to = new Date(Date.now() + BOOKING_HORIZON_DAYS*86400000).toISOString().slice(0,10);
   state.schedule = await rpc("get_booking_schedule", { p_business: "enbfocus", p_from: from, p_to: to });
   state.service = state.schedule.services[0]; // Discovery Call
   renderDateStrip();
@@ -183,7 +185,7 @@ async function loadSchedule() {
 function renderDateStrip() {
   const strip = $("dateStrip");
   const days = [];
-  for (let i=0;i<14;i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
+  for (let i=0;i<BOOKING_HORIZON_DAYS;i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
   strip.innerHTML = days.map(d => {
     const dt = new Date(d + "T12:00:00Z");
     const dow = dt.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
