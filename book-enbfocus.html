@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book a Discovery Call — ENBfocus</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--ink:#0E1210;--ink-soft:#171D1A;--line:#293029;--zest:#C6F24E;--zest-bright:#DBFF7A;--ivory:#F1F5F0;--dim:#9AA69C;--error:#E38F7E;--ok:#A8C3A0;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:var(--ink);color:var(--ivory);font-family:'Inter',sans-serif;font-weight:300;padding:24px 16px;}
+  .card{width:100%;max-width:540px;margin:0 auto}
+  .brand{font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--zest);text-align:center;margin-bottom:8px;font-weight:600}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);text-align:center;line-height:1.2}
+  h1 em{font-style:normal;color:var(--zest)}
+  .sub{color:var(--dim);font-size:.92rem;text-align:center;margin-top:10px;line-height:1.6}
+  .steps{display:flex;justify-content:center;gap:6px;margin:22px 0}
+  .step-dot{width:6px;height:6px;border-radius:50%;background:var(--line)}
+  .step-dot.active{background:var(--zest)}
+  .screen{display:none}
+  .screen.active{display:block}
+  .service-card{width:100%;text-align:left;background:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:10px;cursor:pointer;color:var(--ivory)}
+  .service-card:hover,.service-card.selected{border-color:var(--zest)}
+  .service-name{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600}
+  .service-meta{color:var(--dim);font-size:.85rem;margin-top:4px}
+  .date-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
+  .date-pill{flex:0 0 auto;text-align:center;background:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:10px 14px;cursor:pointer;color:var(--ivory)}
+  .date-pill .dow{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .date-pill .num{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;margin-top:2px;font-weight:600}
+  .date-pill.selected{border-color:var(--zest);background:rgba(198,242,78,.08)}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .slot-btn{padding:11px 4px;background:var(--ink-soft);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.85rem;cursor:pointer}
+  .slot-btn:hover,.slot-btn.selected{border-color:var(--zest);color:var(--zest-bright)}
+  .empty-slots{color:var(--dim);font-size:.88rem;text-align:center;padding:20px 0;font-style:italic}
+  label{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zest);margin:16px 0 8px;font-weight:600}
+  input,textarea{width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:1rem;padding:14px;outline:none;resize:vertical}
+  input:focus,textarea:focus{border-color:var(--zest)}
+  .btn{display:block;width:100%;margin-top:22px;padding:16px;background:var(--zest);color:var(--ink);border:none;border-radius:5px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:wait}
+  .btn-ghost{display:block;width:100%;margin-top:10px;padding:14px;background:transparent;color:var(--zest);border:1px solid var(--zest);border-radius:5px;font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-align:center}
+  .linkline{display:inline-block;margin-top:16px;background:none;border:none;color:var(--dim);font-size:.85rem;text-decoration:underline;cursor:pointer}
+  .banner{display:none;margin-top:16px;padding:12px 14px;border:1px solid var(--error);color:var(--error);font-size:.85rem;border-radius:4px}
+  .banner.show{display:block}
+  .summary{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:6px}
+  .summary div{font-size:.9rem;color:var(--dim);margin-bottom:6px}
+  .summary strong{color:var(--ivory);font-weight:500}
+  .done-icon{text-align:center;font-size:2.4rem;margin-top:10px;color:var(--zest)}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand">ENBfocus</div>
+  <h1>Let's See If We're <em>a Fit</em></h1>
+  <p class="sub">Book a free 15-minute discovery call — no pitch, just a real conversation about your audience and your goals.</p>
+  <div class="steps"><span class="step-dot" data-step="1"></span><span class="step-dot" data-step="2"></span><span class="step-dot" data-step="3"></span></div>
+
+  <section class="screen active" id="screen-time">
+    <div class="date-strip" id="dateStrip"></div>
+    <div class="slots" id="slotGrid"></div>
+  </section>
+
+  <section class="screen" id="screen-details">
+    <div class="summary" id="detailsSummary"></div>
+    <form id="detailsForm">
+      <label for="d-name">Full name</label>
+      <input id="d-name" type="text" required />
+      <label for="d-phone">Phone (for WhatsApp reminders)</label>
+      <input id="d-phone" type="tel" inputmode="tel" placeholder="e.g. 868-555-1234" required />
+      <label for="d-email">Email</label>
+      <input id="d-email" type="email" required />
+      <label for="d-business">What's your business or platform?</label>
+      <input id="d-business" type="text" placeholder="e.g. @yourhandle, your brand" />
+      <label for="d-platform">Where does your audience live?</label>
+      <input id="d-platform" type="text" placeholder="Instagram, TikTok, YouTube, email list…" />
+      <label for="d-audience">What's your audience asking you for?</label>
+      <textarea id="d-audience" rows="3" placeholder="Products, guides, coaching, something else…"></textarea>
+      <label for="d-goal">What's your goal for automated revenue?</label>
+      <textarea id="d-goal" rows="2" placeholder="e.g. a digital product that sells while I sleep"></textarea>
+      <button class="btn" id="btnBook" type="submit">Book My Discovery Call</button>
+    </form>
+    <button class="linkline" type="button" id="backToTime">← Choose a different time</button>
+    <div class="banner" id="detailsError"></div>
+  </section>
+
+  <section class="screen" id="screen-done">
+    <div class="done-icon">✦</div>
+    <h1 id="doneTitle">You're on the calendar</h1>
+    <p class="sub" id="doneSub">All set for the call! You'll get a confirmation the day before, and a heads-up right beforehand.</p>
+    <div class="summary" id="doneSummary"></div>
+    <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Call</button>
+  </section>
+</main>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+const TZ_OFFSET = "-04:00";
+const MIN_LEAD_MS = 1 * 3600 * 1000; // discovery calls can be booked as little as 1h out
+
+const digits = s => (s||"").replace(/\D/g,"");
+const last7 = s => digits(s).slice(-7);
+const esc = s => (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function rpc(fn, body) {
+  const res = await fetch(RPC + fn, { method: "POST", headers: { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function showScreen(id, step) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".step-dot").forEach(d => d.classList.toggle("active", Number(d.dataset.step) <= step));
+  window.scrollTo(0,0);
+}
+
+function ttInstant(dateStr, timeStr) { return new Date(`${dateStr}T${timeStr}:00${TZ_OFFSET}`); }
+function calendarDow(dateStr) { return new Date(dateStr + "T00:00:00Z").getUTCDay(); }
+
+function subtractRange(ranges, [bs, be]) {
+  const out = [];
+  for (const [s,e] of ranges) {
+    if (be <= s || bs >= e) { out.push([s,e]); continue; }
+    if (bs > s) out.push([s, bs]);
+    if (be < e) out.push([be, e]);
+  }
+  return out;
+}
+function mergeRanges(ranges) {
+  const sorted = ranges.slice().sort((a,b) => a[0]-b[0]);
+  const out = [];
+  for (const r of sorted) {
+    if (out.length && r[0] <= out[out.length-1][1]) { if (r[1] > out[out.length-1][1]) out[out.length-1][1] = r[1]; }
+    else out.push(r.slice());
+  }
+  return out;
+}
+
+function generateSlots(schedule, service, dateStr) {
+  const dow = calendarDow(dateStr);
+  const rule = schedule.rules.find(r => r.day_of_week === dow);
+  let ranges = rule ? [[ttInstant(dateStr, rule.start_time.slice(0,5)), ttInstant(dateStr, rule.end_time.slice(0,5))]] : [];
+  const blocks = schedule.blocks.filter(b => b.block_date === dateStr);
+  if (blocks.some(b => b.is_closed && !b.start_time)) ranges = [];
+  blocks.filter(b => !b.is_closed && b.start_time && b.end_time).forEach(b => {
+    ranges.push([ttInstant(dateStr, b.start_time.slice(0,5)), ttInstant(dateStr, b.end_time.slice(0,5))]);
+  });
+  blocks.filter(b => b.is_closed && b.start_time && b.end_time).forEach(b => {
+    ranges = subtractRange(ranges, [ttInstant(dateStr, b.start_time.slice(0,5)), ttInstant(dateStr, b.end_time.slice(0,5))]);
+  });
+  ranges = mergeRanges(ranges);
+
+  const busy = schedule.busy.map(b => [new Date(b.start_at), new Date(b.end_at)]);
+  const durMs = service.duration_minutes * 60000;
+  const bufMs = (service.buffer_minutes||0) * 60000;
+  const stepMs = 15 * 60000;
+  const now = new Date();
+  const slots = [];
+  for (const [rs, re] of ranges) {
+    let t = new Date(Math.ceil(rs.getTime() / stepMs) * stepMs);
+    if (t < rs) t = new Date(rs);
+    while (t.getTime() + durMs <= re.getTime()) {
+      const slotBusyEnd = new Date(t.getTime() + durMs + bufMs);
+      const overlaps = busy.some(([bs,be]) => t < be && slotBusyEnd > bs);
+      if (!overlaps && (t.getTime() - now.getTime()) >= MIN_LEAD_MS) slots.push(new Date(t));
+      t = new Date(t.getTime() + stepMs);
+    }
+  }
+  return slots;
+}
+
+const state = { schedule: null, service: null, dateStr: null, slot: null };
+
+async function loadSchedule() {
+  const from = new Date().toISOString().slice(0,10);
+  const to = new Date(Date.now() + 21*86400000).toISOString().slice(0,10);
+  state.schedule = await rpc("get_booking_schedule", { p_business: "enbfocus", p_from: from, p_to: to });
+  state.service = state.schedule.services[0]; // Discovery Call
+  renderDateStrip();
+}
+
+function renderDateStrip() {
+  const strip = $("dateStrip");
+  const days = [];
+  for (let i=0;i<14;i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
+  strip.innerHTML = days.map(d => {
+    const dt = new Date(d + "T12:00:00Z");
+    const dow = dt.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+    const num = dt.toLocaleDateString("en-US", { day: "numeric", month: "short", timeZone: "UTC" });
+    return `<div class="date-pill" data-date="${d}"><div class="dow">${dow}</div><div class="num">${num}</div></div>`;
+  }).join("");
+  strip.querySelectorAll(".date-pill").forEach(p => p.onclick = () => selectDate(p.dataset.date));
+  selectDate(days[0]);
+}
+
+function selectDate(dateStr) {
+  state.dateStr = dateStr;
+  document.querySelectorAll(".date-pill").forEach(p => p.classList.toggle("selected", p.dataset.date === dateStr));
+  if (!state.service) return;
+  const slots = generateSlots(state.schedule, state.service, dateStr);
+  const grid = $("slotGrid");
+  if (!slots.length) {
+    grid.innerHTML = `<div class="empty-slots" style="grid-column:1/-1">No openings this day — try another date.</div>`;
+    return;
+  }
+  grid.innerHTML = slots.map(s => `<button class="slot-btn" data-iso="${s.toISOString()}">${s.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/Port_of_Spain"})}</button>`).join("");
+  grid.querySelectorAll(".slot-btn").forEach(b => b.onclick = () => selectSlot(b.dataset.iso));
+}
+
+function selectSlot(iso) {
+  state.slot = new Date(iso);
+  const when = state.slot.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"America/Port_of_Spain" });
+  $("detailsSummary").innerHTML = `<div>Discovery Call <strong>15 minutes</strong></div><div>When <strong>${when}</strong></div>`;
+  showScreen("screen-details", 2);
+}
+
+$("backToTime").onclick = () => showScreen("screen-time", 1);
+
+$("detailsForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("detailsError").classList.remove("show");
+  const name = $("d-name").value.trim();
+  const phone = $("d-phone").value.trim();
+  const email = $("d-email").value.trim();
+  if (!name || last7(phone).length < 7 || !/.+@.+\..+/.test(email)) {
+    $("detailsError").textContent = "Please fill in your name, phone, and a valid email.";
+    $("detailsError").classList.add("show");
+    return;
+  }
+  const btn = $("btnBook");
+  btn.disabled = true; btn.textContent = "Booking…";
+  const intake = {
+    business_name: $("d-business").value.trim(),
+    platform: $("d-platform").value.trim(),
+    audience_notes: $("d-audience").value.trim(),
+    revenue_goal: $("d-goal").value.trim()
+  };
+  try {
+    await rpc("create_booking", {
+      p_business: "enbfocus",
+      p_service_id: state.service.id,
+      p_start_at: state.slot.toISOString(),
+      p_name: name, p_phone: phone, p_email: email,
+      p_intake: intake
+    });
+    const when = state.slot.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"America/Port_of_Spain" });
+    $("doneSummary").innerHTML = `<div>When <strong>${when}</strong></div><div>We'll text/email a reminder the day before and right before the call.</div>`;
+    showScreen("screen-done", 3);
+  } catch (err) {
+    console.error(err);
+    const msg = String(err.message||"").includes("slot_taken") ? "That slot was just taken — please pick another time." : "Something went wrong — please try again.";
+    $("detailsError").textContent = msg;
+    $("detailsError").classList.add("show");
+    btn.disabled = false; btn.textContent = "Book My Discovery Call";
+    if (msg.includes("just taken")) { showScreen("screen-time", 1); selectDate(state.dateStr); }
+  }
+});
+
+loadSchedule();
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Confirm Your Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--ink:#171210;--ink-soft:#241C18;--line:#3A2F28;--gold:#C9A26B;--gold-bright:#E0BE8A;--ivory:#F4EDE4;--ivory-dim:#B9AC9D;--error:#D98E7E;--ok:#A8C3A0;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;display:flex;padding:24px 16px;}
+  .card{width:100%;max-width:440px;margin:auto;text-align:center}
+  .brand{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:10px}
+  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.5rem,6vw,2rem);line-height:1.25}
+  .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.6;margin-top:12px}
+  .detail{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:4px;text-align:left}
+  .detail div{font-size:.9rem;color:var(--ivory-dim);margin-bottom:6px}
+  .detail strong{color:var(--ivory);font-weight:500}
+  .actions{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+  button,select,input{font-family:'Karla',sans-serif}
+  .btn{padding:15px;background:var(--gold);color:var(--ink);border:none;border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:wait}
+  .btn-ghost{padding:15px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+  select{width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:10px}
+  .msg{margin-top:16px;font-size:.88rem}
+  .msg.error{color:var(--error)}
+  .msg.ok{color:var(--ok)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="brand">Loading…</div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const card = $("card");
+const params = new URLSearchParams(location.search);
+const token = params.get("token");
+const REST_RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+const HEADERS = { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": "application/json" };
+
+async function rpc(fn, body) {
+  const res = await fetch(REST_RPC + fn, { method: "POST", headers: HEADERS, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function fmt(iso) {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString("en-US", { timeZone: "America/Port_of_Spain", weekday: "long", month: "long", day: "numeric" });
+  const time = d.toLocaleTimeString("en-US", { timeZone: "America/Port_of_Spain", hour: "numeric", minute: "2-digit" });
+  return date + " at " + time;
+}
+
+let booking = null;
+
+async function load() {
+  if (!token) {
+    card.innerHTML = `<div class="brand">Eleganza · ENBfocus</div><h1>Missing link</h1><p class="sub">This confirmation link looks incomplete. Please use the link from your email or WhatsApp message.</p>`;
+    return;
+  }
+  try {
+    const rows = await rpc("get_booking_by_token", { p_token: token });
+    booking = Array.isArray(rows) ? rows[0] : rows;
+    if (!booking) throw new Error("not found");
+    render();
+  } catch (e) {
+    card.innerHTML = `<div class="brand">Eleganza · ENBfocus</div><h1>Couldn't find that booking</h1><p class="sub">This link may have expired or already been used. Please reach out directly to sort out your appointment.</p>`;
+  }
+}
+
+function render() {
+  const brand = booking.business === "enbfocus" ? "ENBfocus" : "Eleganza";
+  const statusLabel = { tentative: "Tentative — needs confirming", confirmed: "Confirmed", checked_in: "Checked in", completed: "Completed", cancelled: "Cancelled" }[booking.status] || booking.status;
+  const canAct = booking.status === "tentative" || booking.status === "confirmed";
+  card.innerHTML = `
+    <div class="brand">${brand}</div>
+    <h1>Hi ${esc(booking.client_name.split(" ")[0])}</h1>
+    <p class="sub">Here's your appointment. Confirm it, or pick a new time if this no longer works.</p>
+    <div class="detail">
+      <div>Service <strong>${esc(booking.service_name)}</strong></div>
+      <div>When <strong>${fmt(booking.start_at)}</strong></div>
+      <div>Status <strong>${esc(statusLabel)}</strong></div>
+    </div>
+    ${canAct ? `
+    <div class="actions">
+      <button class="btn" id="btnConfirm">Confirm this time</button>
+      <button class="btn-ghost" id="btnReschedule">Pick a different time</button>
+    </div>
+    <div id="rescheduleBox" class="hidden">
+      <input type="datetime-local" id="newTime" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:14px" />
+      <button class="btn" id="btnSubmitReschedule" style="width:100%;margin-top:10px">Save new time</button>
+    </div>
+    ` : `<p class="msg ok" style="margin-top:20px">This appointment is ${esc(statusLabel).toLowerCase()} — no action needed.</p>`}
+    <div class="msg" id="msg"></div>
+  `;
+  if (canAct) {
+    $("btnConfirm").onclick = onConfirm;
+    $("btnReschedule").onclick = () => $("rescheduleBox").classList.remove("hidden");
+    $("btnSubmitReschedule").onclick = onReschedule;
+  }
+}
+
+function esc(s) { return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+async function onConfirm() {
+  $("btnConfirm").disabled = true;
+  $("btnConfirm").textContent = "Confirming…";
+  try {
+    await rpc("confirm_booking", { p_token: token });
+    booking.status = "confirmed";
+    render();
+    $("msg").textContent = "Confirmed — see you then!";
+    $("msg").className = "msg ok";
+  } catch (e) {
+    $("msg").textContent = "Something went wrong — please try again.";
+    $("msg").className = "msg error";
+    $("btnConfirm").disabled = false;
+    $("btnConfirm").textContent = "Confirm this time";
+  }
+}
+
+async function onReschedule() {
+  const val = $("newTime").value;
+  if (!val) return;
+  const btn = $("btnSubmitReschedule");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    const iso = new Date(val).toISOString();
+    await rpc("reschedule_booking", { p_token: token, p_new_start_at: iso });
+    const rows = await rpc("get_booking_by_token", { p_token: token });
+    booking = Array.isArray(rows) ? rows[0] : rows;
+    render();
+    $("msg").textContent = "Rescheduled — see the new time above.";
+    $("msg").className = "msg ok";
+  } catch (e) {
+    $("msg").textContent = "That time isn't available — please try another.";
+    $("msg").className = "msg error";
+    btn.disabled = false;
+    btn.textContent = "Save new time";
+  }
+}
+
+load();
+</script>
+</body>
+</html>

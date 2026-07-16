@@ -512,10 +512,40 @@ const HEADERS = {
   "Content-Type": "application/json"
 };
 const REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONFIG.TABLE);
+const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
 
 const $ = id => document.getElementById(id);
 const digits = s => (s || "").replace(/\D/g, "");
 const last7 = s => digits(s).slice(-7);
+
+async function rpc(fn, body) {
+  const res = await fetch(RPC + fn, { method: "POST", headers: HEADERS, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/* Match today's booking by phone, mark it checked-in, and log a receipt
+   so the appointment calendar and the CRM stay in sync automatically. */
+async function linkBookingAndReceipt(ctx) {
+  if (!ctx.phone) return;
+  try {
+    const rows = await rpc("checkin_booking_by_phone", { p_business: "eleganza", p_phone_last7: last7(ctx.phone) });
+    const match = Array.isArray(rows) ? rows[0] : rows;
+    const bookingId = match && match.booking_id;
+    if (ctx.price > 0) {
+      await rpc("log_receipt", {
+        p_booking_id: bookingId || null,
+        p_business: "eleganza",
+        p_client_id: ctx.clientId || null,
+        p_client_name: ctx.name || "",
+        p_service_name: ctx.service || "",
+        p_amount: ctx.price
+      });
+    }
+  } catch (err) {
+    console.warn("Booking/receipt link skipped:", err);
+  }
+}
 
 const app = {
   current: null,   // matched client record
@@ -627,6 +657,7 @@ const app = {
       if (!res.ok) throw new Error("Supabase " + res.status);
       await this.finish(client[C.name], email, {
         clientId: client.id,
+        name: client[C.name],
         price: price,
         hadReward: hadReward,
         service: $("welcome-service").value,
@@ -678,6 +709,7 @@ const app = {
       try { const created = await res.json(); newId = created && created[0] && created[0].id; } catch (_) {}
       await this.finish(name, email, {
         clientId: newId,
+        name: name,
         price: price,
         hadReward: false,
         service: $("reg-service").value,
@@ -702,6 +734,11 @@ const app = {
   async finish(name, email, ctx) {
     this.ctx = ctx || {};
     this.reviewClicked = false;
+
+    // Match today's booking on the calendar and log a receipt — this is what
+    // keeps the CRM in sync automatically the moment a client checks in.
+    linkBookingAndReceipt(this.ctx);
+
     // Aftercare email with review links (won't block check-in if it fails)
     if (email) {
       try {
