@@ -105,11 +105,14 @@ function dayBeforeCopy(b: Booking) {
   const tentativeNote = b.status === "tentative"
     ? " This time is being held for you — please confirm or pick a new one so we can lock it in."
     : "";
+  const prepNote =
+    "\n\nBefore you come in, please avoid: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments." +
+    "\n\nReminder: 15-minute grace period. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.";
   return {
     subject: `Your appointment — ${fmtDate(b.start_at)}`,
     body:
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
-      `Confirm or reschedule here:\n${link}\n\nSee you soon,\nEleganza`,
+      `Confirm or reschedule here:\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
 }
 
