@@ -10,7 +10,8 @@
 // Required secrets (set with `supabase secrets set ...`):
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided by Supabase
 //   RESEND_API_KEY                            -- from resend.com
-//   RESEND_FROM                               -- e.g. "Eleganza <bookings@yourdomain.com>"
+//   RESEND_FROM_ELEGANZA                      -- e.g. "Eleganza <hello@enbfocus.com>"
+//   RESEND_FROM_ENBFOCUS                      -- e.g. "ENBfocus <hello@enbfocus.com>"
 //   WHATSAPP_TOKEN                            -- Meta Cloud API access token
 //   WHATSAPP_PHONE_NUMBER_ID                  -- Meta Cloud API sending number id
 //   WHATSAPP_TEMPLATE_DAY_BEFORE              -- approved template name
@@ -27,7 +28,11 @@
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const RESEND_FROM = Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
+const RESEND_FROM_ELEGANZA = Deno.env.get("RESEND_FROM_ELEGANZA") || Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
+const RESEND_FROM_ENBFOCUS = Deno.env.get("RESEND_FROM_ENBFOCUS") || Deno.env.get("RESEND_FROM") || "ENBfocus <onboarding@resend.dev>";
+function fromFor(business: "eleganza" | "enbfocus") {
+  return business === "enbfocus" ? RESEND_FROM_ENBFOCUS : RESEND_FROM_ELEGANZA;
+}
 const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN");
 const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
 const WHATSAPP_TEMPLATE_DAY_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_DAY_BEFORE") || "appointment_day_before";
@@ -126,7 +131,7 @@ function hourBeforeCopy(b: Booking) {
   };
 }
 
-async function sendEmail(to: string, subject: string, body: string) {
+async function sendEmail(to: string, subject: string, body: string, business: "eleganza" | "enbfocus") {
   if (!RESEND_API_KEY || !to) return { skipped: true };
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -135,7 +140,7 @@ async function sendEmail(to: string, subject: string, body: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: RESEND_FROM,
+      from: fromFor(business),
       to: [to],
       subject,
       text: body,
@@ -205,7 +210,7 @@ Deno.serve(async () => {
   const dayBefore = await fetchDue("day_before_sent_at", 23 * 60, 25 * 60);
   for (const b of dayBefore) {
     const copy = dayBeforeCopy(b);
-    if (b.client_email) await sendEmail(b.client_email, copy.subject, copy.body);
+    if (b.client_email) await sendEmail(b.client_email, copy.subject, copy.body, b.business);
     if (b.client_phone) {
       await sendWhatsApp(b.client_phone, WHATSAPP_TEMPLATE_DAY_BEFORE, [
         firstName(b.client_name),
@@ -222,7 +227,7 @@ Deno.serve(async () => {
   const hourBefore = await fetchDue("hour_before_sent_at", 50, 70);
   for (const b of hourBefore) {
     const copy = hourBeforeCopy(b);
-    if (b.client_email) await sendEmail(b.client_email, copy.subject, copy.body);
+    if (b.client_email) await sendEmail(b.client_email, copy.subject, copy.body, b.business);
     if (b.client_phone) {
       await sendWhatsApp(b.client_phone, WHATSAPP_TEMPLATE_HOUR_BEFORE, [
         firstName(b.client_name),

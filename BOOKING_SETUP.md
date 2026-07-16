@@ -81,8 +81,9 @@ supabase link --project-ref <your-project-ref>
 supabase functions deploy send-reminders
 
 supabase secrets set RESEND_API_KEY=re_xxx
-supabase secrets set RESEND_FROM="Eleganza <bookings@yourdomain.com>"
-supabase secrets set BUSINESS_WHATSAPP_NUMBER=18685551234
+supabase secrets set RESEND_FROM_ELEGANZA="Eleganza <hello@enbfocus.com>"
+supabase secrets set RESEND_FROM_ENBFOCUS="ENBfocus <hello@enbfocus.com>"
+supabase secrets set BUSINESS_WHATSAPP_NUMBER=18684733030
 supabase secrets set SITE_URL=https://enbbrows.github.io/Eleganza-crm
 
 # Add these once WhatsApp templates are approved:
