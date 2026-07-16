@@ -17,7 +17,7 @@ const CONFIG = {
   /* Your own WhatsApp number (international format, digits only, no +).
      Used for the "message me on WhatsApp" links shown to local clients
      before their appointment and after booking. e.g. "18685551234" */
-  BUSINESS_WHATSAPP_NUMBER: "PASTE_YOUR_WHATSAPP_NUMBER",
+  BUSINESS_WHATSAPP_NUMBER: "18684733030",
 
   /* The Eleganza Effect — tune these to your market */
   VALUE_MATH: {
