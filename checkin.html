@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Eleganza Naturally Beautiful — Client Check-In</title>
+<link rel="apple-touch-icon" href="logo-gold.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Eleganza Check-In">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#171210">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -487,6 +493,9 @@
     <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(201,162,107,.12)">
       ❋ My Aftercare Guide — the next 10 days
     </a>
+    <a class="review-btn" id="btn-followup" href="#" style="margin-top:12px;border-style:solid;background:rgba(201,162,107,.12);display:none">
+      📅 Book Your Follow-Up (~5 weeks)
+    </a>
     <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener" style="margin-top:12px">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
       WhatsApp My Aftercare To Me
@@ -777,6 +786,16 @@ const app = {
       wa.style.display = "flex";
     } else {
       wa.style.display = "none";
+    }
+
+    /* Prompt to book the follow-up (~5 weeks out) after a 1st-application visit */
+    const followupExclude = ["Touch-Up", "Consultation", "Other", ""];
+    const followupBtn = $("btn-followup");
+    if (!followupExclude.includes(this.ctx.service || "")) {
+      followupBtn.href = "book-eleganza.html?category=touch_up&suggestDays=35";
+      followupBtn.style.display = "flex";
+    } else {
+      followupBtn.style.display = "none";
     }
 
     /* price + review reward */

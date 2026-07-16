@@ -103,7 +103,12 @@ const CLIENTS_HEADERS = { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "
 const CLIENTS_REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONFIG.TABLE);
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
 const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
-const MIN_LEAD_MS = 2 * 3600 * 1000; // don't offer slots less than 2h out
+const MIN_LEAD_DAYS = 14; // clients must book at least 2 weeks ahead
+const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
+const MIN_LEAD_MS = MIN_LEAD_DAYS * 24 * 3600 * 1000;
+const params = new URLSearchParams(location.search);
+const PRESET_CATEGORY = params.get("category");
+const PRESET_SUGGEST_DAYS = params.get("suggestDays") ? parseInt(params.get("suggestDays"), 10) : null;
 
 const digits = s => (s||"").replace(/\D/g,"");
 const last7 = s => digits(s).slice(-7);
@@ -179,11 +184,9 @@ function generateSlots(schedule, service, dateStr) {
 
 const state = { schedule: null, service: null, dateStr: null, slot: null };
 
-const BOOKING_HORIZON_DAYS = 35; // clients can book about a month out
-
 async function loadSchedule() {
   const from = new Date().toISOString().slice(0,10);
-  const toDate = new Date(Date.now() + BOOKING_HORIZON_DAYS*86400000);
+  const toDate = new Date(Date.now() + (MIN_LEAD_DAYS + VISIBLE_DAYS)*86400000);
   const to = toDate.toISOString().slice(0,10);
   state.schedule = await rpc("get_booking_schedule", { p_business: "eleganza", p_from: from, p_to: to });
   renderServices();
@@ -196,7 +199,8 @@ function fmtMoney(n, currency) {
 
 function renderServices() {
   const list = $("serviceList");
-  list.innerHTML = state.schedule.services.map(s => `
+  const services = PRESET_CATEGORY ? state.schedule.services.filter(s => s.category === PRESET_CATEGORY) : state.schedule.services;
+  list.innerHTML = services.map(s => `
     <button class="service-card" data-id="${s.id}">
       <div class="service-name">${esc(s.name)}</div>
       <div class="service-meta">${s.duration_minutes} min · ${fmtMoney(s.price, s.currency)}</div>
@@ -216,7 +220,7 @@ function selectService(id) {
 function renderDateStrip() {
   const strip = $("dateStrip");
   const days = [];
-  for (let i=0;i<BOOKING_HORIZON_DAYS;i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
+  for (let i=MIN_LEAD_DAYS; i<MIN_LEAD_DAYS+VISIBLE_DAYS; i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
   strip.innerHTML = days.map(d => {
     const dt = new Date(d + "T12:00:00Z");
     const dow = dt.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
@@ -224,12 +228,22 @@ function renderDateStrip() {
     return `<div class="date-pill" data-date="${d}"><div class="dow">${dow}</div><div class="num">${num}</div></div>`;
   }).join("");
   strip.querySelectorAll(".date-pill").forEach(p => p.onclick = () => selectDate(p.dataset.date));
-  selectDate(days[0]);
+
+  let initialDate = days[0];
+  if (PRESET_SUGGEST_DAYS != null) {
+    const target = new Date(Date.now() + PRESET_SUGGEST_DAYS*86400000).toISOString().slice(0,10);
+    initialDate = days.reduce((best, d) => Math.abs(new Date(d) - new Date(target)) < Math.abs(new Date(best) - new Date(target)) ? d : best, days[0]);
+  }
+  selectDate(initialDate);
 }
 
 function selectDate(dateStr) {
   state.dateStr = dateStr;
-  document.querySelectorAll(".date-pill").forEach(p => p.classList.toggle("selected", p.dataset.date === dateStr));
+  document.querySelectorAll(".date-pill").forEach(p => {
+    const match = p.dataset.date === dateStr;
+    p.classList.toggle("selected", match);
+    if (match) p.scrollIntoView({ inline: "center", block: "nearest" });
+  });
   const slots = generateSlots(state.schedule, state.service, dateStr);
   const grid = $("slotGrid");
   if (!slots.length) {
