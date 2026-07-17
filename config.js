@@ -22,7 +22,7 @@ const CONFIG = {
   /* Your WAM! handle/number clients send payment to (personal WAM! account —
      no merchant API, so this just displays instructions; you confirm receipt
      yourself when completing the booking in admin-calendar.html). */
-  WAM_HANDLE: "PASTE_YOUR_WAM_HANDLE",
+  WAM_HANDLE: "@amiileroux",
 
   /* The Eleganza Effect — tune these to your market */
   VALUE_MATH: {
