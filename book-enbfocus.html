@@ -182,10 +182,22 @@ async function loadSchedule() {
   renderDateStrip();
 }
 
+function isDayPotentiallyOpen(dateStr) {
+  const dow = calendarDow(dateStr);
+  const blocks = state.schedule.blocks.filter(b => b.block_date === dateStr);
+  if (blocks.some(b => b.is_closed && !b.start_time)) return false; // whole day blocked
+  const hasRule = state.schedule.rules.some(r => r.day_of_week === dow && (r.category == null || r.category === state.service.category));
+  const hasExtraOpening = blocks.some(b => !b.is_closed && b.start_time && b.end_time);
+  return hasRule || hasExtraOpening;
+}
+
 function renderDateStrip() {
   const strip = $("dateStrip");
   const days = [];
-  for (let i=0;i<BOOKING_HORIZON_DAYS;i++) days.push(new Date(Date.now() + i*86400000).toISOString().slice(0,10));
+  for (let i=0;i<BOOKING_HORIZON_DAYS;i++) {
+    const d = new Date(Date.now() + i*86400000).toISOString().slice(0,10);
+    if (isDayPotentiallyOpen(d)) days.push(d);
+  }
   strip.innerHTML = days.map(d => {
     const dt = new Date(d + "T12:00:00Z");
     const dow = dt.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
@@ -193,6 +205,11 @@ function renderDateStrip() {
     return `<div class="date-pill" data-date="${d}"><div class="dow">${dow}</div><div class="num">${num}</div></div>`;
   }).join("");
   strip.querySelectorAll(".date-pill").forEach(p => p.onclick = () => selectDate(p.dataset.date));
+
+  if (!days.length) {
+    $("slotGrid").innerHTML = `<div class="empty-slots" style="grid-column:1/-1">No upcoming openings — please check back later.</div>`;
+    return;
+  }
   selectDate(days[0]);
 }
 
