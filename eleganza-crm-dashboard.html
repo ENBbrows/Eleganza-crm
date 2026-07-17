@@ -331,7 +331,8 @@ async function loadClients() {
     $("app").style.display = "block";
     renderBoard();
   } catch (e) {
-    $("loadingState").textContent = "Couldn't load — session may have expired. Please log out and back in.";
+    $("loadingState").innerHTML = "Couldn't load — session may have expired.<br><br>" +
+      '<button class="btn-primary" style="width:auto;display:inline-flex" onclick="logout()">Log out and try again</button>';
   }
 }
 
@@ -493,7 +494,8 @@ async function loadAllCalendar() {
     $("app").style.display = "block";
   } catch (e) {
     console.error(e);
-    $("loadingState").textContent = "Couldn't load — session may have expired. Please log out and back in.";
+    $("loadingState").innerHTML = "Couldn't load — session may have expired.<br><br>" +
+      '<button class="btn-primary" style="width:auto;display:inline-flex" onclick="logout()">Log out and try again</button>';
   }
 }
 
