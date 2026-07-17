@@ -796,7 +796,13 @@ const app = {
     // keeps the CRM in sync automatically the moment a client checks in.
     linkBookingAndReceipt(this.ctx);
 
-    // Aftercare email with review links (won't block check-in if it fails)
+    /* price + review reward — computed early so the receipt (email + WhatsApp) can use it */
+    const price = Number(this.ctx.price) || 0;
+    const discountNow = this.ctx.hadReward || this.ctx.reviewedNow;
+    const finalAmount = discountNow ? price * 0.95 : price;
+    const receiptDate = new Date().toLocaleDateString("en-US", { timeZone: "America/Port_of_Spain", month: "long", day: "numeric", year: "numeric" });
+
+    // Aftercare email with review links + payment receipt (won't block check-in if it fails)
     if (email) {
       try {
         await emailjs.send(CONFIG.EMAILJS_SERVICE, CONFIG.EMAILJS_TEMPLATE, {
@@ -806,7 +812,10 @@ const app = {
           email: email,
           service: this.ctx.service || "",
           google_review_url: CONFIG.GOOGLE_REVIEW_URL,
-          facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL
+          facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL,
+          receipt_date: receiptDate,
+          amount: price > 0 ? this.fmt(finalAmount) : "",
+          amount_before_discount: (price > 0 && discountNow) ? this.fmt(price) : ""
         });
       } catch (err) {
         console.error("EmailJS:", err);
@@ -819,7 +828,7 @@ const app = {
     this.setLink("btn-instagram", CONFIG.INSTAGRAM_URL);
     this.setLink("btn-fbpage", CONFIG.FACEBOOK_PAGE_URL);
 
-    /* WhatsApp the aftercare guide to the client's own number */
+    /* WhatsApp the aftercare guide + payment receipt to the client's own number */
     const wa = $("btn-whatsapp");
     const d = digits(this.ctx.phone || "");
     let intl = "";
@@ -829,7 +838,13 @@ const app = {
     else if (d.length >= 10) intl = d;
     if (intl) {
       const first = (name || "love").split(" ")[0];
-      const msg = "Hi " + first + "! \uD83E\uDD0D Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html\n\nWhat once was, is not all lost. \u2728";
+      let msg = "Hi " + first + "! \uD83E\uDD0D Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html";
+      if (price > 0) {
+        msg += "\n\n\uD83E\uDDFE Receipt — " + receiptDate + "\n" + (this.ctx.service || "Service") + ": " +
+          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (5% review reward applied)" : "") +
+          "\nEleganza Naturally Beautiful — thank you for your payment! \uD83E\uDD0D";
+      }
+      msg += "\n\nWhat once was, is not all lost. \u2728";
       wa.href = "https://wa.me/" + intl + "?text=" + encodeURIComponent(msg);
       wa.style.display = "flex";
     } else {
@@ -846,10 +861,8 @@ const app = {
     }
 
 
-    /* price + review reward */
-    const price = Number(this.ctx.price) || 0;
+    /* price box on screen (reuses price/discountNow computed above) */
     const box = $("price-box"), btnD = $("btn-discount"), done = $("discount-done");
-    const discountNow = this.ctx.hadReward || this.ctx.reviewedNow;
     if (price > 0) {
       box.style.display = "block";
       if (discountNow) {
