@@ -49,22 +49,23 @@
   .check-row{display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer}
   .check-row input[type=checkbox]{width:auto;margin-top:3px;flex-shrink:0;accent-color:var(--gold)}
   .check-row span{font-size:.88rem;color:var(--ivory-dim);line-height:1.5}
+  .hint{font-size:.8rem;color:var(--ivory-dim);margin-top:10px}
 </style>
 </head>
 <body>
 <main class="card">
   <div class="brand">Eleganza Naturally Beautiful</div>
-  <h1>Book Your <em style="font-style:italic;color:var(--gold-bright)">Appointment</em></h1>
-  <p class="sub">Pick a service, choose a time, and you're set.</p>
   <div class="steps"><span class="step-dot" data-step="1"></span><span class="step-dot" data-step="2"></span><span class="step-dot" data-step="3"></span><span class="step-dot" data-step="4"></span></div>
 
   <section class="screen active" id="screen-service">
+    <h1>Book Your <em style="font-style:italic;color:var(--gold-bright)">Appointment</em></h1>
+    <p class="sub">Step 1 of 4 — Tap a service below to get started.</p>
     <div id="serviceList"></div>
   </section>
 
   <section class="screen" id="screen-eligibility">
     <h1>Quick <em style="font-style:italic;color:var(--gold-bright)">Eligibility Check</em></h1>
-    <p class="sub">Before booking your microblading appointment, let's make sure the timing is right for you.</p>
+    <p class="sub">Step 1 of 4 — Before booking, check any that apply to you. If none apply, you can book right away.</p>
     <form id="eligibilityForm">
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I have problematic or sensitive skin (eczema, psoriasis, active acne, or very oily skin) in the eyebrow area</span></label>
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I have a serious health condition (e.g. diabetes, an autoimmune condition, a bleeding/clotting disorder, or keloid scarring)</span></label>
@@ -88,12 +89,16 @@
   </section>
 
   <section class="screen" id="screen-time">
+    <h1>Choose a <em style="font-style:italic;color:var(--gold-bright)">Date &amp; Time</em></h1>
+    <p class="sub">Step 2 of 4 — Tap a date below, then tap an available time.</p>
     <div class="date-strip" id="dateStrip"></div>
     <div class="slots" id="slotGrid"></div>
     <button class="linkline" type="button" id="backToService">← Choose a different service</button>
   </section>
 
   <section class="screen" id="screen-details">
+    <h1>Your <em style="font-style:italic;color:var(--gold-bright)">Details</em></h1>
+    <p class="sub">Step 3 of 4 — Just a few details to lock in your spot.</p>
     <div class="summary" id="detailsSummary"></div>
     <div class="summary" style="border-color:var(--line)">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Before You Come In</div>
@@ -117,6 +122,7 @@
       <input id="d-name" type="text" required />
       <label for="d-email">Email <span style="text-transform:none;letter-spacing:0;color:var(--ivory-dim)">(for reminders &amp; aftercare)</span></label>
       <input id="d-email" type="email" />
+      <p class="hint" id="bookHint" style="display:none">Please check the box above to unlock booking.</p>
       <button class="btn" id="btnBook" type="submit">Book This Slot</button>
     </form>
     <button class="linkline" type="button" id="backToTime">← Choose a different time</button>
@@ -129,10 +135,11 @@
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
     <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
-      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking</div>
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking — Choose One</div>
       <div id="paymentIntro"></div>
       <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:12px">I've Sent My Deposit via WAM!</button>
-      <button class="btn-ghost" type="button" id="btnPayCash" style="margin-top:10px">I'll Pay the Full Amount in Cash at Check-In</button>
+      <p class="hint" style="text-align:center;margin:6px 0">— or —</p>
+      <button class="btn-ghost" type="button" id="btnPayCash">I'll Pay the Full Amount in Cash at Check-In</button>
       <div id="paymentAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
     </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
@@ -371,12 +378,18 @@ function renderDetailsSummary() {
   $("microbladingInfoBox").style.display = isFirstApp ? "block" : "none";
   $("readAckRow").style.display = isFirstApp ? "flex" : "none";
   const btnBook = $("btnBook");
+  const hint = $("bookHint");
   if (isFirstApp) {
     $("readAck").checked = false;
     btnBook.disabled = true;
-    $("readAck").onchange = () => { btnBook.disabled = !$("readAck").checked; };
+    hint.style.display = "block";
+    $("readAck").onchange = () => {
+      btnBook.disabled = !$("readAck").checked;
+      hint.style.display = $("readAck").checked ? "none" : "block";
+    };
   } else {
     btnBook.disabled = false;
+    hint.style.display = "none";
   }
 }
 
@@ -482,9 +495,10 @@ function renderDone(result, name, phone) {
     const deposit = Math.min(500, price);
     const remainder = price - deposit;
     $("btnPayWam").textContent = `I've Sent My ${fmtMoney(deposit, state.service.currency)} Deposit via WAM!`;
-    $("paymentIntro").innerHTML = remainder > 0
-      ? `Send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit via WAM! to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking. The remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
-      : `Send <strong>${fmtMoney(deposit, state.service.currency)}</strong> via WAM! to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking.`;
+    $("paymentIntro").innerHTML = (remainder > 0
+      ? `Open the WAM! app and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking. The remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
+      : `Open the WAM! app and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking.`)
+      + ` Once you've sent it, tap the button below.`;
     $("wamPanel").style.display = "block";
   }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
