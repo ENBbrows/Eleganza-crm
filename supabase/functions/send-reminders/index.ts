@@ -114,7 +114,7 @@ function dayBeforeCopy(b: Booking) {
     subject: `Your appointment — ${fmtDate(b.start_at)}`,
     body:
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
-      `Confirm or reschedule here:\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
+      `Please confirm, reschedule, or cancel here (you can let us know your reason if you cancel):\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
 }
 
@@ -132,7 +132,7 @@ function hourBeforeCopy(b: Booking) {
     : "";
   return {
     subject: `See you soon, ${name}!`,
-    body: `Hi ${name}, this is your 1-hour reminder — see you at ${time}!${waLine}`,
+    body: `Hi ${name}, this is your 1-hour reminder — see you at ${time}!\n\nReminder: a $200 late fee applies after 15 minutes, and after 30 minutes you'll need to reschedule.${waLine}`,
   };
 }
 

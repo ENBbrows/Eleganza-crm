@@ -89,10 +89,15 @@ function render() {
     <div class="actions">
       <button class="btn" id="btnConfirm">Confirm this time</button>
       <button class="btn-ghost" id="btnReschedule">Pick a different time</button>
+      <button class="btn-ghost" id="btnCancel" style="color:var(--error);border-color:var(--error)">Cancel this appointment</button>
     </div>
     <div id="rescheduleBox" class="hidden">
       <input type="datetime-local" id="newTime" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:14px" />
       <button class="btn" id="btnSubmitReschedule" style="width:100%;margin-top:10px">Save new time</button>
+    </div>
+    <div id="cancelBox" class="hidden">
+      <textarea id="cancelReason" rows="3" placeholder="Let us know why (optional) — helps us serve you better" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:14px;font-family:inherit;resize:vertical"></textarea>
+      <button class="btn" id="btnSubmitCancel" style="width:100%;margin-top:10px;background:var(--error)">Confirm Cancellation</button>
     </div>
     ` : `<p class="msg ok" style="margin-top:20px">This appointment is ${esc(statusLabel).toLowerCase()} — no action needed.</p>`}
     <div class="msg" id="msg"></div>
@@ -101,6 +106,8 @@ function render() {
     $("btnConfirm").onclick = onConfirm;
     $("btnReschedule").onclick = () => $("rescheduleBox").classList.remove("hidden");
     $("btnSubmitReschedule").onclick = onReschedule;
+    $("btnCancel").onclick = () => $("cancelBox").classList.remove("hidden");
+    $("btnSubmitCancel").onclick = onCancel;
   }
 }
 
@@ -142,6 +149,25 @@ async function onReschedule() {
     $("msg").className = "msg error";
     btn.disabled = false;
     btn.textContent = "Save new time";
+  }
+}
+
+async function onCancel() {
+  const reason = $("cancelReason").value.trim();
+  const btn = $("btnSubmitCancel");
+  btn.disabled = true;
+  btn.textContent = "Cancelling…";
+  try {
+    await rpc("cancel_booking", { p_token: token, p_reason: reason || null });
+    booking.status = "cancelled";
+    render();
+    $("msg").textContent = "Your appointment has been cancelled.";
+    $("msg").className = "msg ok";
+  } catch (e) {
+    $("msg").textContent = "Something went wrong — please try again.";
+    $("msg").className = "msg error";
+    btn.disabled = false;
+    btn.textContent = "Confirm Cancellation";
   }
 }
 

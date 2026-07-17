@@ -46,6 +46,9 @@
   .summary strong{color:var(--ivory);font-weight:500}
   .done-icon{text-align:center;font-size:2.4rem;margin-top:10px}
   .review-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border:1px solid var(--gold);border-radius:2px;color:var(--ivory);text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;margin-top:12px}
+  .check-row{display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer}
+  .check-row input[type=checkbox]{width:auto;margin-top:3px;flex-shrink:0;accent-color:var(--gold)}
+  .check-row span{font-size:.88rem;color:var(--ivory-dim);line-height:1.5}
 </style>
 </head>
 <body>
@@ -57,6 +60,31 @@
 
   <section class="screen active" id="screen-service">
     <div id="serviceList"></div>
+  </section>
+
+  <section class="screen" id="screen-eligibility">
+    <h1>Quick <em style="font-style:italic;color:var(--gold-bright)">Eligibility Check</em></h1>
+    <p class="sub">Before booking your microblading appointment, let's make sure the timing is right for you.</p>
+    <form id="eligibilityForm">
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I have problematic or sensitive skin (eczema, psoriasis, active acne, or very oily skin) in the eyebrow area</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I have a serious health condition (e.g. diabetes, an autoimmune condition, a bleeding/clotting disorder, or keloid scarring)</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I am currently taking medication, especially blood thinners</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I have existing old permanent makeup on my eyebrows</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had botox or fillers in the last 30 days</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had a chemical peel or fruit/milk acid treatment in the last 30 days</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had laser treatments in the last 30 days</span></label>
+      <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had significant sun exposure or tanning on my face in the last 30 days</span></label>
+      <button class="btn" type="submit" id="btnEligContinue">Continue</button>
+    </form>
+    <div id="eligResult" style="display:none">
+      <div class="summary" style="border-color:var(--gold)">
+        <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Consultation Recommended</div>
+        <div>Based on your answers, we recommend a consultation first so we can assess in person — this keeps you safe and ensures the best results.</div>
+      </div>
+      <button class="btn" type="button" id="btnBookVideoConsult">Book a Video Consultation</button>
+      <button class="btn-ghost" type="button" id="btnBookInStudioConsult">Book an In-Studio Consultation</button>
+    </div>
+    <button class="linkline" type="button" id="backFromEligibility">← Choose a different service</button>
   </section>
 
   <section class="screen" id="screen-time">
@@ -72,6 +100,16 @@
       <div>Please avoid, the day of your appointment: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments.</div>
       <div style="margin-top:10px">15-minute grace period for confirmed appointments. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.</div>
     </div>
+    <div class="summary" id="microbladingInfoBox" style="display:none;border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">About Your Microblading Treatment</div>
+      <div>This is a semi-permanent manual technique — pigment is placed in the surface layer of the skin in fine, hair-like strokes matched to your natural color. Color is noticeably darker for the first 5-7 days, then fades 40-50% as it settles. Full healing takes about 28 days, and a follow-up touch-up afterward is a normal, expected part of the process. Results typically last 10-12 months (as little as 6 months on oilier skin).</div>
+      <div style="margin-top:10px"><strong>In the 30 days before your appointment, avoid:</strong> botox/fillers, chemical peels or fruit/milk acid treatments, laser treatments, and strong sun exposure or tanning.</div>
+      <div style="margin-top:10px"><strong>Studio location:</strong> 4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo &amp; Associates office.</div>
+    </div>
+    <label class="check-row" id="readAckRow" style="display:none">
+      <input type="checkbox" id="readAck">
+      <span>I have read and understand the above, including the pre-treatment requirements and studio location.</span>
+    </label>
     <form id="detailsForm">
       <label for="d-phone">Phone number</label>
       <input id="d-phone" type="tel" inputmode="tel" placeholder="e.g. 868-555-1234" required />
@@ -224,9 +262,42 @@ function renderServices() {
 
 function selectService(id) {
   state.service = state.schedule.services.find(s => s.id === id);
+  if (state.service.category === "first_application") {
+    document.querySelectorAll(".elig-check").forEach(c => c.checked = false);
+    $("eligibilityForm").style.display = "block";
+    $("eligResult").style.display = "none";
+    showScreen("screen-eligibility", 1);
+  } else {
+    renderDateStrip();
+    showScreen("screen-time", 2);
+  }
+}
+
+function proceedToTime(service) {
+  state.service = service;
   renderDateStrip();
   showScreen("screen-time", 2);
 }
+
+$("eligibilityForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const anyChecked = Array.from(document.querySelectorAll(".elig-check")).some(c => c.checked);
+  if (anyChecked) {
+    $("eligibilityForm").style.display = "none";
+    $("eligResult").style.display = "block";
+  } else {
+    proceedToTime(state.service);
+  }
+});
+$("btnBookVideoConsult").onclick = () => {
+  const s = state.schedule.services.find(s => s.name === "Video Consultation");
+  if (s) proceedToTime(s);
+};
+$("btnBookInStudioConsult").onclick = () => {
+  const s = state.schedule.services.find(s => s.name === "In-Studio Consultation");
+  if (s) proceedToTime(s);
+};
+$("backFromEligibility").onclick = () => showScreen("screen-service", 1);
 
 function isDayPotentiallyOpen(dateStr) {
   const dow = calendarDow(dateStr);
@@ -291,6 +362,18 @@ function selectSlot(iso) {
 function renderDetailsSummary() {
   const when = state.slot.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"America/Port_of_Spain" });
   $("detailsSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div><div>Price <strong>${fmtMoney(state.service.price, state.service.currency)}</strong></div>`;
+
+  const isFirstApp = state.service.category === "first_application";
+  $("microbladingInfoBox").style.display = isFirstApp ? "block" : "none";
+  $("readAckRow").style.display = isFirstApp ? "flex" : "none";
+  const btnBook = $("btnBook");
+  if (isFirstApp) {
+    $("readAck").checked = false;
+    btnBook.disabled = true;
+    $("readAck").onchange = () => { btnBook.disabled = !$("readAck").checked; };
+  } else {
+    btnBook.disabled = false;
+  }
 }
 
 async function findOrCreateClient(name, phone, email) {
