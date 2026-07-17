@@ -716,8 +716,8 @@ $("newBookingBtn").onclick = async () => {
     <select class="input-full" id="f_bservice" style="padding:9px 10px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:3px">
       ${services.map(s => `<option value="${s.id}">${esc(s.name)} (${s.duration_minutes}min)</option>`).join("")}
     </select>
-    <label class="section-label">Date</label><input type="date" class="input-full" id="f_bdate">
-    <label class="section-label">Time</label><input type="time" class="input-full" id="f_btime">
+    <label class="section-label">Date</label><input type="date" class="input-full" id="f_bdate" value="${new Date().toISOString().slice(0,10)}">
+    <label class="section-label">Time</label><input type="time" class="input-full" id="f_btime" value="09:00">
     <button class="btn-primary" id="submitNewBooking" style="width:100%">Create Booking</button>
     <div class="login-msg" id="newBookingErr"></div>
   `;
@@ -725,7 +725,11 @@ $("newBookingBtn").onclick = async () => {
   $("submitNewBooking").onclick = async () => {
     const name = $("f_bname").value.trim();
     const date = $("f_bdate").value, time = $("f_btime").value;
-    if (!name || !date || !time) { $("newBookingErr").textContent = "Name, date, and time are required."; return; }
+    if (!name || !date || !time) {
+      const missing = [!name && "name", !date && "date", !time && "time"].filter(Boolean).join(", ");
+      $("newBookingErr").textContent = `Please fill in: ${missing}.`;
+      return;
+    }
     try {
       await rpc("create_booking", {
         p_business: biz, p_service_id: $("f_bservice").value,
