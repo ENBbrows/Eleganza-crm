@@ -21,7 +21,7 @@ const CONFIG = {
 
   /* Your WAM! handle/number clients send payment to (personal WAM! account —
      no merchant API, so this just displays instructions; you confirm receipt
-     yourself when completing the booking in admin-calendar.html). */
+     yourself when completing the booking in the CRM's Calendar tab). */
   WAM_HANDLE: "@amiileroux",
 
   /* The Eleganza Effect — tune these to your market */

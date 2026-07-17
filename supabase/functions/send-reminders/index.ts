@@ -22,7 +22,8 @@
 // Until the WhatsApp Cloud API + templates are approved, leave
 // WHATSAPP_TOKEN unset — the function will skip WhatsApp sends
 // and just log what *would* have gone out, so nothing crashes.
-// Manual sending in the meantime happens from admin-calendar.html.
+// Manual sending in the meantime happens from the CRM's Calendar tab
+// (eleganza-crm-dashboard.html?view=calendar).
 // ============================================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
