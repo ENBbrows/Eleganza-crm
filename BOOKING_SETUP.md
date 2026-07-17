@@ -85,6 +85,7 @@ supabase secrets set RESEND_FROM_ELEGANZA="Eleganza <hello@enbfocus.com>"
 supabase secrets set RESEND_FROM_ENBFOCUS="ENBfocus <hello@enbfocus.com>"
 supabase secrets set BUSINESS_WHATSAPP_NUMBER=18684733030
 supabase secrets set SITE_URL=https://enbbrows.github.io/Eleganza-crm
+supabase secrets set WAM_HANDLE=@amiileroux
 
 # Add these once WhatsApp templates are approved:
 supabase secrets set WHATSAPP_TOKEN=xxx
@@ -92,6 +93,7 @@ supabase secrets set WHATSAPP_PHONE_NUMBER_ID=xxx
 supabase secrets set WHATSAPP_TEMPLATE_DAY_BEFORE=appointment_day_before
 supabase secrets set WHATSAPP_TEMPLATE_HOUR_BEFORE=appointment_hour_before
 supabase secrets set WHATSAPP_TEMPLATE_FOLLOWUP=book_your_followup
+supabase secrets set WHATSAPP_TEMPLATE_TWO_WEEK=pay_and_confirm_followup
 ```
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided automatically to

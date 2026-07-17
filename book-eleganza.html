@@ -129,8 +129,11 @@
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
     <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
-      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Payment</div>
-      <div>Send <strong id="wamAmount"></strong> via WAM! to <strong id="wamHandle"></strong> to confirm your booking.</div>
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking</div>
+      <div id="paymentIntro"></div>
+      <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:12px">I've Sent My Deposit via WAM!</button>
+      <button class="btn-ghost" type="button" id="btnPayCash" style="margin-top:10px">I'll Pay the Full Amount in Cash at Check-In</button>
+      <div id="paymentAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
     </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
@@ -341,7 +344,8 @@ function selectDate(dateStr) {
   document.querySelectorAll(".date-pill").forEach(p => {
     const match = p.dataset.date === dateStr;
     p.classList.toggle("selected", match);
-    if (match) p.scrollIntoView({ inline: "center", block: "nearest" });
+    // rAF so the browser finishes laying out a freshly-rendered strip before we scroll it
+    if (match) requestAnimationFrame(() => p.scrollIntoView({ inline: "center", block: "nearest" }));
   });
   const slots = generateSlots(state.schedule, state.service, dateStr);
   const grid = $("slotGrid");
@@ -469,9 +473,18 @@ function renderDone(result, name, phone) {
     ? "We'll send a confirmation message the day before — just tap to confirm or pick a new time."
     : "We'll remind you the day before and an hour before your appointment.";
   $("doneSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>`;
+  state.confirmToken = result.confirm_token;
+  $("paymentAck").style.display = "none";
+  $("btnPayWam").disabled = false; $("btnPayWam").textContent = "I've Sent My Deposit via WAM!";
+  $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
   if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
-    $("wamAmount").textContent = fmtMoney(state.service.price, state.service.currency);
-    $("wamHandle").textContent = CONFIG.WAM_HANDLE;
+    const price = state.service.price;
+    const deposit = Math.min(500, price);
+    const remainder = price - deposit;
+    $("btnPayWam").textContent = `I've Sent My ${fmtMoney(deposit, state.service.currency)} Deposit via WAM!`;
+    $("paymentIntro").innerHTML = remainder > 0
+      ? `Send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit via WAM! to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking. The remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
+      : `Send <strong>${fmtMoney(deposit, state.service.currency)}</strong> via WAM! to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking.`;
     $("wamPanel").style.display = "block";
   }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
@@ -482,6 +495,20 @@ function renderDone(result, name, phone) {
   }
   showScreen("screen-done", 4);
 }
+
+async function setPaymentMethod(method, ackText) {
+  $("btnPayWam").disabled = true;
+  $("btnPayCash").disabled = true;
+  try {
+    await rpc("set_payment_method", { p_token: state.confirmToken, p_method: method });
+  } catch (e) {
+    console.warn("set_payment_method failed:", e);
+  }
+  $("paymentAck").textContent = ackText;
+  $("paymentAck").style.display = "block";
+}
+$("btnPayWam").onclick = () => setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
+$("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
 
 loadSchedule();
 </script>

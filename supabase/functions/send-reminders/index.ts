@@ -39,7 +39,9 @@ const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
 const WHATSAPP_TEMPLATE_DAY_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_DAY_BEFORE") || "appointment_day_before";
 const WHATSAPP_TEMPLATE_HOUR_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_HOUR_BEFORE") || "appointment_hour_before";
 const WHATSAPP_TEMPLATE_FOLLOWUP = Deno.env.get("WHATSAPP_TEMPLATE_FOLLOWUP") || "book_your_followup";
+const WHATSAPP_TEMPLATE_TWO_WEEK = Deno.env.get("WHATSAPP_TEMPLATE_TWO_WEEK") || "pay_and_confirm_followup";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
+const WAM_HANDLE = Deno.env.get("WAM_HANDLE") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
 const TZ = "America/Port_of_Spain";
 
@@ -89,8 +91,31 @@ type Booking = {
   end_at: string;
   status: string;
   confirm_token: string;
-  services: { name: string } | null;
+  services: { name: string; price: number | null; currency: string | null } | null;
 };
+
+function fmtMoney(n: number | null, currency: string | null) {
+  if (!n) return "";
+  return `${currency || "TTD"}$${n.toLocaleString()}`;
+}
+
+function twoWeekCopy(b: Booking) {
+  const name = firstName(b.client_name);
+  const when = `${fmtDate(b.start_at)} at ${fmtTime(b.start_at)}`;
+  const link = `${SITE_URL}/confirm.html?token=${b.confirm_token}`;
+  const price = b.services?.price ?? null;
+  const currency = b.services?.currency ?? null;
+  const deposit = price ? Math.min(500, price) : null;
+  const instruction = deposit && WAM_HANDLE
+    ? `Please send a ${fmtMoney(deposit, currency)} deposit via WAM! to ${WAM_HANDLE} to secure it (balance due in cash at check-in), and confirm here:`
+    : "Please confirm here:";
+  return {
+    subject: "Time to confirm your follow-up",
+    body:
+      `Hi ${name},\n\nYour follow-up appointment is coming up in 2 weeks: ${when}. ${instruction}\n${link}\n\n` +
+      `You can also reschedule or cancel from that same link.\n\nSee you soon,\nEleganza`,
+  };
+}
 
 function dayBeforeCopy(b: Booking) {
   const name = firstName(b.client_name);
@@ -216,6 +241,20 @@ async function fetchFollowupDue() {
   return (await res.json()) as Receipt[];
 }
 
+// Skip the "time to book your follow-up" nudge if they already have one
+// pending (e.g. booked tentatively via the button right at checkout) —
+// that booking's own 2-week reminder covers it instead.
+async function hasUpcomingTouchUp(clientId: number) {
+  const now = new Date().toISOString();
+  const res = await rest(
+    `/rest/v1/bookings?client_id=eq.${clientId}&business=eq.eleganza&status=in.(tentative,confirmed)` +
+      `&start_at=gt.${now}&select=id,services!inner(category)&services.category=eq.touch_up&limit=1`
+  );
+  if (!res.ok) return false;
+  const rows = await res.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
 async function markFollowupSent(id: string) {
   await rest(`/rest/v1/receipts?id=eq.${id}`, {
     method: "PATCH",
@@ -240,13 +279,15 @@ async function fetchClientsByIds(ids: number[]) {
   return map;
 }
 
-async function fetchDue(field: "day_before_sent_at" | "hour_before_sent_at", fromMin: number, toMin: number) {
+type SentField = "day_before_sent_at" | "hour_before_sent_at" | "two_week_sent_at";
+
+async function fetchDue(field: SentField, fromMin: number, toMin: number, statuses: string[] = ["tentative", "confirmed"]) {
   const now = Date.now();
   const from = new Date(now + fromMin * 60000).toISOString();
   const to = new Date(now + toMin * 60000).toISOString();
   const res = await rest(
-    `/rest/v1/bookings?select=id,business,client_name,client_phone,client_email,start_at,end_at,status,confirm_token,services(name)` +
-      `&status=in.(tentative,confirmed)&${field}=is.null&start_at=gte.${from}&start_at=lte.${to}`
+    `/rest/v1/bookings?select=id,business,client_name,client_phone,client_email,start_at,end_at,status,confirm_token,services(name,price,currency)` +
+      `&status=in.(${statuses.join(",")})&${field}=is.null&start_at=gte.${from}&start_at=lte.${to}`
   );
   if (!res.ok) {
     console.error(`fetchDue(${field}) failed:`, await res.text());
@@ -255,7 +296,7 @@ async function fetchDue(field: "day_before_sent_at" | "hour_before_sent_at", fro
   return (await res.json()) as Booking[];
 }
 
-async function markSent(id: string, field: "day_before_sent_at" | "hour_before_sent_at") {
+async function markSent(id: string, field: SentField) {
   await rest(`/rest/v1/bookings?id=eq.${id}`, {
     method: "PATCH",
     headers: { Prefer: "return=minimal" },
@@ -264,7 +305,7 @@ async function markSent(id: string, field: "day_before_sent_at" | "hour_before_s
 }
 
 Deno.serve(async () => {
-  const results: Record<string, number> = { day_before: 0, hour_before: 0, followup: 0 };
+  const results: Record<string, number> = { day_before: 0, hour_before: 0, followup: 0, two_week: 0 };
 
   // Day-before window: 23h–25h out, so a job running every 15 min never double-fires
   const dayBefore = await fetchDue("day_before_sent_at", 23 * 60, 25 * 60);
@@ -298,18 +339,39 @@ Deno.serve(async () => {
     results.hour_before++;
   }
 
-  // Follow-up booking reminder: ~3 weeks after a 1st-application visit
+  // Follow-up booking reminder: ~3 weeks after a 1st-application visit,
+  // unless they already have a follow-up pending (booked via the checkout button)
   const followupDue = await fetchFollowupDue();
   const clientIds = [...new Set(followupDue.map((r) => r.client_id).filter((x): x is number => x != null))];
   const clientMap = await fetchClientsByIds(clientIds);
   for (const r of followupDue) {
-    const client = r.client_id != null ? clientMap[r.client_id] : undefined;
-    const name = firstName(r.client_name || "");
-    const copy = followupCopy(name);
-    if (client?.email) await sendEmail(client.email, copy.subject, copy.body, r.business);
-    if (client?.phone) await sendWhatsApp(client.phone, WHATSAPP_TEMPLATE_FOLLOWUP, [name]);
+    const alreadyBooked = r.client_id != null && (await hasUpcomingTouchUp(r.client_id));
+    if (!alreadyBooked) {
+      const client = r.client_id != null ? clientMap[r.client_id] : undefined;
+      const name = firstName(r.client_name || "");
+      const copy = followupCopy(name);
+      if (client?.email) await sendEmail(client.email, copy.subject, copy.body, r.business);
+      if (client?.phone) await sendWhatsApp(client.phone, WHATSAPP_TEMPLATE_FOLLOWUP, [name]);
+      results.followup++;
+    }
     await markFollowupSent(r.id);
-    results.followup++;
+  }
+
+  // 2-week pay-and-confirm reminder for tentative bookings (e.g. a follow-up
+  // booked at checkout for ~5 weeks out — this lands with 2 weeks' notice)
+  const twoWeekDue = await fetchDue("two_week_sent_at", 13.5 * 24 * 60, 14.5 * 24 * 60, ["tentative"]);
+  for (const b of twoWeekDue) {
+    const copy = twoWeekCopy(b);
+    if (b.client_email) await sendEmail(b.client_email, copy.subject, copy.body, b.business);
+    if (b.client_phone) {
+      await sendWhatsApp(b.client_phone, WHATSAPP_TEMPLATE_TWO_WEEK, [
+        firstName(b.client_name),
+        fmtDate(b.start_at),
+        fmtTime(b.start_at),
+      ]);
+    }
+    await markSent(b.id, "two_week_sent_at");
+    results.two_week++;
   }
 
   return new Response(JSON.stringify({ ok: true, sent: results }), {

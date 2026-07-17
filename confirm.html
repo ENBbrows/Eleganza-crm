@@ -82,6 +82,7 @@ function render() {
     <p class="sub">Here's your appointment. Confirm it, or pick a new time if this no longer works.</p>
     <div class="detail">
       <div>Service <strong>${esc(booking.service_name)}</strong></div>
+      ${booking.price ? `<div>Price <strong>${esc(booking.currency || "TTD")}$${Number(booking.price).toLocaleString()}</strong></div>` : ""}
       <div>When <strong>${fmt(booking.start_at)}</strong></div>
       <div>Status <strong>${esc(statusLabel)}</strong></div>
     </div>
