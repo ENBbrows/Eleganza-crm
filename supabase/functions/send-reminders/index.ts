@@ -38,6 +38,7 @@ const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN");
 const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
 const WHATSAPP_TEMPLATE_DAY_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_DAY_BEFORE") || "appointment_day_before";
 const WHATSAPP_TEMPLATE_HOUR_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_HOUR_BEFORE") || "appointment_hour_before";
+const WHATSAPP_TEMPLATE_FOLLOWUP = Deno.env.get("WHATSAPP_TEMPLATE_FOLLOWUP") || "book_your_followup";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
 const TZ = "America/Port_of_Spain";
@@ -184,6 +185,61 @@ async function sendWhatsApp(phone: string, templateName: string, params: string[
   return { ok: res.ok };
 }
 
+type Receipt = {
+  id: string;
+  business: "eleganza" | "enbfocus";
+  client_id: number | null;
+  client_name: string | null;
+  created_at: string;
+};
+
+function followupCopy(name: string) {
+  const link = `${SITE_URL}/book-eleganza.html?category=touch_up`;
+  return {
+    subject: "Time to book your follow-up",
+    body:
+      `Hi ${name},\n\nIt's been a few weeks since your visit — time to lock in your follow-up appointment.\n\n` +
+      `Book here:\n${link}\n\nSee you soon,\nEleganza`,
+  };
+}
+
+async function fetchFollowupDue() {
+  const cutoff = new Date(Date.now() - 21 * 86400000).toISOString();
+  const res = await rest(
+    `/rest/v1/receipts?select=id,business,client_id,client_name,created_at` +
+      `&needs_followup_reminder=eq.true&followup_reminder_sent_at=is.null&created_at=lte.${cutoff}`
+  );
+  if (!res.ok) {
+    console.error("fetchFollowupDue failed:", await res.text());
+    return [];
+  }
+  return (await res.json()) as Receipt[];
+}
+
+async function markFollowupSent(id: string) {
+  await rest(`/rest/v1/receipts?id=eq.${id}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ followup_reminder_sent_at: new Date().toISOString() }),
+  });
+}
+
+// receipts.client_id has no FK (Clients table wasn't guaranteed to have a
+// matching PK type when this was built), so look phone/email up separately
+// rather than relying on PostgREST embedding.
+async function fetchClientsByIds(ids: number[]) {
+  const map: Record<number, { phone: string | null; email: string | null }> = {};
+  if (!ids.length) return map;
+  const res = await rest(`/rest/v1/Clients?select=id,phone,email&id=in.(${ids.join(",")})`);
+  if (!res.ok) {
+    console.error("fetchClientsByIds failed:", await res.text());
+    return map;
+  }
+  const rows = (await res.json()) as { id: number; phone: string | null; email: string | null }[];
+  for (const r of rows) map[r.id] = { phone: r.phone, email: r.email };
+  return map;
+}
+
 async function fetchDue(field: "day_before_sent_at" | "hour_before_sent_at", fromMin: number, toMin: number) {
   const now = Date.now();
   const from = new Date(now + fromMin * 60000).toISOString();
@@ -208,7 +264,7 @@ async function markSent(id: string, field: "day_before_sent_at" | "hour_before_s
 }
 
 Deno.serve(async () => {
-  const results: Record<string, number> = { day_before: 0, hour_before: 0 };
+  const results: Record<string, number> = { day_before: 0, hour_before: 0, followup: 0 };
 
   // Day-before window: 23h–25h out, so a job running every 15 min never double-fires
   const dayBefore = await fetchDue("day_before_sent_at", 23 * 60, 25 * 60);
@@ -240,6 +296,20 @@ Deno.serve(async () => {
     }
     await markSent(b.id, "hour_before_sent_at");
     results.hour_before++;
+  }
+
+  // Follow-up booking reminder: ~3 weeks after a 1st-application visit
+  const followupDue = await fetchFollowupDue();
+  const clientIds = [...new Set(followupDue.map((r) => r.client_id).filter((x): x is number => x != null))];
+  const clientMap = await fetchClientsByIds(clientIds);
+  for (const r of followupDue) {
+    const client = r.client_id != null ? clientMap[r.client_id] : undefined;
+    const name = firstName(r.client_name || "");
+    const copy = followupCopy(name);
+    if (client?.email) await sendEmail(client.email, copy.subject, copy.body, r.business);
+    if (client?.phone) await sendWhatsApp(client.phone, WHATSAPP_TEMPLATE_FOLLOWUP, [name]);
+    await markFollowupSent(r.id);
+    results.followup++;
   }
 
   return new Response(JSON.stringify({ ok: true, sent: results }), {

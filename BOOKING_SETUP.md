@@ -91,6 +91,7 @@ supabase secrets set WHATSAPP_TOKEN=xxx
 supabase secrets set WHATSAPP_PHONE_NUMBER_ID=xxx
 supabase secrets set WHATSAPP_TEMPLATE_DAY_BEFORE=appointment_day_before
 supabase secrets set WHATSAPP_TEMPLATE_HOUR_BEFORE=appointment_hour_before
+supabase secrets set WHATSAPP_TEMPLATE_FOLLOWUP=book_your_followup
 ```
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided automatically to

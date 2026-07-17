@@ -95,7 +95,14 @@
       <div>Send <strong id="wamAmount"></strong> via WAM! to <strong id="wamHandle"></strong> to confirm your booking.</div>
     </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
+    <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
     <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Appointment</button>
+  </section>
+
+  <section class="screen" id="screen-closed">
+    <div class="done-icon">🤍</div>
+    <h1>All Set</h1>
+    <p class="sub">See you soon — take care of those brows in the meantime.</p>
   </section>
 </main>
 
@@ -309,6 +316,30 @@ async function findOrCreateClient(name, phone, email) {
     return null;
   }
 }
+
+/* Returning clients shouldn't have to retype their details — look them up
+   as soon as they finish entering their phone number. */
+let lastLookedUpPhone = null;
+async function prefillFromPhone() {
+  const phone = $("d-phone").value.trim();
+  if (last7(phone).length < 7 || phone === lastLookedUpPhone) return;
+  lastLookedUpPhone = phone;
+  try {
+    const res = await fetch(`${CLIENTS_REST}?select=${C.name},${C.phone},${C.email}&limit=1000`, { headers: CLIENTS_HEADERS });
+    const rows = await res.json();
+    const key = last7(phone);
+    const match = rows.find(r => last7(r[C.phone]) === key);
+    if (match) {
+      if (!$("d-name").value.trim() && match[C.name]) $("d-name").value = match[C.name];
+      if (!$("d-email").value.trim() && match[C.email]) $("d-email").value = match[C.email];
+    }
+  } catch (e) {
+    console.warn("Prefill lookup skipped:", e);
+  }
+}
+$("d-phone").addEventListener("blur", prefillFromPhone);
+
+$("btnAllDone").onclick = () => showScreen("screen-closed", 4);
 
 $("backToService").onclick = () => showScreen("screen-service", 1);
 $("backToTime").onclick = () => showScreen("screen-time", 2);
