@@ -19,6 +19,11 @@ const CONFIG = {
      before their appointment and after booking. e.g. "18685551234" */
   BUSINESS_WHATSAPP_NUMBER: "18684733030",
 
+  /* Your WAM! handle/number clients send payment to (personal WAM! account —
+     no merchant API, so this just displays instructions; you confirm receipt
+     yourself when completing the booking in admin-calendar.html). */
+  WAM_HANDLE: "PASTE_YOUR_WAM_HANDLE",
+
   /* The Eleganza Effect — tune these to your market */
   VALUE_MATH: {
     pencilCost: 120,      /* TT$ per brow pencil/kit */

@@ -90,6 +90,10 @@
     <h1 id="doneTitle">You're booked</h1>
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
+    <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Payment</div>
+      <div>Send <strong id="wamAmount"></strong> via WAM! to <strong id="wamHandle"></strong> to confirm your booking.</div>
+    </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Appointment</button>
   </section>
@@ -334,6 +338,11 @@ function renderDone(result, name, phone) {
     ? "We'll send a confirmation message the day before — just tap to confirm or pick a new time."
     : "We'll remind you the day before and an hour before your appointment.";
   $("doneSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>`;
+  if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
+    $("wamAmount").textContent = fmtMoney(state.service.price, state.service.currency);
+    $("wamHandle").textContent = CONFIG.WAM_HANDLE;
+    $("wamPanel").style.display = "block";
+  }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
     const wa = $("waButton");
     const msg = `Hi! I just booked ${state.service.name} for ${when}. — ${name}`;
