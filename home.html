@@ -121,6 +121,10 @@
   .testi-quote{font-family:'Fraunces',serif;font-style:italic;color:var(--ivory);font-size:1rem;line-height:1.6}
   .testi-attrib{color:var(--gold);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 
+  /* portfolio gallery */
+  .portfolio-gallery{max-width:420px;margin:0 auto 22px;display:flex;flex-direction:column;gap:14px}
+  .portfolio-gallery img{width:100%;display:block;border-radius:14px 4px 14px 4px;border:1px solid var(--line)}
+
   /* location / policy */
   .info-box{border:1px solid var(--line);border-radius:14px 4px 14px 4px;padding:20px;margin-bottom:14px}
   .info-box .k{color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.7rem;margin-bottom:8px}
@@ -365,6 +369,18 @@
         <p class="testi-quote">"Great service with gorgeous results! Amii explains the process, makes recommendations, and guides you through it. My brows and I are happy."</p>
         <p class="testi-attrib">— Candii A.</p>
       </div>
+      <div class="testi-card">
+        <p class="testi-quote">"After months of research and contemplation, I finally found someone locally who was worthy of microblading my brows and Amii did such a fantastic job! From start to finish she was very patient and precise with each step of the process. I'm so very pleased with my healed brows! I wake up to beautifully shaped brows each day and my daily makeup routine is now a breeze thanks to Amii."</p>
+        <p class="testi-attrib">— Karina P.</p>
+      </div>
+      <div class="testi-card">
+        <p class="testi-quote">"Amii is experienced and knowledgeable in what she does. She provides a very safe, clean and relaxing atmosphere. I love my brows!"</p>
+        <p class="testi-attrib">— Rupa M.</p>
+      </div>
+      <div class="testi-card">
+        <p class="testi-quote">"Amii is excellent at what she does. She explains the procedure before the magic actually begins, ensuring that you are comfortable and well informed at all times. With her, your preferences, opinions, and questions are taken into account, ensuring the best outcome suited for you. I have no regrets."</p>
+        <p class="testi-attrib">— Marjorie C.</p>
+      </div>
     </div>
     <p class="hero-sub" style="margin-top:22px">Read more verified reviews on <a href="#" id="testiGoogle" style="color:var(--gold)" target="_blank" rel="noopener">Google</a> or <a href="#" id="testiFacebook" style="color:var(--gold)" target="_blank" rel="noopener">Facebook</a>.</p>
   </section>
@@ -395,7 +411,10 @@
   <section id="work">
     <p class="section-label">Real Results</p>
     <h2>See the Work</h2>
-    <video class="work-video" src="clip-studio.mp4" muted loop playsinline controls preload="metadata" style="width:100%;max-width:420px;display:block;margin:0 auto 22px;border-radius:14px 4px 14px 4px;border:1px solid var(--line)"></video>
+    <div class="portfolio-gallery">
+      <img src="portfolio/3d-brows-before-after.jpg" alt="3D brows before and after — Fibonacci-mapped natural hair strokes with light shading" loading="lazy" />
+      <img src="portfolio/turn-back-time-before-after.jpg" alt="Microblading before and after — sparse brow transformed to a full, natural shape" loading="lazy" />
+    </div>
     <p class="hero-sub" style="margin-bottom:22px">Before &amp; afters live on Instagram and TikTok — new sets posted regularly.</p>
     <div class="review-row" id="workRow"></div>
   </section>
