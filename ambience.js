@@ -49,9 +49,10 @@
       position:absolute;bottom:72px;right:0;white-space:nowrap;
       background:#241C18;border:1px solid #C9A26B;color:#E0BE8A;
       font-family:'Karla',sans-serif;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
-      padding:7px 12px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .3s;
+      padding:7px 12px;border-radius:14px;opacity:0;pointer-events:none;
     }
-    .amb-hint.show{opacity:1}
+    .amb-hint.show{opacity:1;animation:amb-flash 1.4s ease-in-out infinite}
+    @keyframes amb-flash{0%,100%{opacity:1}50%{opacity:.35}}
     @keyframes amb-idle{
       0%,100%{transform:scale(1);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 0 rgba(201,162,107,.45)}
       50%{transform:scale(1.12);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 14px rgba(201,162,107,0)}
@@ -69,9 +70,7 @@
   badge.innerHTML = `<img src="logo-gold.png" alt="Play ambience music" /><span class="amb-hint show" id="ambHint">🎵 Tap for Music</span>`;
   document.body.appendChild(badge);
   const hint = document.getElementById("ambHint");
-  setTimeout(() => { if (!playing) hint.classList.remove("show"); }, 6000);
-  badge.addEventListener("mouseenter", () => hint.classList.add("show"));
-  badge.addEventListener("mouseleave", () => { if (!playing) hint.classList.remove("show"); });
+  // Stays flashing until they actually tap — no auto-hide timer.
 
   let audio = null, audioCtx = null, analyser = null, dataArray = null, rafId = null, playing = false, ducked = false;
 
@@ -118,6 +117,7 @@
     document.querySelectorAll(".lotus, .amb-badge img").forEach(el => { el.style.transform = "scale(1)"; });
     badge.classList.remove("playing");
     hint.textContent = "🎵 Tap for Music";
+    hint.classList.add("show");
     playing = false;
   }
 
