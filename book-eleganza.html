@@ -137,7 +137,7 @@
     <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking — Choose One</div>
       <div id="paymentIntro"></div>
-      <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:12px">I've Sent My Deposit via WAM!</button>
+      <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:12px">Pay via WAM!</button>
       <p class="hint" style="text-align:center;margin:6px 0">— or —</p>
       <button class="btn-ghost" type="button" id="btnPayCash">I'll Pay the Full Amount in Cash at Check-In</button>
       <div id="paymentAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
@@ -145,6 +145,12 @@
         <a class="review-btn" id="btnNotifyAmiiWa" href="#" target="_blank" rel="noopener" style="display:none">📤 Let Amii Know on WhatsApp</a>
         <a class="review-btn" id="btnReceiptWa" href="#" target="_blank" rel="noopener" style="margin-top:10px;display:none">🧾 Text Myself This Receipt</a>
       </div>
+    </div>
+    <div class="summary" id="voucherPanel" style="display:none;border-color:var(--gold);text-align:center">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 A Gift For A Friend</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold-bright)" id="voucherCode"></div>
+      <div style="margin-top:6px;font-size:.85rem;color:var(--ivory-dim)" id="voucherSub"></div>
+      <a class="review-btn" id="btnShareVoucher" href="#" target="_blank" rel="noopener" style="margin-top:12px">💬 Share With A Friend</a>
     </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
@@ -495,17 +501,18 @@ function renderDone(result, name, phone) {
   $("paymentFollowUp").style.display = "none";
   $("btnNotifyAmiiWa").style.display = "none";
   $("btnReceiptWa").style.display = "none";
-  $("btnPayWam").disabled = false; $("btnPayWam").textContent = "I've Sent My Deposit via WAM!";
+  $("voucherPanel").style.display = "none";
+  $("btnPayWam").disabled = false; $("btnPayWam").textContent = "Pay via WAM!";
   $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
   if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
     const price = state.service.price;
     const deposit = Math.min(500, price);
     const remainder = price - deposit;
-    $("btnPayWam").textContent = `I've Sent My ${fmtMoney(deposit, state.service.currency)} Deposit via WAM!`;
+    $("btnPayWam").textContent = `Pay ${fmtMoney(deposit, state.service.currency)} via WAM!`;
     $("paymentIntro").innerHTML = (remainder > 0
-      ? `Open the WAM! app and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking. The remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
-      : `Open the WAM! app and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> to secure your booking.`)
-      + ` Once you've sent it, tap the button below.`;
+      ? `Tap below to open WAM! and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> — the remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
+      : `Tap below to open WAM! and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong>.`)
+      + ` You'll come right back here once it's sent.`;
     $("wamPanel").style.display = "block";
   }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
@@ -536,9 +543,32 @@ async function setPaymentMethod(method, ackText) {
   }).catch(e => console.warn("notify-payment failed:", e));
 
   renderPaymentFollowUpButtons(method);
+  renderReferralVoucher();
 }
-$("btnPayWam").onclick = () => setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
+$("btnPayWam").onclick = () => {
+  // Opens WAM!'s real site in a new tab — this page stays open right where the
+  // receipt appears once they're back, per the request to "direct client to
+  // pay them back to this page where receipts are received."
+  window.open("https://wam.money", "_blank", "noopener");
+  setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
+};
 $("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
+
+/* Shareable 10%-off code for a friend, generated right after payment is
+   confirmed — expires in 24 hours. */
+async function renderReferralVoucher() {
+  try {
+    const result = await rpc("create_referral_voucher", { p_token: state.confirmToken });
+    if (!result || !result.ok) return;
+    $("voucherCode").textContent = result.code;
+    $("voucherSub").textContent = `${result.discount_pct}% off for a friend's first visit — expires in 24 hours`;
+    const msg = `Hey! Come try Eleganza Naturally Beautiful — use my code ${result.code} for ${result.discount_pct}% off your first visit. It expires in 24 hours though, so don't wait! https://enbbrows.github.io/Eleganza-crm/book-eleganza.html`;
+    $("btnShareVoucher").href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    $("voucherPanel").style.display = "block";
+  } catch (e) {
+    console.warn("create_referral_voucher failed:", e);
+  }
+}
 
 /* One-tap WhatsApp fallback for both sides, since real automatic WhatsApp
    (Meta Cloud API) is still pending business verification. */

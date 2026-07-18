@@ -108,7 +108,8 @@ use a business inbox).
 
 ### What `notify-payment` does
 
-The moment a client taps **I've Sent My Deposit via WAM!** or **I'll Pay the
+The moment a client taps **Pay via WAM!** (opens wam.money in a new tab so
+they can send it, then they're right back on this page) or **I'll Pay the
 Full Amount in Cash at Check-In** on `book-eleganza.html`:
 
 1. `confirm_payment_intent` (SQL) records the payment method on the booking,
@@ -123,6 +124,16 @@ Full Amount in Cash at Check-In** on `book-eleganza.html`:
    automatic WhatsApp to both sides still needs your Meta Business
    verification to go through. Once that's approved, this can be upgraded
    to fully automatic WhatsApp the same way `send-reminders` already is.
+4. A one-time **referral voucher** is generated right there on the page —
+   a 6-character code good for 10% off, expiring in 24 hours, with a
+   ready-made "Share With A Friend" WhatsApp button. A new client can enter
+   that code at check-in (`checkin.html` → New Client → "Referral code") to
+   redeem it automatically — it's checked for validity/expiry and applied
+   to their price on the spot, one-time use.
+
+Run `supabase/migrations/0008_payment_confirmation.sql` and
+`supabase/migrations/0009_referral_vouchers.sql` (SQL Editor, same as
+before) to get `confirm_payment_intent` and the voucher functions in place.
 
 ## 6. Schedule it (Supabase Cron)
 

@@ -460,6 +460,8 @@
       </select>
       <label for="reg-price">Today's price (TT$)</label>
       <input id="reg-price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 500" />
+      <label for="reg-voucher">Referral code <span style="color:var(--ivory-dim);text-transform:none;letter-spacing:0">(from a friend — optional)</span></label>
+      <input id="reg-voucher" type="text" placeholder="e.g. A1B2C3" style="text-transform:uppercase" />
       <button class="btn" id="btn-register" type="submit">Complete Check-In</button>
     </form>
     <button class="linkline" type="button" onclick="app.reset()">Back</button>
@@ -734,7 +736,8 @@ const app = {
     const name = $("reg-name").value.trim();
     const phone = $("reg-phone").value.trim();
     const email = $("reg-email").value.trim();
-    const price = parseFloat($("reg-price").value);
+    let price = parseFloat($("reg-price").value);
+    const voucherCode = $("reg-voucher").value.trim();
     if (!name || last7(phone).length < 7 || !/.+@.+\..+/.test(email)) {
       return this.error("register-error", "Please fill in your name, phone, and a valid email.");
     }
@@ -742,6 +745,18 @@ const app = {
       return this.error("register-error", "Please enter today's price to lock in the visit.");
     }
     this.busy("btn-register", true, "Complete Check-In");
+    let voucherPct = null;
+    if (voucherCode) {
+      try {
+        const result = await rpc("redeem_referral_voucher", { p_code: voucherCode, p_redeemed_by_name: name });
+        if (result && result.valid) {
+          voucherPct = result.discount_pct;
+          price = Math.round(price * (1 - voucherPct / 100) * 100) / 100;
+        }
+      } catch (err) {
+        console.warn("Voucher redemption skipped:", err);
+      }
+    }
     try {
       const row = {
         [C.name]: name,
@@ -770,7 +785,8 @@ const app = {
         price: price,
         hadReward: false,
         service: $("reg-service").value,
-        phone: phone
+        phone: phone,
+        voucherPct: voucherPct
       });
     } catch (err) {
       console.error(err);
@@ -840,8 +856,9 @@ const app = {
       const first = (name || "love").split(" ")[0];
       let msg = "Hi " + first + "! \uD83E\uDD0D Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html";
       if (price > 0) {
+        const voucherNote = this.ctx.voucherPct ? " (" + this.ctx.voucherPct + "% referral code applied)" : "";
         msg += "\n\n\uD83E\uDDFE Receipt — " + receiptDate + "\n" + (this.ctx.service || "Service") + ": " +
-          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (5% review reward applied)" : "") +
+          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (5% review reward applied)" : voucherNote) +
           "\nEleganza Naturally Beautiful — thank you for your payment! \uD83E\uDD0D";
       }
       msg += "\n\nWhat once was, is not all lost. \u2728";
