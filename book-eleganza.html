@@ -405,10 +405,7 @@ function renderDetailsSummary() {
 
 async function findOrCreateClient(name, phone, email) {
   try {
-    const res = await fetch(`${CLIENTS_REST}?select=id,${C.name},${C.phone},${C.email},stage&limit=1000`, { headers: CLIENTS_HEADERS });
-    const rows = await res.json();
-    const key = last7(phone);
-    const match = rows.find(r => last7(r[C.phone]) === key);
+    const match = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
     if (match) {
       if (match.stage === "lead" || match.stage === "contacted") {
         await fetch(`${CLIENTS_REST}?id=eq.${match.id}`, { method:"PATCH", headers: CLIENTS_HEADERS, body: JSON.stringify({ stage: "booked" }) });
@@ -435,10 +432,7 @@ async function prefillFromPhone() {
   if (last7(phone).length < 7 || phone === lastLookedUpPhone) return;
   lastLookedUpPhone = phone;
   try {
-    const res = await fetch(`${CLIENTS_REST}?select=${C.name},${C.phone},${C.email}&limit=1000`, { headers: CLIENTS_HEADERS });
-    const rows = await res.json();
-    const key = last7(phone);
-    const match = rows.find(r => last7(r[C.phone]) === key);
+    const match = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
     if (match) {
       if (!$("d-name").value.trim() && match[C.name]) $("d-name").value = match[C.name];
       if (!$("d-email").value.trim() && match[C.email]) $("d-email").value = match[C.email];

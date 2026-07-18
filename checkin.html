@@ -625,14 +625,7 @@ const app = {
     this.phoneEntered = phone;
     this.busy("btn-lookup", true, "Check In");
     try {
-      const res = await fetch(
-        `${REST}?select=id,${C.name},${C.phone},${C.email},${C.visitCount},${C.totalSpent},${C.nextDiscount}&limit=1000`,
-        { headers: HEADERS }
-      );
-      if (!res.ok) throw new Error("Supabase " + res.status);
-      const rows = await res.json();
-      const key = last7(phone);
-      const match = rows.find(r => last7(r[C.phone]) === key);
+      const match = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
       if (match) {
         this.current = match;
         this.showWelcome(match);
