@@ -60,6 +60,7 @@
   <section class="screen active" id="screen-service">
     <h1>Book Your <em style="font-style:italic;color:var(--gold-bright)">Appointment</em></h1>
     <p class="sub">Step 1 of 4 — Tap a service below to get started.</p>
+    <div class="summary" id="giftBanner" style="display:none;border-color:var(--gold);text-align:center"></div>
     <div id="serviceList"></div>
   </section>
 
@@ -134,6 +135,12 @@
     <h1 id="doneTitle">You're booked</h1>
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
+    <div class="summary" id="giftRedeemPanel" style="display:none;border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Gift Certificate</div>
+      <div id="giftRedeemIntro"></div>
+      <button class="btn" type="button" id="btnRedeemGift" style="margin-top:12px">Redeem My Gift Certificate</button>
+      <div id="giftRedeemAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
+    </div>
     <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking — Choose One</div>
       <div id="paymentIntro"></div>
@@ -178,6 +185,7 @@ const MIN_LEAD_MS = MIN_LEAD_DAYS * 24 * 3600 * 1000;
 const params = new URLSearchParams(location.search);
 const PRESET_CATEGORY = params.get("category");
 const PRESET_SUGGEST_DAYS = params.get("suggestDays") ? parseInt(params.get("suggestDays"), 10) : null;
+const PRESET_GIFT_CODE = params.get("gift");
 
 const digits = s => (s||"").replace(/\D/g,"");
 const last7 = s => digits(s).slice(-7);
@@ -251,7 +259,7 @@ function generateSlots(schedule, service, dateStr) {
   return slots;
 }
 
-const state = { schedule: null, service: null, dateStr: null, slot: null };
+const state = { schedule: null, service: null, dateStr: null, slot: null, gift: null };
 
 async function loadSchedule() {
   const from = new Date().toISOString().slice(0,10);
@@ -264,6 +272,26 @@ async function loadSchedule() {
 function fmtMoney(n, currency) {
   if (!n) return "Free";
   return (currency || "TTD") + "$" + Number(n).toLocaleString();
+}
+
+/* If they arrived via a gift certificate link, show what it's worth and
+   who it's from — the value gets applied automatically at the payment step. */
+async function loadGift() {
+  if (!PRESET_GIFT_CODE) return;
+  try {
+    const result = await rpc("get_gift_certificate", { p_code: PRESET_GIFT_CODE });
+    if (result && result.valid) {
+      state.gift = result;
+      const banner = $("giftBanner");
+      banner.innerHTML = `<div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Gift Certificate Applied</div>` +
+        `<div>You have a <strong>${fmtMoney(result.amount, result.currency)}</strong> gift from <strong>${esc(result.buyer_name)}</strong> — select your service below.</div>`;
+      banner.style.display = "block";
+    } else {
+      console.warn("Gift certificate not valid:", result && result.reason);
+    }
+  } catch (e) {
+    console.warn("Gift lookup skipped:", e);
+  }
 }
 
 function renderServices() {
@@ -382,7 +410,20 @@ function selectSlot(iso) {
 
 function renderDetailsSummary() {
   const when = state.slot.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"America/Port_of_Spain" });
-  $("detailsSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div><div>Price <strong>${fmtMoney(state.service.price, state.service.currency)}</strong></div>`;
+  let priceLine = `<div>Price <strong>${fmtMoney(state.service.price, state.service.currency)}</strong></div>`;
+  if (state.gift) {
+    const covered = Math.min(state.gift.amount, state.service.price || 0);
+    const remainder = (state.service.price || 0) - covered;
+    priceLine = `<div>Price <strong>${fmtMoney(state.service.price, state.service.currency)}</strong></div>` +
+      `<div>🎁 Gift certificate covers <strong>${fmtMoney(covered, state.gift.currency)}</strong>${remainder > 0 ? ` — <strong>${fmtMoney(remainder, state.gift.currency)}</strong> due in cash at check-in` : ""}</div>`;
+  }
+  $("detailsSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>${priceLine}`;
+
+  if (state.gift) {
+    if (!$("d-name").value.trim() && state.gift.recipient_name) $("d-name").value = state.gift.recipient_name;
+    if (!$("d-email").value.trim() && state.gift.recipient_email) $("d-email").value = state.gift.recipient_email;
+    if (!$("d-phone").value.trim() && state.gift.recipient_phone) $("d-phone").value = state.gift.recipient_phone;
+  }
 
   const isFirstApp = state.service.category === "first_application";
   $("microbladingInfoBox").style.display = isFirstApp ? "block" : "none";
@@ -491,14 +532,28 @@ function renderDone(result, name, phone) {
     : "We'll remind you the day before and an hour before your appointment.";
   $("doneSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>`;
   state.confirmToken = result.confirm_token;
+  state.bookingId = result.booking_id;
   $("paymentAck").style.display = "none";
   $("paymentFollowUp").style.display = "none";
   $("btnNotifyAmiiWa").style.display = "none";
   $("btnReceiptWa").style.display = "none";
   $("voucherPanel").style.display = "none";
+  $("giftRedeemPanel").style.display = "none";
+  $("giftRedeemAck").style.display = "none";
+  $("btnRedeemGift").disabled = false; $("btnRedeemGift").textContent = "Redeem My Gift Certificate";
+  $("wamPanel").style.display = "none";
   $("btnPayWam").disabled = false; $("btnPayWam").textContent = "Pay via WAM!";
   $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
-  if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
+
+  if (state.gift) {
+    const price = state.service.price || 0;
+    const covered = Math.min(state.gift.amount, price);
+    const remainder = price - covered;
+    $("giftRedeemIntro").innerHTML = remainder > 0
+      ? `Your gift certificate covers <strong>${fmtMoney(covered, state.gift.currency)}</strong> — the remaining <strong>${fmtMoney(remainder, state.gift.currency)}</strong> is due in cash at check-in. Tap below to lock it in.`
+      : `Your gift certificate fully covers this booking. Tap below to lock it in.`;
+    $("giftRedeemPanel").style.display = "block";
+  } else if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
     const price = state.service.price;
     const deposit = Math.min(500, price);
     const remainder = price - deposit;
@@ -547,6 +602,30 @@ $("btnPayWam").onclick = () => {
   setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
 };
 $("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
+
+$("btnRedeemGift").onclick = async () => {
+  $("btnRedeemGift").disabled = true;
+  $("btnRedeemGift").textContent = "Redeeming…";
+  try {
+    const result = await rpc("redeem_gift_certificate", { p_code: PRESET_GIFT_CODE, p_booking_id: state.bookingId });
+    if (!result || !result.valid) throw new Error("gift_redeem_failed");
+    $("giftRedeemAck").textContent = "✓ Gift certificate applied — see you soon!";
+    $("giftRedeemAck").style.display = "block";
+    $("btnRedeemGift").style.display = "none";
+
+    fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ token: state.confirmToken, method: "gift_certificate" })
+    }).catch(e => console.warn("notify-payment failed:", e));
+
+    renderReferralVoucher();
+  } catch (err) {
+    console.error(err);
+    $("btnRedeemGift").disabled = false;
+    $("btnRedeemGift").textContent = "Redeem My Gift Certificate";
+  }
+};
 
 /* Shareable 10%-off code for a friend, generated right after payment is
    confirmed — expires in 24 hours. */
@@ -604,6 +683,7 @@ function renderPaymentFollowUpButtons(method) {
 }
 
 loadSchedule();
+loadGift();
 </script>
 </body>
 </html>

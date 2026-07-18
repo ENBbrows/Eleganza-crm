@@ -118,6 +118,15 @@ Deno.serve(async (req) => {
         `${b.client_name} booked ${serviceName} on ${when} and will pay ${fmtMoney(price, currency)} in cash at check-in.\n\n` +
           `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}`
       );
+    } else if (method === "gift_certificate") {
+      // Client already sees an on-page confirmation, so this is an owner-only heads-up.
+      await sendEmail(
+        OWNER_EMAIL,
+        `🎁 Gift certificate redeemed — ${name}`,
+        `${b.client_name} booked ${serviceName} on ${when} using a gift certificate.\n\n` +
+          `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}\n\n` +
+          `Check the gift_certificates table (or the CRM) for who purchased it.`
+      );
     }
 
     return new Response(JSON.stringify({ ok: true }), { headers: { "Content-Type": "application/json" } });
