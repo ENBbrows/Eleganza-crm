@@ -25,7 +25,7 @@
     letter-spacing:.01em;
     background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
   }
-  .wrap{max-width:640px;margin:0 auto;padding:48px 20px 80px}
+  .wrap{max-width:640px;margin:0 auto;padding:32px 20px 80px}
   .lotus{display:block;width:130px;height:auto;margin:0 auto 16px}
   .brand{font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);text-align:center}
   .tagline{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1rem;color:var(--gold);letter-spacing:.03em;text-align:center;margin-top:8px}
@@ -50,16 +50,43 @@
   .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
   .rule::before{left:-12px}.rule::after{right:-12px}
 
-  section{scroll-margin-top:20px}
+  section{scroll-margin-top:70px}
   .section-label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:10px}
   h2{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:1.5rem;color:var(--ivory);text-align:center;margin-bottom:20px}
 
-  /* about */
+  /* nav */
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(23,18,16,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
+  .nav-toggle{
+    flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
+    border-radius:2px;padding:9px 12px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    cursor:pointer;font-family:'Karla',sans-serif;
+  }
+  .nav-search-form{flex:1}
+  .nav-search-form input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:20px;
+    color:var(--ivory);padding:9px 14px;font-size:.85rem;font-family:'Karla',sans-serif;outline:none;
+  }
+  .nav-search-form input:focus{border-color:var(--gold)}
+  .nav-dropdown{display:none;flex-direction:column;border-top:1px solid var(--line);background:var(--ink)}
+  .nav-dropdown.open{display:flex}
+  .nav-dropdown-inner{max-width:640px;margin:0 auto;display:flex;flex-direction:column}
+  .nav-dropdown a{
+    padding:14px 20px;color:var(--ivory-dim);text-decoration:none;font-size:.85rem;
+    letter-spacing:.03em;border-bottom:1px solid var(--line);
+  }
+  .nav-dropdown a:last-child{border-bottom:none}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(201,162,107,.05)}
+  .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
+
+  /* artist / about */
   .host{width:150px;height:150px;margin:0 auto 20px;border-radius:50%;padding:6px;border:1px solid var(--gold);position:relative}
   .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
   .host img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 20%;display:block}
   .about-text{color:var(--ivory-dim);font-size:.95rem;line-height:1.75;text-align:center;max-width:480px;margin:0 auto}
   .about-text strong{color:var(--ivory);font-weight:500}
+  .cred-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .cred-badge{border:1px solid var(--gold);border-radius:20px;padding:6px 14px;font-size:.72rem;letter-spacing:.08em;color:var(--gold-bright);text-transform:uppercase}
 
   /* services */
   .cat-label{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory-dim);margin:24px 0 10px}
@@ -69,6 +96,24 @@
   .svc-desc{font-size:.82rem;color:var(--ivory-dim);margin-top:4px;line-height:1.5}
   .svc-price{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--gold-bright);white-space:nowrap}
   .svc-loading,.svc-error{text-align:center;color:var(--ivory-dim);font-size:.9rem;padding:20px 0;font-style:italic}
+
+  /* faq */
+  .faq-list{max-width:520px;margin:0 auto}
+  .faq-item{border-bottom:1px solid var(--line);padding:16px 4px}
+  .faq-item summary{
+    font-family:'Fraunces',serif;font-size:1rem;color:var(--ivory);cursor:pointer;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{content:"+";color:var(--gold);font-size:1.2rem;flex:none}
+  .faq-item[open] summary::after{content:"–"}
+  .faq-item p{color:var(--ivory-dim);font-size:.88rem;line-height:1.65;margin-top:10px}
+
+  /* testimonials */
+  .testi-row{display:flex;flex-direction:column;gap:14px;max-width:480px;margin:0 auto}
+  .testi-card{border:1px solid var(--line);border-radius:4px;padding:20px}
+  .testi-quote{font-family:'Fraunces',serif;font-style:italic;color:var(--ivory);font-size:1rem;line-height:1.6}
+  .testi-attrib{color:var(--gold);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 
   /* location / policy */
   .info-box{border:1px solid var(--line);border-radius:4px;padding:20px;margin-bottom:14px}
@@ -106,6 +151,30 @@
 </style>
 </head>
 <body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navDropdown">☰ Menu</button>
+    <form class="nav-search-form" id="navSearchForm" role="search">
+      <input type="search" id="navSearch" placeholder="Search (pricing, FAQ, location…)" aria-label="Search this page" />
+    </form>
+  </div>
+  <div class="nav-dropdown" id="navDropdown">
+    <div class="nav-dropdown-inner">
+      <a href="#artist">Meet the Artist</a>
+      <a href="#how">How It Works</a>
+      <a href="#services">Services &amp; Pricing</a>
+      <a href="#faq">Q &amp; A</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#visit">Visit &amp; Policies</a>
+      <a href="#work">See the Work</a>
+      <a href="#reviews">Leave a Review</a>
+      <a class="nav-book" href="book-eleganza.html">Book Now</a>
+    </div>
+  </div>
+</nav>
+
 <div class="wrap">
 
   <!-- ═══ HERO ═══ -->
@@ -118,6 +187,26 @@
     <a class="btn" href="book-eleganza.html">Book Your Appointment</a>
     <a class="btn-ghost" href="checkin.html">Already Booked? Check In</a>
   </div>
+
+  <div class="rule"></div>
+
+  <!-- ═══ MEET THE ARTIST ═══ -->
+  <section id="artist">
+    <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
+    <p class="section-label">Meet The Artist</p>
+    <h2>Hi, I'm Amii</h2>
+    <p class="about-text">
+      I'm a certified, internationally trained PhiBrows artist. I believe in natural design — the world's most beautiful wonders are those designed by nature. Supporting others to become the best version of themselves is what I strive for, and I do so by mastering alignment: the Fibonacci sequence is the design, and poise holds the power of alignment. Every being who leaves my studio should feel that — and be reminded of the core of who they really are, and who they're becoming.
+    </p>
+    <div class="cred-row">
+      <span class="cred-badge">✦ PhiBrows Certified</span>
+      <span class="cred-badge">✦ Internationally Trained</span>
+    </div>
+    <div class="info-box" style="margin-top:26px;text-align:left">
+      <div class="k">How It Started</div>
+      <div class="v"><strong>[Amii — replace this with your own words]</strong> Every artist has an origin story — what drew you to brows, what made you pursue certification, what keeps you doing this work. A sentence or two here goes a long way toward helping people trust you before they ever sit in your chair.</div>
+    </div>
+  </section>
 
   <div class="rule"></div>
 
@@ -187,23 +276,80 @@
 
   <div class="rule"></div>
 
-  <!-- ═══ ABOUT ═══ -->
-  <section id="about">
-    <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
-    <p class="section-label">The Artist</p>
-    <h2>Hi, I'm Amii</h2>
-    <p class="about-text">
-      I'm a certified, internationally trained PhiBrows artist. I believe in natural design — the world's most beautiful wonders are those designed by nature. Supporting others to become the best version of themselves is what I strive for, and I do so by mastering alignment: the Fibonacci sequence is the design, and poise holds the power of alignment. Every being who leaves my studio should feel that — and be reminded of the core of who they really are, and who they're becoming.
-    </p>
-  </section>
-
-  <div class="rule"></div>
-
   <!-- ═══ SERVICES & PRICING ═══ -->
   <section id="services">
     <p class="section-label">Menu</p>
     <h2>Services &amp; Pricing</h2>
     <div id="serviceList"><div class="svc-loading">Loading current pricing…</div></div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ═══ Q & A ═══ -->
+  <section id="faq">
+    <p class="section-label">Q &amp; A</p>
+    <h2>Your Questions, Answered</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Who is this for?</summary>
+        <p>Anyone who's tired of filling in their brows every morning and wants natural, low-maintenance definition that doesn't rub off, sweat off, or wash away. Before your first Microblading or 3D appointment, you'll answer a quick eligibility check — some skin conditions, medications, or recent treatments mean a consultation first is the safer route, and that's completely normal.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why invest in yourself?</summary>
+        <p>Because your mornings matter. Between brow pencils, fills, and the minutes spent getting them even every single day, the cost adds up fast — and so does the mental load. This is one decision that gives back time and confidence for months at a stretch. It's not just brows — it's one less thing to think about before you walk out the door.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does it hurt?</summary>
+        <p>Everyone's pain tolerance is different, but most clients find it far more tolerable than expected. We'll talk through your comfort throughout the appointment.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What's the healing process like?</summary>
+        <p>Color is noticeably darker for the first 5-7 days, then fades 40-50% as it settles. Full healing takes about 28 days, and a follow-up touch-up afterward is a normal, expected part of the process.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How long does it last?</summary>
+        <p>Typically 10-12 months, as little as 6 months on oilier skin — that's why an annual touch-up is part of keeping it fresh.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What's the difference between Microblading and 3D?</summary>
+        <p>Microblading uses fine, hair-like strokes for a natural brow shape. 3D adds soft shading on top of those strokes for more depth and a fuller, more filled-in look.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What if I have a health condition, or recent botox/peels/laser?</summary>
+        <p>If you have sensitive or problematic skin, a condition like diabetes or a bleeding disorder, are on blood thinners, or have had botox, a chemical peel, laser treatment, or significant sun exposure in the last 30 days, we'll recommend a consultation first instead of booking directly — this keeps you safe and ensures the best results. You'll see this as a quick check when you go to book.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I pay?</summary>
+        <p>A WAM! deposit secures your spot (or the full amount if it's $500 or less) — the balance is paid in cash at check-in.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What if I need to reschedule, or I'm running late?</summary>
+        <p>You can reschedule from your confirmation link any time before your appointment. There's a 15-minute grace period if you're running late — after that, a $200 late fee applies, and after 30 minutes you'll need to reschedule.</p>
+      </details>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ═══ TESTIMONIALS ═══ -->
+  <section id="testimonials">
+    <p class="section-label">Kind Words</p>
+    <h2>What Clients Say</h2>
+    <div class="testi-row">
+      <div class="testi-card">
+        <p class="testi-quote">"[Amii — swap in a real review quote here]"</p>
+        <p class="testi-attrib">— Client name or initials</p>
+      </div>
+      <div class="testi-card">
+        <p class="testi-quote">"[Another real quote goes here]"</p>
+        <p class="testi-attrib">— Client name or initials</p>
+      </div>
+      <div class="testi-card">
+        <p class="testi-quote">"[A third real quote goes here]"</p>
+        <p class="testi-attrib">— Client name or initials</p>
+      </div>
+    </div>
+    <p class="hero-sub" style="margin-top:22px">Read more verified reviews on <a href="#" id="testiGoogle" style="color:var(--gold)" target="_blank" rel="noopener">Google</a> or <a href="#" id="testiFacebook" style="color:var(--gold)" target="_blank" rel="noopener">Facebook</a>.</p>
   </section>
 
   <div class="rule"></div>
@@ -284,6 +430,8 @@ function setLink(id, url, hideParent) {
 
 setLink("linkGoogle", CONFIG.GOOGLE_REVIEW_URL);
 setLink("linkFacebook", CONFIG.FACEBOOK_REVIEW_URL);
+setLink("testiGoogle", CONFIG.GOOGLE_REVIEW_URL);
+setLink("testiFacebook", CONFIG.FACEBOOK_REVIEW_URL);
 
 if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
   $("linkWhatsapp").href = "https://wa.me/" + CONFIG.BUSINESS_WHATSAPP_NUMBER;
@@ -372,6 +520,53 @@ async function loadServices() {
 function esc(s) { return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 loadServices();
+
+/* ───────────────────── Nav: dropdown + section search ───────────────────── */
+const navToggle = $("navToggle");
+const navDropdown = $("navDropdown");
+navToggle.addEventListener("click", () => {
+  const open = navDropdown.classList.toggle("open");
+  navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+});
+navDropdown.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+  navDropdown.classList.remove("open");
+  navToggle.setAttribute("aria-expanded", "false");
+}));
+
+const SEARCH_MAP = [
+  [["artist","amii","about","bio","credentials","certified","certification","story","started","who is amii","meet"], "artist"],
+  [["how it works","process","steps","journey","what happens"], "how"],
+  [["services","pricing","price","cost","menu","microblading","3d","touch up","touch-up","consultation"], "services"],
+  [["faq","question","questions","pain","hurt","safe","safety","who is this for","invest","why","heal","healing"], "faq"],
+  [["testimonial","testimonials","what clients say","kind words"], "testimonials"],
+  [["visit","location","address","studio","policy","late","deposit","payment","wam","hours","tip"], "visit"],
+  [["work","before","after","instagram","tiktok","portfolio","results"], "work"],
+  [["review","leave a review","google","facebook"], "reviews"],
+  [["book","appointment","schedule","booking"], "__book__"]
+];
+$("navSearchForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = $("navSearch").value.trim().toLowerCase();
+  const input = $("navSearch");
+  if (!q) return;
+  let targetId = null;
+  outer:
+  for (const [keywords, id] of SEARCH_MAP) {
+    for (const kw of keywords) {
+      if (q.includes(kw) || kw.includes(q)) { targetId = id; break outer; }
+    }
+  }
+  if (targetId === "__book__") { location.href = "book-eleganza.html"; return; }
+  if (targetId) {
+    document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" });
+    input.value = "";
+  } else {
+    const original = input.placeholder;
+    input.placeholder = "No match — try 'pricing' or 'FAQ'";
+    input.value = "";
+    setTimeout(() => { input.placeholder = original; }, 2500);
+  }
+});
 </script>
 </body>
 </html>
