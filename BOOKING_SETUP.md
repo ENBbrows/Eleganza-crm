@@ -79,6 +79,7 @@ you a one-tap pre-filled WhatsApp link to send from your own phone, plus a
 supabase login
 supabase link --project-ref <your-project-ref>
 supabase functions deploy send-reminders
+supabase functions deploy notify-payment
 
 supabase secrets set RESEND_API_KEY=re_xxx
 supabase secrets set RESEND_FROM_ELEGANZA="Eleganza <hello@enbfocus.com>"
@@ -86,6 +87,7 @@ supabase secrets set RESEND_FROM_ENBFOCUS="ENBfocus <hello@enbfocus.com>"
 supabase secrets set BUSINESS_WHATSAPP_NUMBER=18684733030
 supabase secrets set SITE_URL=https://enbbrows.github.io/Eleganza-crm
 supabase secrets set WAM_HANDLE=@amiileroux
+supabase secrets set OWNER_EMAIL=amiileroux@gmail.com
 
 # Add these once WhatsApp templates are approved:
 supabase secrets set WHATSAPP_TOKEN=xxx
@@ -98,6 +100,29 @@ supabase secrets set WHATSAPP_TEMPLATE_TWO_WEEK=pay_and_confirm_followup
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided automatically to
 edge functions — you don't need to set those yourself.
+
+`OWNER_EMAIL` is where the instant "deposit received" / "cash booking
+confirmed" alerts land for you — set it to whatever inbox you actually check
+day to day (defaults to your account email above, change it if you'd rather
+use a business inbox).
+
+### What `notify-payment` does
+
+The moment a client taps **I've Sent My Deposit via WAM!** or **I'll Pay the
+Full Amount in Cash at Check-In** on `book-eleganza.html`:
+
+1. `confirm_payment_intent` (SQL) records the payment method on the booking,
+   and — for a WAM! deposit only, since that's real money already sent —
+   logs it straight to the `receipts` table so it shows up in your CRM's
+   financial log immediately, not just at checkout.
+2. `notify-payment` (this edge function) emails a receipt to the client and
+   an alert to you (`OWNER_EMAIL`) right away, via Resend — no waiting on
+   the 15-minute reminder cron.
+3. The booking page also shows two one-tap WhatsApp buttons — **Let Amii
+   Know on WhatsApp** and **Text Myself This Receipt** — since real
+   automatic WhatsApp to both sides still needs your Meta Business
+   verification to go through. Once that's approved, this can be upgraded
+   to fully automatic WhatsApp the same way `send-reminders` already is.
 
 ## 6. Schedule it (Supabase Cron)
 

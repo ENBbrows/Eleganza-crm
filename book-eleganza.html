@@ -141,6 +141,10 @@
       <p class="hint" style="text-align:center;margin:6px 0">— or —</p>
       <button class="btn-ghost" type="button" id="btnPayCash">I'll Pay the Full Amount in Cash at Check-In</button>
       <div id="paymentAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
+      <div id="paymentFollowUp" style="display:none;margin-top:14px">
+        <a class="review-btn" id="btnNotifyAmiiWa" href="#" target="_blank" rel="noopener" style="display:none">📤 Let Amii Know on WhatsApp</a>
+        <a class="review-btn" id="btnReceiptWa" href="#" target="_blank" rel="noopener" style="margin-top:10px;display:none">🧾 Text Myself This Receipt</a>
+      </div>
     </div>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
@@ -488,6 +492,9 @@ function renderDone(result, name, phone) {
   $("doneSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>`;
   state.confirmToken = result.confirm_token;
   $("paymentAck").style.display = "none";
+  $("paymentFollowUp").style.display = "none";
+  $("btnNotifyAmiiWa").style.display = "none";
+  $("btnReceiptWa").style.display = "none";
   $("btnPayWam").disabled = false; $("btnPayWam").textContent = "I've Sent My Deposit via WAM!";
   $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
   if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
@@ -514,15 +521,63 @@ async function setPaymentMethod(method, ackText) {
   $("btnPayWam").disabled = true;
   $("btnPayCash").disabled = true;
   try {
-    await rpc("set_payment_method", { p_token: state.confirmToken, p_method: method });
+    await rpc("confirm_payment_intent", { p_token: state.confirmToken, p_method: method });
   } catch (e) {
-    console.warn("set_payment_method failed:", e);
+    console.warn("confirm_payment_intent failed:", e);
   }
   $("paymentAck").textContent = ackText;
   $("paymentAck").style.display = "block";
+
+  // Fire-and-forget: emails Amii + the client right away (doesn't block the UI)
+  fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+    body: JSON.stringify({ token: state.confirmToken, method })
+  }).catch(e => console.warn("notify-payment failed:", e));
+
+  renderPaymentFollowUpButtons(method);
 }
 $("btnPayWam").onclick = () => setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
 $("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
+
+/* One-tap WhatsApp fallback for both sides, since real automatic WhatsApp
+   (Meta Cloud API) is still pending business verification. */
+function renderPaymentFollowUpButtons(method) {
+  const when = state.slot.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"America/Port_of_Spain" });
+  const price = state.service.price || 0;
+  const deposit = Math.min(500, price);
+  const remainder = price - deposit;
+  const clientName = $("d-name").value.trim();
+  const clientPhone = $("d-phone").value.trim();
+
+  let amiiMsg, receiptMsg;
+  if (method === "wam_deposit") {
+    amiiMsg = `Hi Amii! I just sent my ${fmtMoney(deposit, state.service.currency)} WAM! deposit for ${state.service.name} on ${when}. — ${clientName}`;
+    receiptMsg = `🧾 Eleganza Receipt\n${state.service.name} — ${when}\nWAM! deposit sent: ${fmtMoney(deposit, state.service.currency)}` +
+      (remainder > 0 ? `\nBalance due at check-in: ${fmtMoney(remainder, state.service.currency)}` : "");
+  } else {
+    amiiMsg = `Hi Amii! Booked ${state.service.name} on ${when} — paying ${fmtMoney(price, state.service.currency)} cash at check-in. — ${clientName}`;
+    receiptMsg = `🧾 Eleganza Booking\n${state.service.name} — ${when}\nTo pay: ${fmtMoney(price, state.service.currency)} cash at check-in`;
+  }
+
+  if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
+    const btn = $("btnNotifyAmiiWa");
+    btn.href = `https://wa.me/${CONFIG.BUSINESS_WHATSAPP_NUMBER}?text=${encodeURIComponent(amiiMsg)}`;
+    btn.style.display = "flex";
+  }
+  const d = digits(clientPhone);
+  let intl = "";
+  if (d.length === 7) intl = "1868" + d;
+  else if (d.length === 10 && d.indexOf("868") === 0) intl = "1" + d;
+  else if (d.length === 11 && d.indexOf("1868") === 0) intl = d;
+  else if (d.length >= 10) intl = d;
+  if (intl) {
+    const btn = $("btnReceiptWa");
+    btn.href = `https://wa.me/${intl}?text=${encodeURIComponent(receiptMsg)}`;
+    btn.style.display = "flex";
+  }
+  $("paymentFollowUp").style.display = "block";
+}
 
 loadSchedule();
 </script>
