@@ -32,7 +32,7 @@ const CONFIG = {
   },
 
   /* Where clients can learn brow tips & tricks */
-  YOUTUBE_URL: "PASTE_YOUR_YOUTUBE_CHANNEL_LINK",
+  YOUTUBE_URL: "https://youtube.com/@amiileroux",
   INSTAGRAM_URL: "https://www.instagram.com/enb._brows/",
   FACEBOOK_PAGE_URL: "https://www.facebook.com/share/14j8EG4poYB/",
 
