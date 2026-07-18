@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Training With E.N.B. — Coming Soon</title>
+<meta name="description" content="Learn microblading from Amii Leroux — course and 1:1 coaching, coming soon." />
+<link rel="apple-touch-icon" href="app-icon-black-v2.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
+    --gold:#C9A26B; --gold-bright:#E0BE8A;
+    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
+    --sage:#8C9673; --sage-bright:#A8B48C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;
+    letter-spacing:.01em;padding:40px 20px 80px;
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%);
+  }
+  .wrap{max-width:520px;margin:0 auto;text-align:center}
+  .lotus{display:block;width:100px;height:auto;margin:0 auto 14px}
+  .brand{font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ivory-dim)}
+  .tagline{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1.3rem;color:var(--gold);margin-top:8px}
+  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.8rem,6vw,2.4rem);line-height:1.2;margin-top:18px}
+  h1 em{font-style:italic;color:var(--gold-bright)}
+  .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.7;margin-top:14px;max-width:440px;margin-left:auto;margin-right:auto}
+  .coming-soon-tag{
+    display:inline-block;margin-top:18px;padding:6px 16px;border:1px solid var(--sage-bright);border-radius:20px;
+    color:var(--sage-bright);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+  }
+  .feature-video{width:100%;max-width:420px;margin:28px auto 0;display:block;border-radius:16px 4px 16px 4px;border:1px solid var(--gold)}
+
+  .rule{width:52px;height:26px;margin:48px auto;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M2 13c9-11 39-11 48 0-9 11-39 11-48 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3Cpath d='M26 5v16M15 10c3.5 1.3 7.5 1.3 11 2.5M37 10c-3.5 1.3-7.5 1.3-11 2.5' fill='none' stroke='%23C9A26B' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center/contain}
+
+  .section-label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  h2{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:1.4rem;color:var(--ivory);margin-bottom:22px}
+
+  .offer-row{display:flex;flex-direction:column;gap:16px;max-width:420px;margin:0 auto}
+  .offer-card{
+    border:1px solid var(--line);border-radius:16px 4px 16px 4px;padding:24px 22px;text-align:left;position:relative;
+  }
+  .offer-card .badge{
+    position:absolute;top:16px;right:16px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--sage-bright);border:1px solid var(--sage-bright);border-radius:20px;padding:4px 10px;
+  }
+  .offer-name{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-bright)}
+  .offer-desc{color:var(--ivory-dim);font-size:.88rem;line-height:1.6;margin-top:10px}
+
+  .kit-note{
+    margin-top:24px;padding:18px 20px;border:1px dashed var(--line);border-radius:16px 4px 16px 4px;
+    color:var(--ivory-dim);font-size:.85rem;line-height:1.6;text-align:left;
+  }
+  .kit-note strong{color:var(--ivory);font-weight:500}
+
+  .notify-form{margin-top:32px;max-width:360px;margin-left:auto;margin-right:auto}
+  .notify-form input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;color:var(--ivory);
+    font-family:'Karla',sans-serif;font-size:1rem;padding:13px 14px;outline:none;
+  }
+  .notify-form input:focus{border-color:var(--gold)}
+  .btn{
+    display:block;width:100%;margin-top:12px;padding:15px;background:var(--gold);color:var(--ink);
+    border:none;border-radius:2px;font-weight:600;font-size:.78rem;letter-spacing:.22em;
+    text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center;
+  }
+  .btn:disabled{opacity:.5;cursor:wait}
+  .back-link{display:block;text-align:center;margin-top:40px;color:var(--ivory-dim);font-size:.82rem;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="lotus" src="logo-gold.png" alt="E.N.B. lotus" />
+  <p class="brand">E.N.B.</p>
+  <p class="tagline">Training</p>
+  <h1>Become a <em>Microblading Artist</em></h1>
+  <p class="sub">Ten years of technique, refined for real skin tones and real climates — taught by Amii Leroux, straight from the studio that built it.</p>
+  <span class="coming-soon-tag">Coming Soon</span>
+
+  <video class="feature-video" src="training-feature.mov" muted autoplay loop playsinline controls preload="metadata"></video>
+
+  <div class="rule"></div>
+
+  <section>
+    <p class="section-label">Choose Your Path</p>
+    <h2>How You'll Learn</h2>
+    <div class="offer-row">
+      <div class="offer-card">
+        <span class="badge">Coming Soon</span>
+        <div class="offer-name">The Course</div>
+        <div class="offer-desc">A full, self-paced training built from real technique — the exact approach Amii developed to bring this beauty service to Caribbean skin, when no one else had figured it out yet.</div>
+      </div>
+      <div class="offer-card">
+        <span class="badge">Coming Soon</span>
+        <div class="offer-name">1:1 Coaching</div>
+        <div class="offer-desc">Direct, personal mentorship — for artists who want feedback on their own hand, their own clients, and their own growth as a business.</div>
+      </div>
+    </div>
+
+    <div class="kit-note">
+      <strong>Starting from scratch?</strong> A linked starter kit (everything you need to begin practicing) is on the way — we'll drop the link here once it's ready.
+    </div>
+  </section>
+
+  <form class="notify-form" id="notifyForm">
+    <label style="display:block;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;text-align:left">Want to know when it's ready?</label>
+    <input type="email" id="notifyEmail" placeholder="you@example.com" disabled />
+    <button class="btn" type="button" disabled>Notify Me — Coming Soon</button>
+  </form>
+
+  <a class="back-link" href="home.html">← Back to Eleganza Naturally Beautiful</a>
+</div>
+
+<script src="ambience.js"></script>
+</body>
+</html>
