@@ -13,8 +13,8 @@
   const style = document.createElement("style");
   style.textContent = `
     .gift-popup-overlay{
-      position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:90;
-      display:none;align-items:center;justify-content:center;padding:20px;
+      position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;
+      display:none;align-items:center;justify-content:flex-start;padding:20px;
     }
     .gift-popup-overlay.show{display:flex}
     .gift-popup{
