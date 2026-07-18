@@ -151,6 +151,16 @@
 
   <div class="rule"></div>
 
+  <!-- ═══ SEE THE WORK ═══ -->
+  <section id="work">
+    <p class="section-label">Real Results</p>
+    <h2>See the Work</h2>
+    <p class="hero-sub" style="margin-bottom:22px">Before &amp; afters live on Instagram and TikTok — new sets posted regularly.</p>
+    <div class="review-row" id="workRow"></div>
+  </section>
+
+  <div class="rule"></div>
+
   <!-- ═══ REVIEWS + REFERRAL ═══ -->
   <section id="reviews">
     <p class="section-label">Kind Words</p>
@@ -205,6 +215,19 @@ if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("
 }
 
 $("tipHandle").textContent = (CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) ? CONFIG.WAM_HANDLE : "our WAM! handle";
+
+/* "See the Work" — links straight to Instagram/TikTok instead of hosting
+   before/after photos here, so it also drives traffic across platforms. */
+(function renderWork() {
+  const row = $("workRow");
+  const section = row.closest("section");
+  const links = [
+    ["📸 See Before &amp; Afters on Instagram", CONFIG.INSTAGRAM_URL],
+    ["🎥 See Before &amp; Afters on TikTok", CONFIG.TIKTOK_URL]
+  ].filter(([, url]) => url && url.indexOf("PASTE_") !== 0);
+  if (!links.length) { section.style.display = "none"; return; }
+  row.innerHTML = links.map(([label, url]) => `<a class="review-btn" href="${url}" target="_blank" rel="noopener">${label}</a>`).join("");
+})();
 
 /* Footer social links — only show the ones actually filled in */
 (function renderSocial() {
