@@ -92,6 +92,17 @@
   .social-row a{color:var(--gold);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid transparent}
   .social-row a:hover{border-color:var(--gold)}
   .copyright{color:var(--ivory-dim);font-size:.75rem;margin-top:24px}
+
+  /* how it works */
+  .step-list{max-width:480px;margin:0 auto}
+  .step{display:flex;gap:16px;margin-bottom:22px}
+  .step-num{
+    flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-size:.95rem;color:var(--gold-bright);
+  }
+  .step-title{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ivory);margin-bottom:4px}
+  .step-desc{font-size:.87rem;color:var(--ivory-dim);line-height:1.6}
 </style>
 </head>
 <body>
@@ -107,6 +118,72 @@
     <a class="btn" href="book-eleganza.html">Book Your Appointment</a>
     <a class="btn-ghost" href="checkin.html">Already Booked? Check In</a>
   </div>
+
+  <div class="rule"></div>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <section id="how">
+    <p class="section-label">Your Journey</p>
+    <h2>How It Works</h2>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Book Online</div>
+          <div class="step-desc">Pick your service and an open time — appointments are booked at least 2 weeks out.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Quick Eligibility Check</div>
+          <div class="step-desc">First-time Microblading or 3D clients answer a few quick questions so we can make sure the timing's right for you — if not, we'll get you into a consultation first instead.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Read Your Prep Info</div>
+          <div class="step-desc">Before/after care, what to avoid, and the studio address — you'll confirm you've read it before you can book.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Secure Your Spot</div>
+          <div class="step-desc">A WAM! deposit locks in your appointment (or pay the full amount in cash at check-in).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">We'll Remind You</div>
+          <div class="step-desc">A message the day before to confirm or reschedule, then another an hour before your appointment.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div>
+          <div class="step-title">Check In When You Arrive</div>
+          <div class="step-desc">One quick lookup by phone number — returning clients don't need to re-enter their details.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div>
+          <div class="step-title">Aftercare, Sent Automatically</div>
+          <div class="step-desc">Your aftercare guide and payment receipt land on WhatsApp and email right after checkout.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div>
+          <div class="step-title">Book Your Follow-Up</div>
+          <div class="step-desc">Reserve your ~5-week follow-up right then, or wait for a reminder 2 weeks out. Every paid visit also comes with a 10%-off code to share with a friend.</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <div class="rule"></div>
 
