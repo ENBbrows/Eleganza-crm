@@ -14,6 +14,7 @@
     --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
     --gold:#C9A26B; --gold-bright:#E0BE8A;
     --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
+    --sage:#8C9673; --sage-bright:#A8B48C;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -23,7 +24,10 @@
     font-family:'Karla',sans-serif;
     font-weight:300;
     letter-spacing:.01em;
-    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 40%, rgba(140,150,115,.06), transparent 55%),
+      radial-gradient(ellipse 70% 45% at 10% 75%, rgba(140,150,115,.05), transparent 55%);
   }
   .wrap{max-width:640px;margin:0 auto;padding:32px 20px 80px}
   .lotus{display:block;width:130px;height:auto;margin:0 auto 16px}
@@ -46,9 +50,10 @@
   }
   .btn-ghost:hover{background:rgba(201,162,107,.08)}
 
-  .rule{width:56px;height:1px;background:var(--gold);margin:56px auto;position:relative}
-  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
-  .rule::before{left:-12px}.rule::after{right:-12px}
+  .rule{
+    width:52px;height:26px;margin:56px auto;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M2 13c9-11 39-11 48 0-9 11-39 11-48 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3Cpath d='M26 5v16M15 10c3.5 1.3 7.5 1.3 11 2.5M37 10c-3.5 1.3-7.5 1.3-11 2.5' fill='none' stroke='%23C9A26B' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
 
   section{scroll-margin-top:70px}
   .section-label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:10px}
@@ -80,18 +85,19 @@
   .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
 
   /* artist / about */
-  .host{width:150px;height:150px;margin:0 auto 20px;border-radius:50%;padding:6px;border:1px solid var(--gold);position:relative}
+  .host{width:150px;height:150px;margin:0 auto 14px;border-radius:50%;padding:6px;border:1px solid var(--gold);position:relative}
   .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
   .host img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 20%;display:block}
+  .host-leaves{display:block;width:110px;margin:0 auto 8px;opacity:.8}
   .about-text{color:var(--ivory-dim);font-size:.95rem;line-height:1.75;text-align:center;max-width:480px;margin:0 auto}
   .about-text strong{color:var(--ivory);font-weight:500}
   .cred-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
-  .cred-badge{border:1px solid var(--gold);border-radius:20px;padding:6px 14px;font-size:.72rem;letter-spacing:.08em;color:var(--gold-bright);text-transform:uppercase}
+  .cred-badge{border:1px solid var(--sage-bright);border-radius:20px;padding:6px 14px;font-size:.72rem;letter-spacing:.08em;color:var(--sage-bright);text-transform:uppercase}
 
   /* services */
   .cat-label{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory-dim);margin:24px 0 10px}
   .cat-label:first-child{margin-top:0}
-  .svc-card{border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .svc-card{border:1px solid var(--line);border-radius:14px 4px 14px 4px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
   .svc-name{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ivory)}
   .svc-desc{font-size:.82rem;color:var(--ivory-dim);margin-top:4px;line-height:1.5}
   .svc-price{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--gold-bright);white-space:nowrap}
@@ -105,18 +111,18 @@
     display:flex;justify-content:space-between;align-items:center;gap:12px;
   }
   .faq-item summary::-webkit-details-marker{display:none}
-  .faq-item summary::after{content:"+";color:var(--gold);font-size:1.2rem;flex:none}
-  .faq-item[open] summary::after{content:"–"}
+  .faq-item summary::after{content:"+";color:var(--gold);font-size:1.2rem;flex:none;transition:color .2s}
+  .faq-item[open] summary::after{content:"–";color:var(--sage-bright)}
   .faq-item p{color:var(--ivory-dim);font-size:.88rem;line-height:1.65;margin-top:10px}
 
   /* testimonials */
   .testi-row{display:flex;flex-direction:column;gap:14px;max-width:480px;margin:0 auto}
-  .testi-card{border:1px solid var(--line);border-radius:4px;padding:20px}
+  .testi-card{border:1px solid var(--line);border-radius:14px 4px 14px 4px;padding:20px}
   .testi-quote{font-family:'Fraunces',serif;font-style:italic;color:var(--ivory);font-size:1rem;line-height:1.6}
   .testi-attrib{color:var(--gold);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 
   /* location / policy */
-  .info-box{border:1px solid var(--line);border-radius:4px;padding:20px;margin-bottom:14px}
+  .info-box{border:1px solid var(--line);border-radius:14px 4px 14px 4px;padding:20px;margin-bottom:14px}
   .info-box .k{color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.7rem;margin-bottom:8px}
   .info-box .v{color:var(--ivory-dim);font-size:.9rem;line-height:1.6}
   .info-box .v strong{color:var(--ivory);font-weight:500}
@@ -193,6 +199,12 @@
   <!-- ═══ MEET THE ARTIST ═══ -->
   <section id="artist">
     <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
+    <svg class="host-leaves" viewBox="0 0 110 22" fill="none" aria-hidden="true">
+      <path d="M2 11c14-9 40-9 53 0" stroke="#8C9673" stroke-width="1"/>
+      <path d="M108 11c-14-9-40-9-53 0" stroke="#8C9673" stroke-width="1"/>
+      <path d="M8 10c3-4 7-4 9 0M20 8c3-4 7-4 9 0M32 6c3-3 6-3 8 0" stroke="#8C9673" stroke-width=".7"/>
+      <path d="M102 10c-3-4-7-4-9 0M90 8c-3-4-7-4-9 0M78 6c-3-3-6-3-8 0" stroke="#8C9673" stroke-width=".7"/>
+    </svg>
     <p class="section-label">Meet The Artist</p>
     <h2>Hi, I'm Amii</h2>
     <p class="about-text">
