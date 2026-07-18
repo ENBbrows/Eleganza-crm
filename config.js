@@ -34,7 +34,7 @@ const CONFIG = {
   /* Where clients can learn brow tips & tricks */
   YOUTUBE_URL: "PASTE_YOUR_YOUTUBE_CHANNEL_LINK",
   INSTAGRAM_URL: "https://www.instagram.com/enb._brows/",
-  FACEBOOK_PAGE_URL: "PASTE_YOUR_FACEBOOK_PAGE_LINK",
+  FACEBOOK_PAGE_URL: "https://www.facebook.com/share/14j8EG4poYB/",
 
   /* Column names in your Clients table */
   COLUMNS: {
