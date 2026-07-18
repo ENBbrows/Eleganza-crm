@@ -182,6 +182,7 @@
       <a href="#visit">Visit &amp; Policies</a>
       <a href="#work">See the Work</a>
       <a href="#reviews">Leave a Review</a>
+      <a href="gift-eleganza.html">🎁 Gift Certificates</a>
       <a class="nav-book" href="book-eleganza.html">Book Now</a>
     </div>
   </div>
@@ -569,7 +570,8 @@ const SEARCH_MAP = [
   [["visit","location","address","studio","policy","late","deposit","payment","wam","hours","tip"], "visit"],
   [["work","before","after","instagram","tiktok","portfolio","results"], "work"],
   [["review","leave a review","google","facebook"], "reviews"],
-  [["book","appointment","schedule","booking"], "__book__"]
+  [["book","appointment","schedule","booking"], "__book__"],
+  [["gift","gift certificate","gift card","present"], "__gift__"]
 ];
 $("navSearchForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -584,6 +586,7 @@ $("navSearchForm").addEventListener("submit", e => {
     }
   }
   if (targetId === "__book__") { location.href = "book-eleganza.html"; return; }
+  if (targetId === "__gift__") { location.href = "gift-eleganza.html"; return; }
   if (targetId) {
     document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" });
     input.value = "";

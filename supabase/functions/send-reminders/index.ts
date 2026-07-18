@@ -304,8 +304,75 @@ async function markSent(id: string, field: SentField) {
   });
 }
 
+const STUDIO_ADDRESS = "4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo & Associates office.";
+const GIFT_DESIGN_NAMES: Record<string, string> = {
+  love: "Because I Love You",
+  christmas: "Season's Greetings",
+  milestone: "Congratulations",
+};
+
+type GiftRow = {
+  id: string;
+  design: string;
+  amount: number;
+  buyer_name: string;
+  recipient_name: string;
+  recipient_email: string | null;
+  personal_message: string | null;
+  signed_by: string | null;
+  redemption_code: string;
+  referral_voucher_code: string | null;
+};
+
+async function fetchGiftsDue() {
+  const now = new Date().toISOString();
+  const res = await rest(
+    `/rest/v1/gift_certificates?select=id,design,amount,buyer_name,recipient_name,recipient_email,personal_message,signed_by,redemption_code,referral_voucher_code` +
+      `&payment_status=eq.paid&sent_at=is.null&send_at=lte.${now}`
+  );
+  if (!res.ok) {
+    console.error("fetchGiftsDue failed:", await res.text());
+    return [];
+  }
+  return (await res.json()) as GiftRow[];
+}
+
+async function deliverGiftToRecipient(g: GiftRow) {
+  if (!g.recipient_email) return;
+  const name = firstName(g.recipient_name);
+  const buyerFirst = firstName(g.buyer_name);
+  const bookLink = `${SITE_URL}/book-eleganza.html?gift=${g.redemption_code}`;
+  const messageBlock = g.personal_message ? `\n"${g.personal_message}"\n— ${g.signed_by || buyerFirst}\n` : `\n— ${g.signed_by || buyerFirst}\n`;
+  const referralLine = g.referral_voucher_code
+    ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
+    : "";
+  const contactCard =
+    `Eleganza Naturally Beautiful\n` +
+    `Location: ${STUDIO_ADDRESS}\n` +
+    (BUSINESS_WHATSAPP_NUMBER ? `WhatsApp: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}\n` : "") +
+    `Website: ${SITE_URL}/home.html`;
+
+  await sendEmail(
+    g.recipient_email,
+    `You've received an Eleganza gift certificate! 🤍`,
+    `Hi ${name},\n\n${buyerFirst} sent you a ${GIFT_DESIGN_NAMES[g.design] || g.design} gift certificate worth TT$${g.amount.toLocaleString()} at Eleganza Naturally Beautiful.\n${messageBlock}\n` +
+      `Ready to book? Use this link — your gift is already linked to it:\n${bookLink}\n\n` +
+      `Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
+      `${contactCard}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`,
+    "eleganza"
+  );
+}
+
+async function markGiftSent(id: string) {
+  await rest(`/rest/v1/gift_certificates?id=eq.${id}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ sent_at: new Date().toISOString() }),
+  });
+}
+
 Deno.serve(async () => {
-  const results: Record<string, number> = { day_before: 0, hour_before: 0, followup: 0, two_week: 0 };
+  const results: Record<string, number> = { day_before: 0, hour_before: 0, followup: 0, two_week: 0, gifts: 0 };
 
   // Day-before window: 23h–25h out, so a job running every 15 min never double-fires
   const dayBefore = await fetchDue("day_before_sent_at", 23 * 60, 25 * 60);
@@ -372,6 +439,17 @@ Deno.serve(async () => {
     }
     await markSent(b.id, "two_week_sent_at");
     results.two_week++;
+  }
+
+  // Scheduled gift certificate deliveries — buyer already paid, and either
+  // asked for it to go out at a specific future time, or notify-gift's
+  // immediate send attempt didn't fire (e.g. it errored). This sweep is
+  // the reliable backstop for both.
+  const giftsDue = await fetchGiftsDue();
+  for (const g of giftsDue) {
+    await deliverGiftToRecipient(g);
+    await markGiftSent(g.id);
+    results.gifts++;
   }
 
   return new Response(JSON.stringify({ ok: true, sent: results }), {

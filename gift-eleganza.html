@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gift Certificates — Eleganza Naturally Beautiful</title>
+<meta name="description" content="Give the gift of confidence — Eleganza Naturally Beautiful gift certificates." />
+<link rel="apple-touch-icon" href="app-icon-black-v2.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
+    --gold:#C9A26B; --gold-bright:#E0BE8A;
+    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0; --error:#D98E7E;
+    --sage:#8C9673; --sage-bright:#A8B48C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;
+    letter-spacing:.01em;padding:32px 20px 80px;
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%);
+  }
+  .wrap{max-width:480px;margin:0 auto}
+  .lotus{display:block;width:100px;height:auto;margin:0 auto 14px}
+  .brand{font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ivory-dim);text-align:center}
+  h1{font-family:'Fraunces',serif;font-weight:300;font-style:italic;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.2;text-align:center;margin-top:16px;color:var(--gold-bright)}
+  .sub{color:var(--ivory-dim);font-size:.92rem;line-height:1.65;text-align:center;margin-top:12px}
+  .back-link{display:block;text-align:center;margin-top:14px;color:var(--ivory-dim);font-size:.82rem;text-decoration:underline}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* gift card visuals */
+  .gift-carousel{position:relative;max-width:300px;margin:28px auto 14px}
+  .gift-card-visual{
+    aspect-ratio:4/5;border-radius:16px 4px 16px 4px;border:1px solid var(--gold);
+    display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    padding:24px;position:relative;overflow:hidden;cursor:pointer;
+  }
+  .gift-card-visual.active{display:flex}
+  .gift-card-visual::before{content:"";position:absolute;inset:8px;border:1px solid rgba(201,162,107,.35);border-radius:12px 3px 12px 3px;pointer-events:none}
+  .gift-card-visual::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(120deg, transparent 40%, rgba(201,162,107,.1) 50%, transparent 60%);
+    animation:gc-shimmer 3.2s ease-in-out infinite;
+  }
+  @keyframes gc-shimmer{0%,100%{opacity:.4}50%{opacity:1}}
+  .gc-card[data-design="love"] .gift-card-visual{background:radial-gradient(ellipse at 50% 0%, rgba(224,190,138,.14), var(--ink) 70%)}
+  .gc-card[data-design="christmas"] .gift-card-visual{background:radial-gradient(ellipse at 50% 0%, rgba(140,150,115,.16), var(--ink) 70%)}
+  .gc-card[data-design="milestone"] .gift-card-visual{background:radial-gradient(ellipse at 50% 0%, rgba(201,162,107,.18), var(--ink) 70%)}
+  .gc-kicker{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ivory-dim)}
+  .gc-motif{width:56px;height:56px;margin-top:16px}
+  .gc-title{font-family:'Fraunces',serif;font-style:italic;font-size:1.3rem;color:var(--gold-bright);margin-top:14px;padding:0 10px}
+  .gc-sub{font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ivory-dim);margin-top:8px}
+  .gc-amount{font-family:'Fraunces',serif;font-size:1.7rem;color:var(--ivory);margin-top:18px}
+
+  .carousel-dots{display:flex;justify-content:center;gap:8px;margin-top:14px}
+  .carousel-dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:1px solid var(--gold);cursor:pointer}
+  .carousel-dot.active{background:var(--gold)}
+  .carousel-name{text-align:center;font-family:'Fraunces',serif;font-size:.95rem;color:var(--ivory-dim);margin-top:10px}
+
+  label{display:block;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:16px 0 8px}
+  input,select,textarea{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;color:var(--ivory);
+    font-family:'Karla',sans-serif;font-size:1rem;padding:13px 14px;outline:none;
+  }
+  textarea{resize:vertical;min-height:80px}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+  .price-row{display:flex;gap:10px;margin-top:8px}
+  .price-opt{
+    flex:1;text-align:center;padding:16px 8px;border:1px solid var(--line);border-radius:14px 4px 14px 4px;
+    cursor:pointer;color:var(--ivory-dim);
+  }
+  .price-opt.selected{border-color:var(--gold);color:var(--gold-bright);background:rgba(201,162,107,.06)}
+  .price-opt .amt{font-family:'Fraunces',serif;font-size:1.3rem;display:block}
+  .price-opt .lbl{font-size:.72rem;margin-top:4px;display:block}
+
+  .btn{
+    display:block;width:100%;margin-top:22px;padding:16px;background:var(--gold);color:var(--ink);
+    border:none;border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.24em;
+    text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center;
+  }
+  .btn:disabled{opacity:.5;cursor:wait}
+  .btn-ghost{
+    display:block;width:100%;margin-top:10px;padding:14px;background:transparent;color:var(--gold);
+    border:1px solid var(--gold);border-radius:2px;font-weight:600;font-size:.78rem;letter-spacing:.2em;
+    text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center;
+  }
+  .banner{display:none;margin-top:16px;padding:12px 14px;border:1px solid var(--error);color:var(--error);font-size:.85rem;border-radius:2px}
+  .banner.show{display:block}
+  .summary{margin-top:20px;padding:18px;border:1px solid var(--gold);border-radius:14px 4px 14px 4px}
+  .summary .k{color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.7rem;margin-bottom:8px}
+  .summary .v{color:var(--ivory-dim);font-size:.9rem;line-height:1.6}
+  .summary .v strong{color:var(--ivory);font-weight:500}
+  .done-icon{text-align:center;font-size:2.4rem;margin:10px 0}
+  .rule{width:44px;height:22px;margin:36px auto;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cpath d='M2 11c7-9 33-9 40 0-7 9-33 9-40 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3C/svg%3E") no-repeat center/contain}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
+  <p class="brand">Eleganza Naturally Beautiful</p>
+  <h1>Give the Gift of <em>Confidence</em></h1>
+  <p class="sub">A gift certificate for someone who deserves brows that frame their story.</p>
+
+  <!-- ═══ SCREEN 1 · CHOOSE ═══ -->
+  <section class="screen active" id="screen-choose">
+    <div class="gift-carousel" id="giftCarousel">
+      <div class="gc-card" data-design="love">
+        <div class="gift-card-visual active">
+          <div class="gc-kicker">Eleganza Naturally Beautiful</div>
+          <svg class="gc-motif" viewBox="0 0 64 64" fill="none"><path d="M32 54s-22-13-22-29c0-8 6-14 14-14 4 0 8 2 8 6 0-4 4-6 8-6 8 0 14 6 14 14 0 16-22 29-22 29z" stroke="#C9A26B" stroke-width="1.4"/></svg>
+          <div class="gc-title">Because I Love You</div>
+          <div class="gc-sub">Gift Certificate</div>
+          <div class="gc-amount" data-amount-display>TT$2,500</div>
+        </div>
+      </div>
+      <div class="gc-card" data-design="christmas">
+        <div class="gift-card-visual">
+          <div class="gc-kicker">Eleganza Naturally Beautiful</div>
+          <svg class="gc-motif" viewBox="0 0 64 64" fill="none" stroke="#8C9673" stroke-width="1.4"><line x1="32" y1="6" x2="32" y2="58"/><line x1="8" y1="18" x2="56" y2="46"/><line x1="8" y1="46" x2="56" y2="18"/><line x1="32" y1="6" x2="32" y2="58" transform="rotate(90 32 32)"/></svg>
+          <div class="gc-title">Season's Greetings</div>
+          <div class="gc-sub">Gift Certificate</div>
+          <div class="gc-amount" data-amount-display>TT$2,500</div>
+        </div>
+      </div>
+      <div class="gc-card" data-design="milestone">
+        <div class="gift-card-visual">
+          <div class="gc-kicker">Eleganza Naturally Beautiful</div>
+          <svg class="gc-motif" viewBox="0 0 64 64" fill="none"><path d="M6 40c10-16 42-16 52 0" stroke="#C9A26B" stroke-width="1.2"/><path d="M14 36c3-5 8-5 10 0M24 32c3-5 8-5 10 0" stroke="#C9A26B" stroke-width=".9"/><path d="M50 36c-3-5-8-5-10 0M40 32c-3-5-8-5-10 0" stroke="#C9A26B" stroke-width=".9"/><path d="M32 8l2.5 6.5L41 16l-5 4.5 1.3 7L32 24l-5.3 3.5L28 20 23 15.5l6.5-1z" fill="#C9A26B"/></svg>
+          <div class="gc-title">Congratulations</div>
+          <div class="gc-sub">Gift Certificate</div>
+          <div class="gc-amount" data-amount-display>TT$2,500</div>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+    <p class="carousel-name" id="carouselName">Because I Love You</p>
+
+    <label for="g-amount">Select a value</label>
+    <div class="price-row">
+      <div class="price-opt selected" data-amount="2500">
+        <span class="amt">TT$2,500</span>
+        <span class="lbl">Full Microblading</span>
+      </div>
+      <div class="price-opt" data-amount="1000">
+        <span class="amt">TT$1,000</span>
+        <span class="lbl">Returning Client Service</span>
+      </div>
+    </div>
+
+    <button class="btn" type="button" id="btnToDetails">Continue</button>
+  </section>
+
+  <!-- ═══ SCREEN 2 · DETAILS ═══ -->
+  <section class="screen" id="screen-details">
+    <form id="detailsForm" novalidate>
+      <label for="d-recipient-name">Recipient's name</label>
+      <input id="d-recipient-name" type="text" required />
+      <label for="d-recipient-email">Recipient's email</label>
+      <input id="d-recipient-email" type="email" required />
+      <label for="d-recipient-phone">Recipient's phone <span style="text-transform:none;letter-spacing:0;color:var(--ivory-dim)">(optional)</span></label>
+      <input id="d-recipient-phone" type="tel" />
+
+      <label for="d-message">Personal message</label>
+      <textarea id="d-message" placeholder="Write something from the heart…"></textarea>
+      <label for="d-signed">Signed</label>
+      <input id="d-signed" type="text" placeholder="Your name" required />
+
+      <label for="d-send-date">When should it be sent?</label>
+      <input id="d-send-date" type="datetime-local" />
+      <p class="sub" style="text-align:left;margin-top:6px;font-size:.8rem">Leave blank to send right after payment is confirmed.</p>
+
+      <label for="d-buyer-name">Your name</label>
+      <input id="d-buyer-name" type="text" required />
+      <label for="d-buyer-email">Your email <span style="text-transform:none;letter-spacing:0;color:var(--ivory-dim)">(for your receipt)</span></label>
+      <input id="d-buyer-email" type="email" required />
+      <label for="d-buyer-phone">Your phone</label>
+      <input id="d-buyer-phone" type="tel" required />
+
+      <button class="btn" type="submit" id="btnToPay">Continue to Payment</button>
+    </form>
+    <button class="btn-ghost" type="button" id="backToChoose">← Choose a different design</button>
+    <div class="banner" id="detailsError"></div>
+  </section>
+
+  <!-- ═══ SCREEN 3 · PAY ═══ -->
+  <section class="screen" id="screen-pay">
+    <div class="summary" id="paySummary"></div>
+    <div class="summary" style="border-color:var(--gold);margin-top:14px">
+      <div class="k">Secure This Gift</div>
+      <div class="v" id="payIntro"></div>
+      <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:14px">Pay via WAM!</button>
+      <button class="btn" type="button" id="btnConfirmPaid" style="display:none">I've Sent My Payment</button>
+    </div>
+    <div class="banner" id="payError"></div>
+  </section>
+
+  <!-- ═══ SCREEN 4 · DONE ═══ -->
+  <section class="screen" id="screen-done">
+    <div class="done-icon">✦</div>
+    <h1>Sent With Love</h1>
+    <p class="sub" id="doneSub"></p>
+    <div class="summary" id="doneSummary"></div>
+    <a class="btn" href="home.html">Back to Eleganza</a>
+  </section>
+
+  <a class="back-link" href="home.html">← Back to Eleganza Naturally Beautiful</a>
+</div>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+async function rpc(fn, body) {
+  const res = await fetch(RPC + fn, {
+    method: "POST",
+    headers: { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+function fmtMoney(n) { return "TT$" + Number(n).toLocaleString(); }
+function esc(s) { return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+const DESIGN_NAMES = { love: "Because I Love You", christmas: "Season's Greetings", milestone: "Congratulations" };
+const state = { design: "love", amount: 2500 };
+
+/* ── Carousel ── */
+const cards = Array.from(document.querySelectorAll(".gc-card"));
+const dotsWrap = $("carouselDots");
+cards.forEach((card, i) => {
+  const dot = document.createElement("div");
+  dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+  dot.addEventListener("click", () => selectCard(i));
+  dotsWrap.appendChild(dot);
+});
+function selectCard(i) {
+  cards.forEach((card, idx) => {
+    card.querySelector(".gift-card-visual").classList.toggle("active", idx === i);
+  });
+  dotsWrap.querySelectorAll(".carousel-dot").forEach((d, idx) => d.classList.toggle("active", idx === i));
+  state.design = cards[i].dataset.design;
+  $("carouselName").textContent = DESIGN_NAMES[state.design];
+}
+let currentCardIndex = 0;
+$("giftCarousel").addEventListener("click", () => {
+  currentCardIndex = (currentCardIndex + 1) % cards.length;
+  selectCard(currentCardIndex);
+});
+
+/* ── Price selector ── */
+document.querySelectorAll(".price-opt").forEach(opt => {
+  opt.addEventListener("click", () => {
+    document.querySelectorAll(".price-opt").forEach(o => o.classList.remove("selected"));
+    opt.classList.add("selected");
+    state.amount = Number(opt.dataset.amount);
+    document.querySelectorAll("[data-amount-display]").forEach(el => el.textContent = fmtMoney(state.amount));
+  });
+});
+
+$("btnToDetails").addEventListener("click", () => showScreen("screen-details"));
+$("backToChoose").addEventListener("click", () => showScreen("screen-choose"));
+
+/* ── Details form ── */
+$("detailsForm").addEventListener("submit", e => {
+  e.preventDefault();
+  $("detailsError").classList.remove("show");
+  const required = ["d-recipient-name", "d-recipient-email", "d-signed", "d-buyer-name", "d-buyer-email", "d-buyer-phone"];
+  for (const id of required) {
+    if (!$(id).value.trim()) {
+      $("detailsError").textContent = "Please fill in all required fields.";
+      $("detailsError").classList.add("show");
+      return;
+    }
+  }
+  state.recipientName = $("d-recipient-name").value.trim();
+  state.recipientEmail = $("d-recipient-email").value.trim();
+  state.recipientPhone = $("d-recipient-phone").value.trim();
+  state.message = $("d-message").value.trim();
+  state.signedBy = $("d-signed").value.trim();
+  state.sendAt = $("d-send-date").value ? new Date($("d-send-date").value).toISOString() : null;
+  state.buyerName = $("d-buyer-name").value.trim();
+  state.buyerEmail = $("d-buyer-email").value.trim();
+  state.buyerPhone = $("d-buyer-phone").value.trim();
+  renderPaySummary();
+  showScreen("screen-pay");
+});
+
+/* ── Pay screen ── */
+async function renderPaySummary() {
+  $("paySummary").innerHTML = `
+    <div class="k">Your Gift</div>
+    <div class="v">
+      Design <strong>${esc(DESIGN_NAMES[state.design])}</strong><br>
+      Value <strong>${fmtMoney(state.amount)}</strong><br>
+      To <strong>${esc(state.recipientName)}</strong><br>
+      ${state.sendAt ? `Sending <strong>${new Date(state.sendAt).toLocaleString("en-US",{dateStyle:"long",timeStyle:"short"})}</strong>` : `Sending <strong>as soon as payment is confirmed</strong>`}
+    </div>`;
+  const handle = (CONFIG.WAM_BUSINESS_HANDLE && CONFIG.WAM_BUSINESS_HANDLE.indexOf("PASTE_") !== 0) ? CONFIG.WAM_BUSINESS_HANDLE : CONFIG.WAM_HANDLE;
+  $("payIntro").innerHTML = `Open the WAM! app and send <strong>${fmtMoney(state.amount)}</strong> to <strong>${esc(handle)}</strong>. Once you've sent it, tap the button below.`;
+}
+
+let giftId = null;
+$("btnPayWam").addEventListener("click", async () => {
+  $("payError").classList.remove("show");
+  $("btnPayWam").disabled = true;
+  window.open("https://wam.money", "_blank", "noopener");
+  try {
+    const result = await rpc("create_gift_order", {
+      p_design: state.design, p_amount: state.amount,
+      p_buyer_name: state.buyerName, p_buyer_email: state.buyerEmail, p_buyer_phone: state.buyerPhone,
+      p_recipient_name: state.recipientName, p_recipient_email: state.recipientEmail, p_recipient_phone: state.recipientPhone,
+      p_personal_message: state.message, p_signed_by: state.signedBy, p_send_at: state.sendAt
+    });
+    giftId = result.id;
+    $("btnPayWam").style.display = "none";
+    $("btnConfirmPaid").style.display = "block";
+  } catch (err) {
+    console.error(err);
+    $("payError").textContent = "Something went wrong — please try again.";
+    $("payError").classList.add("show");
+    $("btnPayWam").disabled = false;
+  }
+});
+
+$("btnConfirmPaid").addEventListener("click", async () => {
+  $("btnConfirmPaid").disabled = true;
+  $("btnConfirmPaid").textContent = "Confirming…";
+  try {
+    await rpc("confirm_gift_payment", { p_id: giftId });
+    // Fire-and-forget: sends the recipient + buyer emails right away (unless scheduled for later)
+    fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-gift`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ id: giftId })
+    }).catch(e => console.warn("notify-gift failed:", e));
+
+    $("doneSub").textContent = state.sendAt
+      ? `We'll deliver it to ${state.recipientName} right on schedule.`
+      : `${state.recipientName} will receive it by email shortly.`;
+    $("doneSummary").innerHTML = `<div class="v">Design <strong>${esc(DESIGN_NAMES[state.design])}</strong><br>Value <strong>${fmtMoney(state.amount)}</strong></div>`;
+    showScreen("screen-done");
+  } catch (err) {
+    console.error(err);
+    $("payError").textContent = "Something went wrong confirming your payment — please try again.";
+    $("payError").classList.add("show");
+    $("btnConfirmPaid").disabled = false;
+    $("btnConfirmPaid").textContent = "I've Sent My Payment";
+  }
+});
+</script>
+</body>
+</html>

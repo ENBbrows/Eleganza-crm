@@ -80,6 +80,7 @@ supabase login
 supabase link --project-ref <your-project-ref>
 supabase functions deploy send-reminders
 supabase functions deploy notify-payment
+supabase functions deploy notify-gift
 
 supabase secrets set RESEND_API_KEY=re_xxx
 supabase secrets set RESEND_FROM_ELEGANZA="Eleganza <hello@enbfocus.com>"
@@ -134,6 +135,23 @@ Full Amount in Cash at Check-In** on `book-eleganza.html`:
 Run `supabase/migrations/0008_payment_confirmation.sql` and
 `supabase/migrations/0009_referral_vouchers.sql` (SQL Editor, same as
 before) to get `confirm_payment_intent` and the voucher functions in place.
+
+### Gift certificates (`gift-eleganza.html`)
+
+Run `supabase/migrations/0011_gift_certificates.sql` and deploy
+`notify-gift` (steps above). Payment currently follows the same WAM!
+deposit + manual-confirm pattern as everything else — the buyer sends
+payment via WAM! to `WAM_BUSINESS_HANDLE` (set in `config.js`), taps
+"I've Sent My Payment," and that's self-reported the same way a booking
+deposit is. This is meant to be upgraded to real automated WAM! Business
+checkout once that account exists and its API reference is available —
+at that point `confirm_gift_payment` gets called by a webhook instead of
+a tap. Buying a certificate also mints a bundled 10%-off referral voucher
+for the recipient (`referral_vouchers` table), and logs the sale straight
+to `receipts` for the financial log. If the buyer schedules delivery for
+a future date, `send-reminders`' cron sweep (already running every 15
+min) delivers it automatically once that time arrives — no separate cron
+needed.
 
 ## 6. Schedule it (Supabase Cron)
 

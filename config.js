@@ -24,6 +24,11 @@ const CONFIG = {
      yourself when completing the booking in the CRM's Calendar tab). */
   WAM_HANDLE: "@amiileroux",
 
+  /* Your WAM! Business handle — used for gift certificate purchases. Once
+     WAM! Business API credentials are wired into an edge function, this can
+     become a real automated checkout instead of tap-to-confirm. */
+  WAM_BUSINESS_HANDLE: "@enb",
+
   /* The Eleganza Effect — tune these to your market */
   VALUE_MATH: {
     pencilCost: 120,      /* TT$ per brow pencil/kit */
