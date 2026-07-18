@@ -30,7 +30,13 @@
       radial-gradient(ellipse 70% 45% at 10% 75%, rgba(140,150,115,.05), transparent 55%);
   }
   .wrap{max-width:640px;margin:0 auto;padding:32px 20px 80px}
-  .lotus{display:block;width:130px;height:auto;margin:0 auto 16px}
+  .lotus{display:block;width:130px;height:auto;margin:0 auto 16px;transition:transform .08s linear}
+  .music-toggle{
+    position:fixed;bottom:20px;right:20px;z-index:60;
+    background:var(--ink-soft);border:1px solid var(--gold);color:var(--gold);
+    border-radius:20px;padding:10px 16px;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+    cursor:pointer;font-family:'Karla',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.4);
+  }
   .brand{font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);text-align:center}
   .tagline{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1rem;color:var(--gold);letter-spacing:.03em;text-align:center;margin-top:8px}
   h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2rem,7vw,2.8rem);line-height:1.2;text-align:center;margin-top:22px}
@@ -312,11 +318,19 @@
       </details>
       <details class="faq-item">
         <summary>Does it hurt?</summary>
-        <p>Everyone's pain tolerance is different, but most clients find it far more tolerable than expected. We'll talk through your comfort throughout the appointment.</p>
+        <p>Pain levels can vary — many clients report little to no pain. Factors like your menstrual cycle or personal sensitivity can affect how it feels, but for the most part, the process is generally painless.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How long does the procedure take?</summary>
+        <p>The initial procedure takes about 2 hours.</p>
       </details>
       <details class="faq-item">
         <summary>What's the healing process like?</summary>
         <p>Color is noticeably darker for the first 5-7 days, then fades 40-50% as it settles. Full healing takes about 28 days, and a follow-up touch-up afterward is a normal, expected part of the process.</p>
+      </details>
+      <details class="faq-item">
+        <summary>When do I touch up?</summary>
+        <p>Your touch-up will be 5-6 weeks after your initial microblading procedure.</p>
       </details>
       <details class="faq-item">
         <summary>How long does it last?</summary>
@@ -390,6 +404,7 @@
   <section id="work">
     <p class="section-label">Real Results</p>
     <h2>See the Work</h2>
+    <video class="work-video" src="clip-studio.mp4" muted loop playsinline controls preload="metadata" style="width:100%;max-width:420px;display:block;margin:0 auto 22px;border-radius:14px 4px 14px 4px;border:1px solid var(--line)"></video>
     <p class="hero-sub" style="margin-bottom:22px">Before &amp; afters live on Instagram and TikTok — new sets posted regularly.</p>
     <div class="review-row" id="workRow"></div>
   </section>
@@ -579,6 +594,77 @@ $("navSearchForm").addEventListener("submit", e => {
     setTimeout(() => { input.placeholder = original; }, 2500);
   }
 });
+
+/* ───────────────────── Seasonal ambience: tap to play, logo pulses to the beat ─────────────────────
+   Browsers block audio from auto-playing with sound, so this can only ever start on a real tap —
+   that's a platform rule, not a choice made here. Once tapped, the logo(s) pulse in real time using
+   the Web Audio API's frequency data, not a fixed animation. */
+const SEASON_TRACKS = [
+  { months: [2, 3], file: "audio/season-soca.mp3", label: "Soca" },
+  { months: [4, 5, 6], file: "audio/season-love.mp3", label: "Love Song" },
+  { months: [7, 8], file: "audio/season-sunset.mp3", label: "Sunset House" },
+  // Sept/Oct "dark trap" track hasn't been sent yet — add it here once it is:
+  // { months: [9, 10], file: "audio/season-darktrap.mp3", label: "Dark Trap" },
+  { months: [11, 12, 1], file: "audio/season-christmas.mp3", label: "Christmas" }
+];
+function currentSeasonTrack() {
+  const m = new Date().getMonth() + 1; // 1-12
+  return SEASON_TRACKS.find(s => s.months.includes(m)) || null;
+}
+
+(function setupAmbience() {
+  const track = currentSeasonTrack();
+  if (!track) return; // no track configured for this month yet
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "music-toggle";
+  btn.id = "musicToggle";
+  btn.textContent = "🎵 Play " + track.label;
+  document.body.appendChild(btn);
+
+  let audio = null, audioCtx = null, analyser = null, dataArray = null, rafId = null, playing = false;
+
+  function pulseLoop() {
+    if (!analyser) return;
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    const n = Math.min(24, dataArray.length); // low-mid frequencies read as the "beat"
+    for (let i = 0; i < n; i++) sum += dataArray[i];
+    const avg = sum / n / 255;
+    const scale = 1 + avg * 0.18;
+    document.querySelectorAll(".lotus").forEach(el => { el.style.transform = `scale(${scale})`; });
+    rafId = requestAnimationFrame(pulseLoop);
+  }
+
+  btn.addEventListener("click", () => {
+    if (!audio) {
+      audio = new Audio(track.file);
+      audio.loop = true;
+      audio.volume = 0.5;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(audio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+    }
+    if (!playing) {
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      audio.play();
+      pulseLoop();
+      btn.textContent = "🔇 Pause " + track.label;
+      playing = true;
+    } else {
+      audio.pause();
+      cancelAnimationFrame(rafId);
+      document.querySelectorAll(".lotus").forEach(el => { el.style.transform = "scale(1)"; });
+      btn.textContent = "🎵 Play " + track.label;
+      playing = false;
+    }
+  });
+})();
 </script>
 </body>
 </html>
