@@ -212,6 +212,7 @@ $("tipHandle").textContent = (CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PA
   const links = [
     ["Instagram", CONFIG.INSTAGRAM_URL],
     ["Facebook", CONFIG.FACEBOOK_PAGE_URL],
+    ["TikTok", CONFIG.TIKTOK_URL],
     ["YouTube", CONFIG.YOUTUBE_URL]
   ].filter(([, url]) => url && url.indexOf("PASTE_") !== 0);
   row.innerHTML = links.map(([label, url]) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`).join("");

@@ -35,6 +35,7 @@ const CONFIG = {
   YOUTUBE_URL: "https://youtube.com/@amiileroux",
   INSTAGRAM_URL: "https://www.instagram.com/enb._brows/",
   FACEBOOK_PAGE_URL: "https://www.facebook.com/share/14j8EG4poYB/",
+  TIKTOK_URL: "https://www.tiktok.com/@e.n.b.brows",
 
   /* Column names in your Clients table */
   COLUMNS: {
