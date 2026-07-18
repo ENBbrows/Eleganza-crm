@@ -42,7 +42,7 @@
       background:#171210;border:1px solid #C9A26B;
       display:flex;align-items:center;justify-content:center;
       cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5);
-      animation:amb-idle 2.4s ease-in-out infinite;
+      animation:amb-idle 1.6s ease-in-out infinite;
     }
     .amb-badge img{width:30px;height:auto;display:block;transition:transform .08s linear}
     .amb-hint{
@@ -53,10 +53,10 @@
     }
     .amb-hint.show{opacity:1}
     @keyframes amb-idle{
-      0%,100%{box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 0 rgba(201,162,107,.45)}
-      50%{box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 12px rgba(201,162,107,0)}
+      0%,100%{transform:scale(1);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 0 rgba(201,162,107,.45)}
+      50%{transform:scale(1.12);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 14px rgba(201,162,107,0)}
     }
-    .amb-badge.playing{animation:none}
+    .amb-badge.playing{animation:amb-idle 1.6s ease-in-out infinite}
     .lotus{transition:transform .08s linear}
   `;
   document.head.appendChild(style);
@@ -66,11 +66,10 @@
   const badge = document.createElement("div");
   badge.className = "amb-badge";
   badge.id = "ambienceBadge";
-  badge.innerHTML = `<img src="logo-gold.png" alt="Play ambience music" /><span class="amb-hint" id="ambHint">🎵 Tap for Music</span>`;
+  badge.innerHTML = `<img src="logo-gold.png" alt="Play ambience music" /><span class="amb-hint show" id="ambHint">🎵 Tap for Music</span>`;
   document.body.appendChild(badge);
   const hint = document.getElementById("ambHint");
-  setTimeout(() => hint.classList.add("show"), 700);
-  setTimeout(() => hint.classList.remove("show"), 6000);
+  setTimeout(() => { if (!playing) hint.classList.remove("show"); }, 6000);
   badge.addEventListener("mouseenter", () => hint.classList.add("show"));
   badge.addEventListener("mouseleave", () => { if (!playing) hint.classList.remove("show"); });
 
