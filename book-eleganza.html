@@ -181,8 +181,11 @@ const CLIENTS_REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONF
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
 const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
 const MIN_LEAD_DAYS = 14; // clients must book at least 2 weeks ahead
+const ANNUAL_TOUCHUP_LEAD_DAYS = 7; // Annual Touch-Up can be booked just 1 week out
 const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
-const MIN_LEAD_MS = MIN_LEAD_DAYS * 24 * 3600 * 1000;
+function leadDaysFor(service) {
+  return (service && service.name === "Annual Touch-Up") ? ANNUAL_TOUCHUP_LEAD_DAYS : MIN_LEAD_DAYS;
+}
 const params = new URLSearchParams(location.search);
 const PRESET_CATEGORY = params.get("category");
 const PRESET_SUGGEST_DAYS = params.get("suggestDays") ? parseInt(params.get("suggestDays"), 10) : null;
@@ -246,6 +249,7 @@ function generateSlots(schedule, service, dateStr) {
   const bufMs = (service.buffer_minutes||0) * 60000;
   const stepMs = 30 * 60000;
   const now = new Date();
+  const leadMs = leadDaysFor(service) * 24 * 3600 * 1000;
   const slots = [];
   for (const [rs, re] of ranges) {
     let t = new Date(Math.ceil(rs.getTime() / stepMs) * stepMs);
@@ -253,7 +257,7 @@ function generateSlots(schedule, service, dateStr) {
     while (t.getTime() + durMs <= re.getTime()) {
       const slotBusyEnd = new Date(t.getTime() + durMs + bufMs);
       const overlaps = busy.some(([bs,be]) => t < be && slotBusyEnd > bs);
-      if (!overlaps && (t.getTime() - now.getTime()) >= MIN_LEAD_MS) slots.push(new Date(t));
+      if (!overlaps && (t.getTime() - now.getTime()) >= leadMs) slots.push(new Date(t));
       t = new Date(t.getTime() + stepMs);
     }
   }
@@ -360,7 +364,8 @@ function isDayPotentiallyOpen(dateStr) {
 function renderDateStrip() {
   const strip = $("dateStrip");
   const days = [];
-  for (let i=MIN_LEAD_DAYS; i<MIN_LEAD_DAYS+VISIBLE_DAYS; i++) {
+  const leadDays = leadDaysFor(state.service);
+  for (let i=leadDays; i<leadDays+VISIBLE_DAYS; i++) {
     const d = new Date(Date.now() + i*86400000).toISOString().slice(0,10);
     if (isDayPotentiallyOpen(d)) days.push(d);
   }
@@ -546,6 +551,8 @@ function renderDone(result, name, phone) {
   $("btnPayWam").disabled = false; $("btnPayWam").textContent = "Pay via WAM!";
   $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
 
+  // Every paid service must end at a checkout step — no silent dead ends,
+  // regardless of whether WAM! happens to be configured.
   if (state.gift) {
     const price = state.service.price || 0;
     const covered = Math.min(state.gift.amount, price);
@@ -554,15 +561,24 @@ function renderDone(result, name, phone) {
       ? `Your gift certificate covers <strong>${fmtMoney(covered, state.gift.currency)}</strong> — the remaining <strong>${fmtMoney(remainder, state.gift.currency)}</strong> is due in cash at check-in. Tap below to lock it in.`
       : `Your gift certificate fully covers this booking. Tap below to lock it in.`;
     $("giftRedeemPanel").style.display = "block";
-  } else if (state.service.price > 0 && CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) {
+  } else if (state.service.price > 0) {
     const price = state.service.price;
-    const deposit = Math.min(500, price);
-    const remainder = price - deposit;
-    $("btnPayWam").textContent = `Pay ${fmtMoney(deposit, state.service.currency)} via WAM!`;
-    $("paymentIntro").innerHTML = (remainder > 0
-      ? `Tap below to open WAM! and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> — the remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
-      : `Tap below to open WAM! and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong>.`)
-      + ` You'll come right back here once it's sent.`;
+    const wamConfigured = CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0;
+    if (wamConfigured) {
+      const deposit = Math.min(500, price);
+      const remainder = price - deposit;
+      $("btnPayWam").style.display = "block";
+      $("btnPayWam").textContent = `Pay ${fmtMoney(deposit, state.service.currency)} via WAM!`;
+      $("paymentIntro").innerHTML = (remainder > 0
+        ? `Tap below to open WAM! and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> — the remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
+        : `Tap below to open WAM! and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong>.`)
+        + ` You'll come right back here once it's sent.`;
+    } else {
+      // WAM! isn't configured — fall back to a cash-only checkout so there's
+      // still always somewhere for this to land.
+      $("btnPayWam").style.display = "none";
+      $("paymentIntro").innerHTML = `Total due: <strong>${fmtMoney(price, state.service.currency)}</strong>, payable in cash at check-in.`;
+    }
     $("wamPanel").style.display = "block";
   }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
