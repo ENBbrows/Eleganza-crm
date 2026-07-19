@@ -21,7 +21,15 @@
     letter-spacing:.01em;display:flex;align-items:center;justify-content:center;padding:20px;
     background-image:radial-gradient(ellipse 90% 60% at 50% 0%, rgba(201,162,107,.1), transparent 60%);
   }
-  .wrap{width:100%;max-width:640px;text-align:center}
+  .wrap{width:100%;max-width:640px;text-align:center;position:relative}
+
+  .sparkle-layer{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5}
+  .sparkle{position:absolute;color:var(--gold-bright);text-shadow:0 0 8px rgba(224,190,138,.85);animation:sparkle-pop 1.3s ease-out forwards}
+  @keyframes sparkle-pop{
+    0%{transform:scale(0) rotate(0deg);opacity:0}
+    28%{transform:scale(1.25) rotate(90deg);opacity:1}
+    100%{transform:scale(.15) rotate(200deg);opacity:0}
+  }
   .brand{font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:22px}
 
   /* ── envelope ── */
@@ -122,6 +130,7 @@
   <div class="card-stage" id="cardStage">
     <div class="state-msg" id="loadingMsg">Opening your gift…</div>
   </div>
+  <div class="sparkle-layer" id="sparkleLayer"></div>
   <div class="page-dots" id="pageDots" style="display:none">
     <span class="page-dot active" data-page="0"></span>
     <span class="page-dot" data-page="1"></span>
@@ -161,11 +170,9 @@ const DESIGNS = {
     motif: `<g stroke="#8C9673" stroke-width="1.4" fill="none"><line x1="32" y1="6" x2="32" y2="58"/><line x1="8" y1="18" x2="56" y2="46"/><line x1="8" y1="46" x2="56" y2="18"/></g>`
   },
   milestone: {
-    // Congratulations doesn't have a dedicated seasonal track — using Sunset House
-    // for its upbeat, celebratory feel. Easy to swap: change `track` below.
     title: "Congratulations",
-    track: "audio/season-sunset.mp3",
-    trackLabel: "Sunset House",
+    track: "audio/season-love.mp3",
+    trackLabel: "Uptempo Soca",
     motif: `<g><path d="M6 40c10-16 42-16 52 0" stroke="#C9A26B" stroke-width="1.2" fill="none"/><path d="M14 36c3-5 8-5 10 0M24 32c3-5 8-5 10 0" stroke="#C9A26B" stroke-width=".9" fill="none"/><path d="M50 36c-3-5-8-5-10 0M40 32c-3-5-8-5-10 0" stroke="#C9A26B" stroke-width=".9" fill="none"/><path d="M32 8l2.5 6.5L41 16l-5 4.5 1.3 7L32 24l-5.3 3.5L28 20 23 15.5l6.5-1z" fill="#C9A26B"/></g>`
   }
 };
@@ -200,6 +207,25 @@ function playTrack(design) {
   const np = $("nowPlaying");
   np.textContent = "🎵 Now playing — " + design.trackLabel;
   np.classList.add("show");
+}
+
+function burstSparkles() {
+  const layer = $("sparkleLayer");
+  if (!layer) return;
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement("span");
+    s.className = "sparkle";
+    s.textContent = Math.random() > 0.5 ? "✦" : "✧";
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 24 + Math.random() * 42;
+    s.style.left = (50 + Math.cos(angle) * radius) + "%";
+    s.style.top = (50 + Math.sin(angle) * radius * 0.55) + "%";
+    s.style.fontSize = (0.75 + Math.random() * 0.95) + "rem";
+    s.style.animationDelay = (Math.random() * 0.45) + "s";
+    layer.appendChild(s);
+    setTimeout(() => s.remove(), 1900);
+  }
 }
 
 let currentPage = 0;
@@ -266,6 +292,7 @@ async function init() {
         envelope.style.display = "none";
         stage.classList.add("show");
         $("pageDots").style.display = "flex";
+        burstSparkles();
       }, 750);
     });
   } catch (e) {
