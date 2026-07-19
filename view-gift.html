@@ -67,12 +67,19 @@
   .envelope-hint{margin-top:10px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);animation:tap-flash 1.4s ease-in-out infinite}
 
   /* ── landscape card, two pages ── */
-  .card-stage{perspective:2000px;width:100%;aspect-ratio:8/5;max-width:640px;margin:0 auto;position:relative;display:none}
+  /* On narrow phones, a strict 8:5 box is too short to fit the cover page's
+     logo+motif+title+hint stack — content was getting clipped by the card's
+     overflow:hidden. min-height keeps everything visible; the wider
+     landscape aspect-ratio only kicks in once there's room for it. */
+  .card-stage{perspective:2000px;width:100%;max-width:640px;margin:0 auto;position:relative;display:none;min-height:440px}
   .card-stage.show{display:block}
+  @media (min-width:560px){
+    .card-stage{aspect-ratio:8/5;min-height:0}
+  }
   .card{
     position:absolute;inset:0;border-radius:20px 6px 20px 6px;border:1px solid var(--gold);
     display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-    padding:28px;overflow:hidden;cursor:pointer;box-shadow:0 20px 60px rgba(0,0,0,.5);
+    padding:28px;overflow-y:auto;overflow-x:hidden;cursor:pointer;box-shadow:0 20px 60px rgba(0,0,0,.5);
     opacity:0;transform:scale(.97);pointer-events:none;transition:opacity .5s ease, transform .5s ease;
   }
   .card.active{opacity:1;transform:scale(1);pointer-events:auto}

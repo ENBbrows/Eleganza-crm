@@ -77,7 +77,9 @@
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had a chemical peel or fruit/milk acid treatment in the last 30 days</span></label>
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had laser treatments in the last 30 days</span></label>
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I've had significant sun exposure or tanning on my face in the last 30 days</span></label>
-      <button class="btn" type="submit" id="btnEligContinue">Continue</button>
+      <label class="check-row" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)"><input type="checkbox" id="elig-none"><span><strong style="color:var(--ivory)">None of the above</strong> — none of these apply to me</span></label>
+      <p class="hint" id="eligHint">Check "None of the above" or any conditions that apply to continue.</p>
+      <button class="btn" type="submit" id="btnEligContinue" disabled>Continue</button>
     </form>
     <div id="eligResult" style="display:none">
       <div class="summary" style="border-color:var(--gold)">
@@ -141,6 +143,10 @@
       <div id="giftRedeemIntro"></div>
       <button class="btn" type="button" id="btnRedeemGift" style="margin-top:12px">Redeem My Gift Certificate</button>
       <div id="giftRedeemAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
+      <div id="giftBalancePanel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+        <div id="giftBalanceMsg" style="font-size:.88rem;color:var(--ivory-dim)"></div>
+        <button class="btn-ghost" type="button" id="btnUseGiftBalance" style="margin-top:10px">Book Something Else With It</button>
+      </div>
     </div>
     <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking — Choose One</div>
@@ -182,8 +188,10 @@ const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
 const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
 const MIN_LEAD_DAYS = 14; // clients must book at least 2 weeks ahead
 const ANNUAL_TOUCHUP_LEAD_DAYS = 7; // Annual Touch-Up can be booked just 1 week out
+const GIFT_LEAD_DAYS = 7; // clients redeeming a gift certificate can book just 1 week out
 const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
 function leadDaysFor(service) {
+  if (state.gift) return GIFT_LEAD_DAYS;
   return (service && service.name === "Annual Touch-Up") ? ANNUAL_TOUCHUP_LEAD_DAYS : MIN_LEAD_DAYS;
 }
 const params = new URLSearchParams(location.search);
@@ -317,6 +325,9 @@ function selectService(id) {
   state.service = state.schedule.services.find(s => s.id === id);
   if (state.service.category === "first_application") {
     document.querySelectorAll(".elig-check").forEach(c => c.checked = false);
+    $("elig-none").checked = false;
+    $("btnEligContinue").disabled = true;
+    $("eligHint").style.display = "block";
     $("eligibilityForm").style.display = "block";
     $("eligResult").style.display = "none";
     showScreen("screen-eligibility", 1);
@@ -324,6 +335,24 @@ function selectService(id) {
     renderDateStrip();
     showScreen("screen-time", 2);
   }
+}
+
+/* "None of the above" and the actual condition checkboxes are mutually
+   exclusive, and at least one row (any row) must be checked before
+   Continue unlocks — so qualifying is always an explicit choice, not
+   just leaving everything blank. */
+document.querySelectorAll(".elig-check").forEach(c => c.addEventListener("change", () => {
+  if (c.checked) $("elig-none").checked = false;
+  updateEligContinue();
+}));
+$("elig-none").addEventListener("change", () => {
+  if ($("elig-none").checked) document.querySelectorAll(".elig-check").forEach(c => c.checked = false);
+  updateEligContinue();
+});
+function updateEligContinue() {
+  const anyChecked = $("elig-none").checked || Array.from(document.querySelectorAll(".elig-check")).some(c => c.checked);
+  $("btnEligContinue").disabled = !anyChecked;
+  $("eligHint").style.display = anyChecked ? "none" : "block";
 }
 
 function proceedToTime(service) {
@@ -334,8 +363,8 @@ function proceedToTime(service) {
 
 $("eligibilityForm").addEventListener("submit", e => {
   e.preventDefault();
-  const anyChecked = Array.from(document.querySelectorAll(".elig-check")).some(c => c.checked);
-  if (anyChecked) {
+  const anyConditionChecked = Array.from(document.querySelectorAll(".elig-check")).some(c => c.checked);
+  if (anyConditionChecked) {
     $("eligibilityForm").style.display = "none";
     $("eligResult").style.display = "block";
   } else {
@@ -546,6 +575,7 @@ function renderDone(result, name, phone) {
   $("voucherPanel").style.display = "none";
   $("giftRedeemPanel").style.display = "none";
   $("giftRedeemAck").style.display = "none";
+  $("giftBalancePanel").style.display = "none";
   $("btnRedeemGift").disabled = false; $("btnRedeemGift").textContent = "Redeem My Gift Certificate";
   $("wamPanel").style.display = "none";
   $("btnPayWam").disabled = false; $("btnPayWam").textContent = "Pay via WAM!";
@@ -553,13 +583,20 @@ function renderDone(result, name, phone) {
 
   // Every paid service must end at a checkout step — no silent dead ends,
   // regardless of whether WAM! happens to be configured.
-  if (state.gift) {
+  // Gift certificates only apply to actual paid procedures, not to the
+  // (already paid-for) consultations they route people to when they don't
+  // qualify — that keeps the gift's balance untouched until it's used on
+  // the real appointment.
+  const giftEligible = state.gift && (state.service.category === "first_application" || state.service.category === "touch_up");
+  if (giftEligible) {
     const price = state.service.price || 0;
     const covered = Math.min(state.gift.amount, price);
-    const remainder = price - covered;
-    $("giftRedeemIntro").innerHTML = remainder > 0
-      ? `Your gift certificate covers <strong>${fmtMoney(covered, state.gift.currency)}</strong> — the remaining <strong>${fmtMoney(remainder, state.gift.currency)}</strong> is due in cash at check-in. Tap below to lock it in.`
-      : `Your gift certificate fully covers this booking. Tap below to lock it in.`;
+    const oweExtra = price - covered;
+    const leftoverAfter = state.gift.amount - covered;
+    let msg = `Your gift certificate covers <strong>${fmtMoney(covered, state.gift.currency)}</strong> of this booking.`;
+    if (oweExtra > 0) msg += ` The remaining <strong>${fmtMoney(oweExtra, state.gift.currency)}</strong> is due in cash at check-in.`;
+    if (leftoverAfter > 0) msg += ` You'll still have <strong>${fmtMoney(leftoverAfter, state.gift.currency)}</strong> left on the gift afterward — use the same link anytime to put it toward something else.`;
+    $("giftRedeemIntro").innerHTML = msg + ` Tap below to lock it in.`;
     $("giftRedeemPanel").style.display = "block";
   } else if (state.service.price > 0) {
     const price = state.service.price;
@@ -629,6 +666,12 @@ $("btnRedeemGift").onclick = async () => {
     $("giftRedeemAck").textContent = "✓ Gift certificate applied — see you soon!";
     $("giftRedeemAck").style.display = "block";
     $("btnRedeemGift").style.display = "none";
+
+    if (result.remaining_balance > 0) {
+      $("giftBalanceMsg").innerHTML = `You still have <strong>${fmtMoney(result.remaining_balance, result.currency)}</strong> left on this gift. Use the same link whenever you like to put it toward another visit.`;
+      $("btnUseGiftBalance").onclick = () => { location.href = `book-eleganza.html?gift=${PRESET_GIFT_CODE}`; };
+      $("giftBalancePanel").style.display = "block";
+    }
 
     fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
       method: "POST",
