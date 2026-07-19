@@ -205,6 +205,7 @@
     <h1>Sent With Love</h1>
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
+    <a class="btn-ghost" id="btnPreviewGift" href="#" target="_blank" rel="noopener">👀 Preview What They'll See</a>
     <a class="btn" href="home.html">Back to Eleganza</a>
   </section>
 
@@ -312,6 +313,7 @@ async function renderPaySummary() {
 }
 
 let giftId = null;
+let giftRedemptionCode = null;
 $("btnPayWam").addEventListener("click", async () => {
   $("payError").classList.remove("show");
   $("btnPayWam").disabled = true;
@@ -324,6 +326,7 @@ $("btnPayWam").addEventListener("click", async () => {
       p_personal_message: state.message, p_signed_by: state.signedBy, p_send_at: state.sendAt
     });
     giftId = result.id;
+    giftRedemptionCode = result.redemption_code;
     $("btnPayWam").style.display = "none";
     $("btnConfirmPaid").style.display = "block";
   } catch (err) {
@@ -350,6 +353,7 @@ $("btnConfirmPaid").addEventListener("click", async () => {
       ? `We'll deliver it to ${state.recipientName} right on schedule.`
       : `${state.recipientName} will receive it by email shortly.`;
     $("doneSummary").innerHTML = `<div class="v">Design <strong>${esc(DESIGN_NAMES[state.design])}</strong><br>Value <strong>${fmtMoney(state.amount)}</strong></div>`;
+    $("btnPreviewGift").href = `view-gift.html?code=${giftRedemptionCode}`;
     showScreen("screen-done");
   } catch (err) {
     console.error(err);

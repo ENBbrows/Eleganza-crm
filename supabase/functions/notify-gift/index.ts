@@ -90,8 +90,7 @@ async function deliverToRecipient(g: GiftRow) {
   if (!g.recipient_email) return;
   const name = firstName(g.recipient_name);
   const buyerFirst = firstName(g.buyer_name);
-  const bookLink = `${SITE_URL}/book-eleganza.html?gift=${g.redemption_code}`;
-  const messageBlock = g.personal_message ? `\n"${g.personal_message}"\n— ${g.signed_by || buyerFirst}\n` : `\n— ${g.signed_by || buyerFirst}\n`;
+  const openLink = `${SITE_URL}/view-gift.html?code=${g.redemption_code}`;
 
   const referralLine = g.referral_voucher_code
     ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
@@ -100,9 +99,9 @@ async function deliverToRecipient(g: GiftRow) {
   await sendEmail(
     g.recipient_email,
     `You've received an Eleganza gift certificate! 🤍`,
-    `Hi ${name},\n\n${buyerFirst} sent you a ${DESIGN_NAMES[g.design] || g.design} gift certificate worth ${fmtMoney(g.amount)} at Eleganza Naturally Beautiful.\n${messageBlock}\n` +
-      `Ready to book? Use this link — your gift is already linked to it:\n${bookLink}\n\n` +
-      `Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
+    `Hi ${name},\n\n${buyerFirst} sent you a ${DESIGN_NAMES[g.design] || g.design} gift certificate worth ${fmtMoney(g.amount)} at Eleganza Naturally Beautiful.\n\n` +
+      `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
+      `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
       `${contactCardBlock()}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`
   );
 }
