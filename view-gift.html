@@ -22,10 +22,45 @@
     background-image:radial-gradient(ellipse 90% 60% at 50% 0%, rgba(201,162,107,.1), transparent 60%);
   }
   .wrap{width:100%;max-width:640px;text-align:center}
-  .brand{font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:18px}
+  .brand{font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:22px}
 
-  /* landscape card, two pages */
-  .card-stage{perspective:2000px;width:100%;aspect-ratio:8/5;max-width:640px;margin:0 auto;position:relative}
+  /* ── envelope ── */
+  .envelope-stage{
+    width:100%;max-width:340px;margin:20px auto 0;aspect-ratio:4/3;position:relative;
+    cursor:pointer;perspective:1200px;
+  }
+  .envelope-stage.hidden{display:none}
+  .envelope-body{
+    position:absolute;left:0;right:0;bottom:0;height:72%;z-index:1;
+    background:linear-gradient(180deg, var(--ink-soft), var(--ink));
+    border:1px solid var(--gold);border-radius:4px 4px 10px 10px;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;
+    box-shadow:0 16px 40px rgba(0,0,0,.5);
+  }
+  .envelope-flap{
+    position:absolute;left:0;right:0;top:0;height:58%;z-index:2;
+    background:linear-gradient(150deg, #2c221c, var(--ink-soft));
+    border:1px solid var(--gold);
+    clip-path:polygon(0 0, 100% 0, 50% 92%);
+    transform-origin:top center;
+    transition:transform .7s cubic-bezier(.4,.2,.2,1);
+  }
+  .envelope-stage.opening .envelope-flap{transform:rotateX(180deg)}
+  .envelope-stage.opening .envelope-body{animation:envelope-pop .5s ease .35s both}
+  @keyframes envelope-pop{0%{transform:scale(1)}50%{transform:scale(1.05) translateY(-6px)}100%{transform:scale(1)}}
+  .envelope-seal{
+    position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);
+    width:48px;height:48px;border-radius:50%;background:var(--gold);
+    display:flex;align-items:center;justify-content:center;z-index:3;
+    box-shadow:0 4px 16px rgba(0,0,0,.5);
+  }
+  .envelope-seal svg{width:26px;height:26px}
+  .envelope-label{font-family:'Fraunces',serif;font-style:italic;color:var(--gold-bright);font-size:1.35rem}
+  .envelope-hint{margin-top:10px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);animation:tap-flash 1.4s ease-in-out infinite}
+
+  /* ── landscape card, two pages ── */
+  .card-stage{perspective:2000px;width:100%;aspect-ratio:8/5;max-width:640px;margin:0 auto;position:relative;display:none}
+  .card-stage.show{display:block}
   .card{
     position:absolute;inset:0;border-radius:20px 6px 20px 6px;border:1px solid var(--gold);
     display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
@@ -72,6 +107,18 @@
 <body>
 <div class="wrap">
   <p class="brand">Eleganza Naturally Beautiful</p>
+
+  <div class="envelope-stage hidden" id="envelopeStage">
+    <div class="envelope-flap" id="envelopeFlap"></div>
+    <div class="envelope-seal">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-8-4.9-8-10.8C4 6.3 6.2 4 9 4c1.5 0 2.7.8 3 2 .3-1.2 1.5-2 3-2 2.8 0 5 2.3 5 5.2C20 15.1 12 20 12 20z" fill="#171210"/></svg>
+    </div>
+    <div class="envelope-body">
+      <div class="envelope-label">A Gift For You</div>
+      <div class="envelope-hint">Tap to Open ✦</div>
+    </div>
+  </div>
+
   <div class="card-stage" id="cardStage">
     <div class="state-msg" id="loadingMsg">Opening your gift…</div>
   </div>
@@ -163,15 +210,18 @@ function showPage(i) {
 }
 
 async function init() {
+  const envelope = $("envelopeStage");
   const stage = $("cardStage");
   if (!CODE) {
     stage.innerHTML = `<div class="state-msg">This link is missing its gift code.</div>`;
+    stage.classList.add("show");
     return;
   }
   try {
     const result = await rpc("get_gift_certificate", { p_code: CODE });
     if (!result || !result.valid) {
       stage.innerHTML = `<div class="state-msg">This gift link has already been used or couldn't be found. If that seems wrong, reach out to Eleganza directly.</div>`;
+      stage.classList.add("show");
       return;
     }
     const design = DESIGNS[result.design] || DESIGNS.love;
@@ -193,24 +243,35 @@ async function init() {
         <a class="card-btn" href="${bookLink}">Redeem Your Gift</a>
       </div>
     `;
-    $("pageDots").style.display = "flex";
 
     const cover = $("pageCover");
     cover.addEventListener("click", () => {
       if (currentPage !== 0) return;
       showPage(1);
-      playTrack(design);
     });
     document.querySelectorAll(".page-dot").forEach(dot => {
-      dot.addEventListener("click", () => {
-        const i = Number(dot.dataset.page);
-        showPage(i);
-        if (i === 1 && !audio) playTrack(design);
-      });
+      dot.addEventListener("click", () => showPage(Number(dot.dataset.page)));
+    });
+
+    // Envelope first — opening it is the tap that both reveals the card and
+    // starts the music (the same gesture browsers require before any audio
+    // can play, so this satisfies "plays on open" and the platform's
+    // autoplay rule in a single motion instead of fighting each other).
+    envelope.classList.remove("hidden");
+    envelope.addEventListener("click", function openEnvelope() {
+      envelope.removeEventListener("click", openEnvelope);
+      envelope.classList.add("opening");
+      playTrack(design);
+      setTimeout(() => {
+        envelope.style.display = "none";
+        stage.classList.add("show");
+        $("pageDots").style.display = "flex";
+      }, 750);
     });
   } catch (e) {
     console.error(e);
     stage.innerHTML = `<div class="state-msg">Couldn't load this gift right now — please try again shortly.</div>`;
+    stage.classList.add("show");
   }
 }
 
