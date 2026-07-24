@@ -10,10 +10,21 @@
 // delivery is left for the scheduled sweep (see send-reminders) to pick
 // up once that time arrives, and only the buyer's receipt goes out now.
 //
+// Delivery also tries a WhatsApp notification alongside the email, like a
+// delivery concierge arriving right on schedule — but WhatsApp's rules
+// require an approved message template before a business can message
+// someone who hasn't messaged first, so this stays a silent no-op until
+// WHATSAPP_TOKEN + WHATSAPP_TEMPLATE_GIFT_RECEIVED are actually set. Once
+// they are, gift delivery starts sending WhatsApp automatically — no code
+// changes needed then. Suggested template text (submit this for approval):
+//   "Hi {{1}}! You've got mail from an admirer — {{2}} sent you a gift
+//    from Eleganza Naturally Beautiful. Open it here: {{3}}"
+//
 // Required secrets (same as send-reminders / notify-payment):
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided
 //   RESEND_API_KEY, RESEND_FROM_ELEGANZA
 //   BUSINESS_WHATSAPP_NUMBER, WAM_HANDLE
+//   WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_TEMPLATE_GIFT_RECEIVED  -- optional, for the concierge WhatsApp send
 // ============================================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -22,6 +33,9 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_ELEGANZA = Deno.env.get("RESEND_FROM_ELEGANZA") || Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
+const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN");
+const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
+const WHATSAPP_TEMPLATE_GIFT_RECEIVED = Deno.env.get("WHATSAPP_TEMPLATE_GIFT_RECEIVED") || "gift_certificate_received";
 const TZ = "America/Port_of_Spain";
 
 const STUDIO_ADDRESS = "4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo & Associates office.";
@@ -49,6 +63,17 @@ function fmtMoney(n: number) {
 function firstName(name: string) {
   return (name || "there").split(" ")[0];
 }
+function digits(s: string) {
+  return (s || "").replace(/\D/g, "");
+}
+function intlPhone(phone: string) {
+  const d = digits(phone);
+  if (d.length === 7) return "1868" + d;
+  if (d.length === 10 && d.startsWith("868")) return "1" + d;
+  if (d.length === 11 && d.startsWith("1868")) return d;
+  if (d.length >= 10) return d;
+  return "";
+}
 
 async function sendEmail(to: string, subject: string, body: string) {
   if (!RESEND_API_KEY || !to) return;
@@ -60,6 +85,27 @@ async function sendEmail(to: string, subject: string, body: string) {
   if (!res.ok) console.error("Resend error:", await res.text());
 }
 
+async function sendWhatsApp(phone: string, templateName: string, params: string[]) {
+  if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !phone) return;
+  const to = intlPhone(phone);
+  if (!to) return;
+  const res = await fetch(`https://graph.facebook.com/v20.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${WHATSAPP_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: "en" },
+        components: [{ type: "body", parameters: params.map((text) => ({ type: "text", text })) }],
+      },
+    }),
+  });
+  if (!res.ok) console.error("WhatsApp error:", await res.text());
+}
+
 type GiftRow = {
   id: string;
   design: string;
@@ -69,6 +115,7 @@ type GiftRow = {
   buyer_email: string;
   recipient_name: string;
   recipient_email: string | null;
+  recipient_phone: string | null;
   personal_message: string | null;
   signed_by: string | null;
   send_at: string;
@@ -87,23 +134,28 @@ function contactCardBlock() {
 }
 
 async function deliverToRecipient(g: GiftRow) {
-  if (!g.recipient_email) return;
   const name = firstName(g.recipient_name);
   const buyerFirst = firstName(g.buyer_name);
   const openLink = `${SITE_URL}/view-gift.html?code=${g.redemption_code}`;
 
-  const referralLine = g.referral_voucher_code
-    ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
-    : "";
+  if (g.recipient_email) {
+    const referralLine = g.referral_voucher_code
+      ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
+      : "";
 
-  await sendEmail(
-    g.recipient_email,
-    `You've received an Eleganza gift certificate! 🤍`,
-    `Hi ${name},\n\n${buyerFirst} sent you a ${DESIGN_NAMES[g.design] || g.design} gift certificate worth ${fmtMoney(g.amount)} at Eleganza Naturally Beautiful.\n\n` +
-      `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
-      `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
-      `${contactCardBlock()}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`
-  );
+    await sendEmail(
+      g.recipient_email,
+      `You've received an Eleganza gift certificate! 🤍`,
+      `Hi ${name},\n\n${buyerFirst} sent you a ${DESIGN_NAMES[g.design] || g.design} gift certificate worth ${fmtMoney(g.amount)} at Eleganza Naturally Beautiful.\n\n` +
+        `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
+        `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
+        `${contactCardBlock()}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`
+    );
+  }
+
+  if (g.recipient_phone) {
+    await sendWhatsApp(g.recipient_phone, WHATSAPP_TEMPLATE_GIFT_RECEIVED, [name, buyerFirst, openLink]);
+  }
 }
 
 async function sendBuyerReceipt(g: GiftRow) {

@@ -40,6 +40,7 @@ const WHATSAPP_TEMPLATE_DAY_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_DAY_BEFORE"
 const WHATSAPP_TEMPLATE_HOUR_BEFORE = Deno.env.get("WHATSAPP_TEMPLATE_HOUR_BEFORE") || "appointment_hour_before";
 const WHATSAPP_TEMPLATE_FOLLOWUP = Deno.env.get("WHATSAPP_TEMPLATE_FOLLOWUP") || "book_your_followup";
 const WHATSAPP_TEMPLATE_TWO_WEEK = Deno.env.get("WHATSAPP_TEMPLATE_TWO_WEEK") || "pay_and_confirm_followup";
+const WHATSAPP_TEMPLATE_GIFT_RECEIVED = Deno.env.get("WHATSAPP_TEMPLATE_GIFT_RECEIVED") || "gift_certificate_received";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
 const WAM_HANDLE = Deno.env.get("WAM_HANDLE") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
@@ -318,6 +319,7 @@ type GiftRow = {
   buyer_name: string;
   recipient_name: string;
   recipient_email: string | null;
+  recipient_phone: string | null;
   personal_message: string | null;
   signed_by: string | null;
   redemption_code: string;
@@ -327,7 +329,7 @@ type GiftRow = {
 async function fetchGiftsDue() {
   const now = new Date().toISOString();
   const res = await rest(
-    `/rest/v1/gift_certificates?select=id,design,amount,buyer_name,recipient_name,recipient_email,personal_message,signed_by,redemption_code,referral_voucher_code` +
+    `/rest/v1/gift_certificates?select=id,design,amount,buyer_name,recipient_name,recipient_email,recipient_phone,personal_message,signed_by,redemption_code,referral_voucher_code` +
       `&payment_status=eq.paid&sent_at=is.null&send_at=lte.${now}`
   );
   if (!res.ok) {
@@ -337,29 +339,41 @@ async function fetchGiftsDue() {
   return (await res.json()) as GiftRow[];
 }
 
+// This is the "delivery concierge" moment — the scheduled send_at has
+// finally arrived, so both channels fire together right on time. WhatsApp
+// requires an approved message template before a business can message
+// someone who hasn't messaged first (see notify-gift for the suggested
+// template text); until WHATSAPP_TOKEN + WHATSAPP_TEMPLATE_GIFT_RECEIVED
+// are set, sendWhatsApp() below silently no-ops and only email goes out.
 async function deliverGiftToRecipient(g: GiftRow) {
-  if (!g.recipient_email) return;
   const name = firstName(g.recipient_name);
   const buyerFirst = firstName(g.buyer_name);
   const openLink = `${SITE_URL}/view-gift.html?code=${g.redemption_code}`;
-  const referralLine = g.referral_voucher_code
-    ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
-    : "";
-  const contactCard =
-    `Eleganza Naturally Beautiful\n` +
-    `Location: ${STUDIO_ADDRESS}\n` +
-    (BUSINESS_WHATSAPP_NUMBER ? `WhatsApp: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}\n` : "") +
-    `Website: ${SITE_URL}/home.html`;
 
-  await sendEmail(
-    g.recipient_email,
-    `You've received an Eleganza gift certificate! 🤍`,
-    `Hi ${name},\n\n${buyerFirst} sent you a ${GIFT_DESIGN_NAMES[g.design] || g.design} gift certificate worth TT$${g.amount.toLocaleString()} at Eleganza Naturally Beautiful.\n\n` +
-      `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
-      `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
-      `${contactCard}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`,
-    "eleganza"
-  );
+  if (g.recipient_email) {
+    const referralLine = g.referral_voucher_code
+      ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
+      : "";
+    const contactCard =
+      `Eleganza Naturally Beautiful\n` +
+      `Location: ${STUDIO_ADDRESS}\n` +
+      (BUSINESS_WHATSAPP_NUMBER ? `WhatsApp: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}\n` : "") +
+      `Website: ${SITE_URL}/home.html`;
+
+    await sendEmail(
+      g.recipient_email,
+      `You've received an Eleganza gift certificate! 🤍`,
+      `Hi ${name},\n\n${buyerFirst} sent you a ${GIFT_DESIGN_NAMES[g.design] || g.design} gift certificate worth TT$${g.amount.toLocaleString()} at Eleganza Naturally Beautiful.\n\n` +
+        `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
+        `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
+        `${contactCard}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`,
+      "eleganza"
+    );
+  }
+
+  if (g.recipient_phone) {
+    await sendWhatsApp(g.recipient_phone, WHATSAPP_TEMPLATE_GIFT_RECEIVED, [name, buyerFirst, openLink]);
+  }
 }
 
 async function markGiftSent(id: string) {
