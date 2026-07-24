@@ -208,7 +208,7 @@
       </div>
     </div>
     <div class="summary" id="voucherPanel" style="display:none;border-color:var(--gold);text-align:center">
-      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 A Gift For A Friend</div>
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Give 10% — Get 10%</div>
       <div style="font-family:'Fraunces',serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold-bright)" id="voucherCode"></div>
       <div style="margin-top:6px;font-size:.85rem;color:var(--ivory-dim)" id="voucherSub"></div>
       <a class="review-btn" id="btnShareVoucher" href="#" target="_blank" rel="noopener" style="margin-top:12px">💬 Share With A Friend</a>
@@ -741,7 +741,7 @@ async function renderReferralVoucher() {
     const result = await rpc("create_referral_voucher", { p_token: state.confirmToken });
     if (!result || !result.ok) return;
     $("voucherCode").textContent = result.code;
-    $("voucherSub").textContent = `${result.discount_pct}% off for a friend's first visit — expires in 24 hours`;
+    $("voucherSub").textContent = `Share this — your friend gets ${result.discount_pct}% off their first visit, and you get ${result.discount_pct}% off your next one, as soon as they use it. Their code expires in 24 hours.`;
     const msg = `Hey! Come try Eleganza Naturally Beautiful — use my code ${result.code} for ${result.discount_pct}% off your first visit. It expires in 24 hours though, so don't wait! https://enbbrows.github.io/Eleganza-crm/book-eleganza.html`;
     $("btnShareVoucher").href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
     $("voucherPanel").style.display = "block";

@@ -261,6 +261,20 @@
     margin-top:16px;
   }
 
+  /* ——— collapsible "more" sections, so the done screen isn't a wall of buttons ——— */
+  .more-section{margin-top:18px;border:1px solid var(--line);border-radius:2px;text-align:left}
+  .more-section summary{
+    padding:15px 16px;cursor:pointer;color:var(--gold);font-size:.78rem;font-weight:600;
+    letter-spacing:.15em;text-transform:uppercase;list-style:none;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .more-section summary::-webkit-details-marker{display:none}
+  .more-section summary::after{content:"▾";font-size:.9rem;color:var(--ivory-dim);transition:transform .2s}
+  .more-section[open] summary::after{transform:rotate(180deg)}
+  .more-section > *:not(summary){margin-left:16px;margin-right:16px}
+  .more-section > summary + *{margin-top:2px}
+  .more-section > *:last-child{margin-bottom:16px}
+
   /* ——— review buttons ——— */
   .review-row{margin-top:26px;display:flex;flex-direction:column;gap:12px}
   .review-btn{
@@ -528,52 +542,63 @@
     <p class="tagline">What once was, is not all lost</p>
     <h1>All done, <em id="done-name">love</em></h1>
     <p class="stars" aria-hidden="true">★ ★ ★ ★ ★</p>
-    <p class="sub">Thank you for trusting me with your brows — it means everything. If you loved your experience, a quick review helps this small studio bloom. <em style="color:var(--gold-bright)">— Amii</em></p>
-    <div class="review-row">
-      <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
-        Review us on Google
-      </a>
-      <a class="review-btn" id="btn-facebook" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
-        Review us on Facebook
-      </a>
-    </div>
+    <p class="sub">Thank you for trusting me with your brows — it means everything. <em style="color:var(--gold-bright)">— Amii</em></p>
+
     <div class="price-box" id="price-box" style="display:none">
       <p class="price-line">Today's service · <strong id="price-original"></strong></p>
-      <button class="btn-discount" id="btn-discount" type="button" disabled>Leave a review above to unlock 5% off</button>
+      <button class="btn-discount" id="btn-discount" type="button" disabled>Leave a review below to unlock 5% off</button>
       <p class="discount-done" id="discount-done">✓ Review reward applied — today's total is <strong id="price-final"></strong><br />Just show this screen at the counter. 🤍</p>
     </div>
-    <div class="value-box" id="value-box" style="display:none">
-      <p class="value-title">The Eleganza Effect ✨</p>
-      <p class="value-line">You're walking out with more than beautiful brows — you're reclaiming your mornings. Over the next year, today's investment saves you roughly:</p>
-      <p class="value-nums"><strong id="save-money"></strong> in brow pencils &amp; fills<br /><strong id="save-time"></strong> of mirror time — mornings you wake up already done</p>
-    </div>
-    <p class="sub" style="margin-top:22px">Keep your results glowing — brow tips &amp; tricks live here:</p>
-    <div class="review-row" style="margin-top:12px">
-      <a class="review-btn" id="btn-youtube" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
-        YouTube — Tips &amp; Tricks
-      </a>
-      <a class="review-btn" id="btn-instagram" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
-        Instagram
-      </a>
-      <a class="review-btn" id="btn-fbpage" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
-        Facebook
-      </a>
-    </div>
+
     <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(201,162,107,.12)">
       ❋ My Aftercare Guide — the next 10 days
     </a>
     <a class="review-btn" id="btn-followup" href="#" style="margin-top:12px;border-style:solid;background:rgba(201,162,107,.12);display:none">
       📅 Book Your Follow-Up (~5 weeks)
     </a>
-    <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener" style="margin-top:12px">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
-      WhatsApp My Aftercare To Me
-    </a>
+
+    <details class="more-section">
+      <summary>⭐ Leave A Review — Unlock 5% Off</summary>
+      <div class="review-row">
+        <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+          Review us on Google
+        </a>
+        <a class="review-btn" id="btn-facebook" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          Review us on Facebook
+        </a>
+      </div>
+    </details>
+
+    <details class="more-section">
+      <summary>More For You</summary>
+      <div class="value-box" id="value-box" style="display:none">
+        <p class="value-title">The Eleganza Effect ✨</p>
+        <p class="value-line">You're walking out with more than beautiful brows — you're reclaiming your mornings. Over the next year, today's investment saves you roughly:</p>
+        <p class="value-nums"><strong id="save-money"></strong> in brow pencils &amp; fills<br /><strong id="save-time"></strong> of mirror time — mornings you wake up already done</p>
+      </div>
+      <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
+        WhatsApp My Aftercare To Me
+      </a>
+      <p class="sub" style="margin-top:16px;text-align:left">Keep your results glowing — brow tips &amp; tricks live here:</p>
+      <div class="review-row" style="margin-top:12px">
+        <a class="review-btn" id="btn-youtube" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
+          YouTube — Tips &amp; Tricks
+        </a>
+        <a class="review-btn" id="btn-instagram" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
+          Instagram
+        </a>
+        <a class="review-btn" id="btn-fbpage" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          Facebook
+        </a>
+      </div>
+    </details>
+
     <div class="email-note" id="done-email-note" style="display:none">
       Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
     </div>
@@ -705,8 +730,23 @@ const app = {
       ? `Visit nº ${visits + 1}`
       : "So glad you're back";
     $("welcome-email-wrap").style.display = client[C.email] ? "none" : "block";
-    $("reward-badge").style.display = client[C.nextDiscount] ? "block" : "none";
+    const pendingPct = this.pendingRewardPct(client);
+    const badge = $("reward-badge");
+    if (pendingPct > 0) {
+      badge.textContent = `🎁 ${pendingPct}% off today's visit`;
+      badge.style.display = "block";
+    } else {
+      badge.style.display = "none";
+    }
     this.show("screen-welcome");
+  },
+
+  /* A referral reward (10%, earned when a friend uses their shared code)
+     takes priority over a review reward (5%) if somehow both are pending. */
+  pendingRewardPct(client) {
+    const referralPct = Number(client.referral_reward_pct) || 0;
+    if (referralPct > 0) return referralPct;
+    return client[C.nextDiscount] ? 5 : 0;
   },
 
   /* ── 2 · RETURNING CLIENT CHECK-IN ────────── */
@@ -721,14 +761,15 @@ const app = {
     }
     this.busy("btn-welcome", true, "Complete Check-In");
     try {
-      const hadReward = !!client[C.nextDiscount];
+      const hadRewardPct = this.pendingRewardPct(client);
       const patch = {
         [C.lastVisit]: new Date().toISOString(),
         [C.visitCount]: (Number(client[C.visitCount]) || 0) + 1,
         [C.service]: $("welcome-service").value,
         [C.price]: price,
         [C.totalSpent]: (Number(client[C.totalSpent]) || 0) + price,
-        [C.nextDiscount]: false
+        [C.nextDiscount]: false,
+        referral_reward_pct: null
       };
       if (!client[C.email] && email) patch[C.email] = email;
       const res = await fetch(`${REST}?id=eq.${client.id}`, {
@@ -741,7 +782,7 @@ const app = {
         clientId: client.id,
         name: client[C.name],
         price: price,
-        hadReward: hadReward,
+        hadRewardPct: hadRewardPct,
         service: $("welcome-service").value,
         phone: client[C.phone] || this.phoneEntered
       });
@@ -830,7 +871,7 @@ const app = {
         clientId: newId,
         name: name,
         price: price,
-        hadReward: false,
+        hadRewardPct: 0,
         service: $("reg-service").value,
         phone: phone,
         voucherPct: voucherPct
@@ -859,10 +900,13 @@ const app = {
     // keeps the CRM in sync automatically the moment a client checks in.
     linkBookingAndReceipt(this.ctx);
 
-    /* price + review reward — computed early so the receipt (email + WhatsApp) can use it */
+    /* price + reward — computed early so the receipt (email + WhatsApp) can use it.
+       A pre-existing reward (referral 10%, or a review reward saved from a past
+       visit) takes priority; otherwise a review claimed just now is worth 5%. */
     const price = Number(this.ctx.price) || 0;
-    const discountNow = this.ctx.hadReward || this.ctx.reviewedNow;
-    const finalAmount = discountNow ? price * 0.95 : price;
+    const appliedPct = Math.max(Number(this.ctx.hadRewardPct) || 0, this.ctx.reviewedNow ? 5 : 0);
+    const discountNow = appliedPct > 0;
+    const finalAmount = discountNow ? price * (1 - appliedPct / 100) : price;
     const receiptDate = new Date().toLocaleDateString("en-US", { timeZone: "America/Port_of_Spain", month: "long", day: "numeric", year: "numeric" });
 
     // Aftercare email with review links + payment receipt (won't block check-in if it fails)
@@ -905,7 +949,7 @@ const app = {
       if (price > 0) {
         const voucherNote = this.ctx.voucherPct ? " (" + this.ctx.voucherPct + "% referral code applied)" : "";
         msg += "\n\n\uD83E\uDDFE Receipt — " + receiptDate + "\n" + (this.ctx.service || "Service") + ": " +
-          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (5% review reward applied)" : voucherNote) +
+          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (" + appliedPct + "% reward applied)" : voucherNote) +
           "\nEleganza Naturally Beautiful — thank you for your payment! \uD83E\uDD0D";
       }
       msg += "\n\nWhat once was, is not all lost. \u2728";
@@ -930,12 +974,12 @@ const app = {
     if (price > 0) {
       box.style.display = "block";
       if (discountNow) {
-        const final = price * 0.95;
+        const final = price * (1 - appliedPct / 100);
         $("price-original").innerHTML =
           '<span class="struck" style="text-decoration:line-through;color:var(--ivory-dim);font-size:1rem">' +
           this.fmt(price) + '</span> → ' + this.fmt(final);
         btnD.style.display = "none";
-        done.innerHTML = '✓ Review reward applied — today\'s total is <strong>' + this.fmt(final) +
+        done.innerHTML = '✓ ' + appliedPct + '% reward applied — today\'s total is <strong>' + this.fmt(final) +
           '</strong><br />Just show this screen at the counter. 🤍';
         done.style.display = "block";
       } else {
@@ -943,7 +987,7 @@ const app = {
         btnD.style.display = "block";
         btnD.disabled = true;
         btnD.classList.remove("ready");
-        btnD.textContent = "Leave a review above to unlock 5% off your next visit";
+        btnD.textContent = "Leave a review below to unlock 5% off your next visit";
         done.style.display = "none";
       }
     } else {
@@ -973,7 +1017,7 @@ const app = {
 
   /* review buttons unlock the next-visit reward */
   unlockDiscount() {
-    if (this.reviewClicked || !this.ctx || !(Number(this.ctx.price) > 0) || this.ctx.hadReward) return;
+    if (this.reviewClicked || !this.ctx || !(Number(this.ctx.price) > 0) || Number(this.ctx.hadRewardPct) > 0) return;
     this.reviewClicked = true;
     const btnD = $("btn-discount");
     if (!this.ctx.clientId) return; // can't save without a record id
