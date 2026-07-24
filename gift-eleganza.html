@@ -260,9 +260,20 @@
 </div>
 
 <script src="config.js"></script>
+<script src="client-identity.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+
+/* Prefill the BUYER's own details if this device has them on file — the
+   recipient is a different person, so never prefill that from identity. */
+(function prefillBuyerFromIdentity() {
+  const identity = ClientIdentity.get();
+  if (!identity) return;
+  if ($("d-buyer-name") && !$("d-buyer-name").value.trim() && identity.name) $("d-buyer-name").value = identity.name;
+  if ($("d-buyer-email") && !$("d-buyer-email").value.trim() && identity.email) $("d-buyer-email").value = identity.email;
+  if ($("d-buyer-phone") && !$("d-buyer-phone").value.trim() && identity.phone) $("d-buyer-phone").value = identity.phone;
+})();
 async function rpc(fn, body) {
   const res = await fetch(RPC + fn, {
     method: "POST",
@@ -389,6 +400,7 @@ $("btnConfirmPaid").addEventListener("click", async () => {
   $("btnConfirmPaid").textContent = "Confirming…";
   try {
     await rpc("confirm_gift_payment", { p_id: giftId });
+    ClientIdentity.save({ name: state.buyerName, phone: state.buyerPhone, email: state.buyerEmail });
     // Fire-and-forget: sends the recipient + buyer emails right away (unless scheduled for later)
     fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-gift`, {
       method: "POST",

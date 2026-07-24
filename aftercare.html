@@ -136,6 +136,24 @@
     border-radius:2px;
   }
   .back:hover{background:var(--gold-bright)}
+
+  .send-box{margin-top:24px;padding:20px;border:1px solid var(--gold);border-radius:2px;background:rgba(201,162,107,.06)}
+  .btn-send{
+    display:block;width:100%;border:none;cursor:pointer;
+    padding:15px 20px;background:var(--gold);color:var(--ink);
+    font-family:'Karla',sans-serif;font-size:.78rem;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;border-radius:2px;
+  }
+  .btn-send:hover{background:var(--gold-bright)}
+  .btn-send:disabled{opacity:.55;cursor:wait}
+  .send-box input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;
+    color:var(--ivory);font-family:'Karla',sans-serif;font-size:1rem;padding:14px;outline:none;margin-bottom:10px;
+  }
+  .send-box input:focus{border-color:var(--gold)}
+  .send-status{margin-top:12px;font-size:.85rem;line-height:1.6}
+  .send-status.ok{color:var(--ok)}
+  .send-status.error{color:#D98E7E}
 </style>
 </head>
 <body>
@@ -145,6 +163,15 @@
   <p class="tagline">What once was, is not all lost</p>
   <h1>Thank you, <em>beautiful</em></h1>
   <p class="sub">Your new brows are an investment — and the next 5 days decide how gorgeously they heal. This is your guide, exactly as Amii teaches it. Follow it, and your color will settle soft, even, and true.</p>
+
+  <div class="send-box" id="sendBox">
+    <button class="btn-send" id="btnSendMe" type="button">📤 Send Me This Guide (Email + WhatsApp)</button>
+    <div id="phonePrompt" style="display:none;margin-top:12px">
+      <input id="lookupPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Your phone number" />
+      <button class="btn-send" id="btnLookupSend" type="button">Find Me &amp; Send</button>
+    </div>
+    <p class="send-status" id="sendStatus" style="display:none"></p>
+  </div>
 
   <div class="rule"></div>
 
@@ -198,5 +225,141 @@
 
   <a class="back" href="checkin.html">← Back to the studio</a>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="config.js"></script>
+<script src="client-identity.js"></script>
+<script>
+emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
+
+const $ = id => document.getElementById(id);
+const digits = s => (s || "").replace(/\D/g, "");
+const last7 = s => digits(s).slice(-7);
+const params = new URLSearchParams(location.search);
+
+async function lookupByPhone(phone) {
+  const res = await fetch(CONFIG.SUPABASE_URL + "/rest/v1/rpc/lookup_client_by_phone", {
+    method: "POST",
+    headers: { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ p_phone_last7: last7(phone) })
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function intlPhone(phone) {
+  const d = digits(phone);
+  if (d.length === 7) return "1868" + d;
+  if (d.length === 10 && d.indexOf("868") === 0) return "1" + d;
+  if (d.length === 11 && d.indexOf("1868") === 0) return d;
+  if (d.length >= 10) return d;
+  return "";
+}
+
+function showStatus(msg, kind) {
+  const el = $("sendStatus");
+  el.textContent = msg;
+  el.className = "send-status " + (kind || "");
+  el.style.display = "block";
+}
+
+/* A link from checkin.html carries ?phone=&name=&email= for the client who
+   just checked in on THIS device — always safe, it's the person who was
+   just there. Otherwise fall back to whatever this device remembers from
+   a past visit; if neither exists, we ask (once) and remember from then on. */
+function knownIdentity() {
+  const urlPhone = params.get("phone");
+  if (urlPhone) {
+    return { phone: urlPhone, name: params.get("name") || "", email: params.get("email") || "" };
+  }
+  return ClientIdentity.get();
+}
+let pendingIdentity = knownIdentity();
+
+async function sendGuideTo(identity) {
+  try {
+    const name = identity.name || "beautiful";
+    const first = name.split(" ")[0];
+    if (identity.email) {
+      try {
+        await emailjs.send(CONFIG.EMAILJS_SERVICE, CONFIG.EMAILJS_TEMPLATE, {
+          to_name: name, name: name, to_email: identity.email, email: identity.email,
+          service: "", google_review_url: CONFIG.GOOGLE_REVIEW_URL, facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL,
+          receipt_date: "", amount: "", amount_before_discount: ""
+        });
+      } catch (e) {
+        console.error("EmailJS:", e);
+      }
+    }
+    let waOpened = false;
+    const intl = intlPhone(identity.phone || "");
+    if (intl) {
+      const msg = "Hi " + first + "! 🤍 Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html\n\nWhat once was, is not all lost. ✨";
+      window.open("https://wa.me/" + intl + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+      waOpened = true;
+    }
+    ClientIdentity.save({ name: identity.name, phone: identity.phone, email: identity.email });
+    $("btnSendMe").style.display = "none";
+    $("phonePrompt").style.display = "none";
+    showStatus(
+      "✓ Sent" + (identity.email ? " to " + identity.email : "") + "." +
+      (waOpened ? " WhatsApp is open with your guide ready — just tap send there too." : ""),
+      "ok"
+    );
+  } catch (e) {
+    console.error(e);
+    showStatus("Something went wrong sending it — please try again.", "error");
+  }
+}
+
+$("btnSendMe").addEventListener("click", async () => {
+  if (pendingIdentity && pendingIdentity.phone) {
+    $("btnSendMe").disabled = true;
+    $("btnSendMe").textContent = "Sending…";
+    try {
+      const match = await lookupByPhone(pendingIdentity.phone);
+      const identity = match
+        ? { name: match.name || pendingIdentity.name, phone: pendingIdentity.phone, email: match.email || pendingIdentity.email }
+        : pendingIdentity;
+      await sendGuideTo(identity);
+    } catch (e) {
+      console.error(e);
+      await sendGuideTo(pendingIdentity); // best effort with what we already have
+    }
+  } else {
+    $("btnSendMe").style.display = "none";
+    $("phonePrompt").style.display = "block";
+    $("lookupPhone").focus();
+  }
+});
+
+$("btnLookupSend").addEventListener("click", async () => {
+  const phone = $("lookupPhone").value.trim();
+  if (last7(phone).length < 7) {
+    showStatus("Please enter a valid phone number.", "error");
+    return;
+  }
+  $("btnLookupSend").disabled = true;
+  $("btnLookupSend").textContent = "Finding you…";
+  try {
+    const match = await lookupByPhone(phone);
+    if (!match) {
+      const waFallback = CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0
+        ? ` Message us on WhatsApp and we'll send it to you: https://wa.me/${CONFIG.BUSINESS_WHATSAPP_NUMBER}`
+        : " Please check in first, then try again.";
+      showStatus("We couldn't find that number on file." + waFallback, "error");
+      $("btnLookupSend").disabled = false;
+      $("btnLookupSend").textContent = "Find Me & Send";
+      return;
+    }
+    await sendGuideTo({ name: match.name, phone: phone, email: match.email });
+  } catch (e) {
+    console.error(e);
+    showStatus("Something went wrong — please try again in a moment.", "error");
+    $("btnLookupSend").disabled = false;
+    $("btnLookupSend").textContent = "Find Me & Send";
+  }
+});
+</script>
 </body>
 </html>

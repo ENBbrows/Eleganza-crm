@@ -226,6 +226,7 @@
 </main>
 
 <script src="config.js"></script>
+<script src="client-identity.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const C = CONFIG.COLUMNS;
@@ -594,6 +595,7 @@ $("detailsForm").addEventListener("submit", async e => {
       p_client_id: clientId || null
     });
     const r = Array.isArray(result) ? result[0] : result;
+    ClientIdentity.save({ name, phone, email });
     renderDone(r, name, phone);
   } catch (err) {
     console.error(err);
@@ -788,6 +790,17 @@ function renderPaymentFollowUpButtons(method) {
   }
   $("paymentFollowUp").style.display = "block";
 }
+
+/* If this device has already checked in or booked before, don't make them
+   retype their details — quietly prefill so the Details step is one tap. */
+function prefillFromIdentity() {
+  const identity = ClientIdentity.get();
+  if (!identity) return;
+  if (!$("d-phone").value.trim() && identity.phone) $("d-phone").value = identity.phone;
+  if (!$("d-name").value.trim() && identity.name) $("d-name").value = identity.name;
+  if (!$("d-email").value.trim() && identity.email) $("d-email").value = identity.email;
+}
+prefillFromIdentity();
 
 loadSchedule();
 loadGift();

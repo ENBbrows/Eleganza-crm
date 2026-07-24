@@ -609,6 +609,7 @@
 </div>
 
 <script src="config.js"></script>
+<script src="client-identity.js"></script>
 <script>
 /* Settings live in config.js — edit that file, not this one. */
 
@@ -899,6 +900,16 @@ const app = {
     // Match today's booking on the calendar and log a receipt — this is what
     // keeps the CRM in sync automatically the moment a client checks in.
     linkBookingAndReceipt(this.ctx);
+
+    // Remember this client's own details on this device, and hand them off
+    // to the aftercare page so it can send itself with zero extra typing.
+    ClientIdentity.save({ name: name, phone: this.ctx.phone, email: email });
+    const aftercareParams = new URLSearchParams();
+    if (this.ctx.phone) aftercareParams.set("phone", this.ctx.phone);
+    if (name) aftercareParams.set("name", name);
+    if (email) aftercareParams.set("email", email);
+    const aftercareQs = aftercareParams.toString();
+    $("btn-aftercare").href = "aftercare.html" + (aftercareQs ? "?" + aftercareQs : "");
 
     /* price + reward — computed early so the receipt (email + WhatsApp) can use it.
        A pre-existing reward (referral 10%, or a review reward saved from a past
