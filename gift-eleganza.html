@@ -427,11 +427,26 @@ $("btnConfirmPaid").addEventListener("click", async () => {
     // Real automatic WhatsApp delivery needs an approved WhatsApp Business
     // template (not set up yet) — until then, this one tap opens WhatsApp
     // with the notification ready so you can send it yourself right now.
+    //
+    // This has to respect the scheduled send date the same way the email
+    // does: if delivery is set for later, tapping this immediately would
+    // hand the recipient the reveal link (and let them redeem it) before
+    // the scheduled moment. So a future-dated gift gets a teaser-only
+    // message with no link — it lets you give them a heads-up without
+    // spoiling or unlocking it early. Only an immediate/unscheduled gift
+    // gets the full message with the actual link.
     const waTo = intlPhone(state.recipientPhone);
+    const isScheduledForLater = state.sendAt && new Date(state.sendAt) > new Date();
     if (waTo) {
       const recipientFirst = (state.recipientName || "").split(" ")[0] || "there";
-      const openLink = `https://enbbrows.github.io/Eleganza-crm/view-gift.html?code=${giftRedemptionCode}`;
-      const waMsg = `Hi ${recipientFirst}! 💌 You've got mail from an admirer — someone sent you a gift from Eleganza Naturally Beautiful. Open it here:\n${openLink}`;
+      let waMsg;
+      if (isScheduledForLater) {
+        const when = new Date(state.sendAt).toLocaleDateString("en-US", { dateStyle: "long" });
+        waMsg = `Hi ${recipientFirst}! 💌 Someone has a little surprise coming your way from Eleganza Naturally Beautiful on ${when}... keep an eye on your email 👀`;
+      } else {
+        const openLink = `https://enbbrows.github.io/Eleganza-crm/view-gift.html?code=${giftRedemptionCode}`;
+        waMsg = `Hi ${recipientFirst}! 💌 You've got mail from an admirer — someone sent you a gift from Eleganza Naturally Beautiful. Open it here:\n${openLink}`;
+      }
       $("btnNotifyRecipientWa").href = `https://wa.me/${waTo}?text=${encodeURIComponent(waMsg)}`;
       $("btnNotifyRecipientWa").style.display = "block";
     } else {
