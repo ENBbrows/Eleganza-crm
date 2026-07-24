@@ -109,6 +109,15 @@
     <p class="sub">Step 1 of 4 — Tap a service below to get started.</p>
     <img src="portfolio/turn-back-time-before-after.jpg" alt="Real before and after — microblading transformation" style="width:100%;max-width:420px;display:block;margin:18px auto;border-radius:14px 4px 14px 4px;border:1px solid var(--gold)" />
     <div class="summary" id="giftBanner" style="display:none;border-color:var(--gold);text-align:center"></div>
+    <div id="giftApplyWrap" style="text-align:center;margin-bottom:14px">
+      <button class="linkline" type="button" id="btnShowGiftEntry">🎁 Redeeming a gift certificate?</button>
+      <div id="giftApplyForm" style="display:none;margin-top:10px;text-align:left">
+        <label for="giftCodeInput">Gift code or link</label>
+        <input id="giftCodeInput" type="text" placeholder="Paste the code or link from your gift email" />
+        <button class="btn-ghost" type="button" id="btnApplyGift" style="margin-top:8px">Apply Gift Certificate</button>
+        <div class="banner" id="giftApplyError" style="margin-top:8px"></div>
+      </div>
+    </div>
     <div id="serviceList"></div>
   </section>
 
@@ -213,6 +222,7 @@
       <div style="margin-top:6px;font-size:.85rem;color:var(--ivory-dim)" id="voucherSub"></div>
       <a class="review-btn" id="btnShareVoucher" href="#" target="_blank" rel="noopener" style="margin-top:12px">💬 Share With A Friend</a>
     </div>
+    <a class="review-btn" id="btnAftercare" href="aftercare.html" style="border-style:solid;background:rgba(201,162,107,.12)">❋ My Aftercare Guide — Email &amp; WhatsApp</a>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
     <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Appointment</button>
@@ -245,7 +255,7 @@ function leadDaysFor(service) {
 const params = new URLSearchParams(location.search);
 const PRESET_CATEGORY = params.get("category");
 const PRESET_SUGGEST_DAYS = params.get("suggestDays") ? parseInt(params.get("suggestDays"), 10) : null;
-const PRESET_GIFT_CODE = params.get("gift");
+let giftCode = params.get("gift"); // can also be set later via the "Redeeming a gift certificate?" form
 
 const digits = s => (s||"").replace(/\D/g,"");
 const last7 = s => digits(s).slice(-7);
@@ -335,19 +345,45 @@ function fmtMoney(n, currency) {
   return (currency || "TTD") + "$" + Number(n).toLocaleString();
 }
 
+function renderGiftBanner(result) {
+  const banner = $("giftBanner");
+  banner.innerHTML = `<div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Gift Certificate Applied</div>` +
+    `<div>You have a <strong>${fmtMoney(result.amount, result.currency)}</strong> gift from <strong>${esc(result.buyer_name)}</strong> — select your service below.</div>`;
+  banner.style.display = "block";
+  $("giftApplyWrap").style.display = "none";
+}
+
+/* A pasted gift email/WhatsApp message only ever contains the full
+   view-gift.html link, not a short standalone code — accept either. */
+function extractGiftCode(input) {
+  const trimmed = (input || "").trim();
+  if (!trimmed) return "";
+  try {
+    const url = new URL(trimmed);
+    return url.searchParams.get("code") || url.searchParams.get("gift") || "";
+  } catch (e) {
+    return trimmed; // not a URL — treat as a bare code
+  }
+}
+
+async function applyGiftCode(code) {
+  if (!code) return { valid: false, reason: "empty" };
+  const result = await rpc("get_gift_certificate", { p_code: code });
+  if (result && result.valid) {
+    giftCode = code;
+    state.gift = result;
+    renderGiftBanner(result);
+  }
+  return result;
+}
+
 /* If they arrived via a gift certificate link, show what it's worth and
    who it's from — the value gets applied automatically at the payment step. */
 async function loadGift() {
-  if (!PRESET_GIFT_CODE) return;
+  if (!giftCode) return;
   try {
-    const result = await rpc("get_gift_certificate", { p_code: PRESET_GIFT_CODE });
-    if (result && result.valid) {
-      state.gift = result;
-      const banner = $("giftBanner");
-      banner.innerHTML = `<div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Gift Certificate Applied</div>` +
-        `<div>You have a <strong>${fmtMoney(result.amount, result.currency)}</strong> gift from <strong>${esc(result.buyer_name)}</strong> — select your service below.</div>`;
-      banner.style.display = "block";
-    } else {
+    const result = await applyGiftCode(giftCode);
+    if (!result || !result.valid) {
       console.warn("Gift certificate not valid:", result && result.reason);
     }
   } catch (e) {
@@ -615,6 +651,17 @@ function renderDone(result, name, phone) {
     ? "We'll send a confirmation message the day before — just tap to confirm or pick a new time."
     : "We'll remind you the day before and an hour before your appointment.";
   $("doneSummary").innerHTML = `<div>Service <strong>${esc(state.service.name)}</strong></div><div>When <strong>${when}</strong></div>`;
+
+  // Aftercare is offered for every service, not just first-time procedures —
+  // hand off identity so the aftercare page can send itself with one tap.
+  const detailsEmail = $("d-email").value.trim();
+  const aftercareParams = new URLSearchParams();
+  if (phone) aftercareParams.set("phone", phone);
+  if (name) aftercareParams.set("name", name);
+  if (detailsEmail) aftercareParams.set("email", detailsEmail);
+  const aftercareQs = aftercareParams.toString();
+  $("btnAftercare").href = "aftercare.html" + (aftercareQs ? "?" + aftercareQs : "");
+
   state.confirmToken = result.confirm_token;
   state.bookingId = result.booking_id;
   $("paymentAck").style.display = "none";
@@ -710,7 +757,7 @@ $("btnRedeemGift").onclick = async () => {
   $("btnRedeemGift").disabled = true;
   $("btnRedeemGift").textContent = "Redeeming…";
   try {
-    const result = await rpc("redeem_gift_certificate", { p_code: PRESET_GIFT_CODE, p_booking_id: state.bookingId });
+    const result = await rpc("redeem_gift_certificate", { p_code: giftCode, p_booking_id: state.bookingId });
     if (!result || !result.valid) throw new Error("gift_redeem_failed");
     $("giftRedeemAck").textContent = "✓ Gift certificate applied — see you soon!";
     $("giftRedeemAck").style.display = "block";
@@ -718,7 +765,7 @@ $("btnRedeemGift").onclick = async () => {
 
     if (result.remaining_balance > 0) {
       $("giftBalanceMsg").innerHTML = `You still have <strong>${fmtMoney(result.remaining_balance, result.currency)}</strong> left on this gift. Use the same link whenever you like to put it toward another visit.`;
-      $("btnUseGiftBalance").onclick = () => { location.href = `book-eleganza.html?gift=${PRESET_GIFT_CODE}`; };
+      $("btnUseGiftBalance").onclick = () => { location.href = `book-eleganza.html?gift=${giftCode}`; };
       $("giftBalancePanel").style.display = "block";
     }
 
@@ -801,6 +848,39 @@ function prefillFromIdentity() {
   if (!$("d-email").value.trim() && identity.email) $("d-email").value = identity.email;
 }
 prefillFromIdentity();
+
+$("btnShowGiftEntry").addEventListener("click", () => {
+  $("btnShowGiftEntry").style.display = "none";
+  $("giftApplyForm").style.display = "block";
+  $("giftCodeInput").focus();
+});
+$("btnApplyGift").addEventListener("click", async () => {
+  $("giftApplyError").classList.remove("show");
+  const code = extractGiftCode($("giftCodeInput").value);
+  if (!code) {
+    $("giftApplyError").textContent = "Please paste your gift code or link.";
+    $("giftApplyError").classList.add("show");
+    return;
+  }
+  const btn = $("btnApplyGift");
+  btn.disabled = true; btn.textContent = "Checking…";
+  try {
+    const result = await applyGiftCode(code);
+    if (!result || !result.valid) {
+      $("giftApplyError").textContent = result && result.reason === "fully_redeemed"
+        ? "That gift certificate has already been fully used."
+        : "We couldn't find that gift certificate — double check the code or link and try again.";
+      $("giftApplyError").classList.add("show");
+      btn.disabled = false; btn.textContent = "Apply Gift Certificate";
+    }
+    // on success, renderGiftBanner() already hides the form and shows the banner
+  } catch (e) {
+    console.error(e);
+    $("giftApplyError").textContent = "Something went wrong — please try again.";
+    $("giftApplyError").classList.add("show");
+    btn.disabled = false; btn.textContent = "Apply Gift Certificate";
+  }
+});
 
 loadSchedule();
 loadGift();
