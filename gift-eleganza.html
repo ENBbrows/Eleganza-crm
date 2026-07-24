@@ -252,6 +252,7 @@
     <h1>Sent With Love</h1>
     <p class="sub" id="doneSub"></p>
     <div class="summary" id="doneSummary"></div>
+    <a class="btn-ghost" id="btnNotifyRecipientWa" href="#" target="_blank" rel="noopener" style="display:none">📱 Let Them Know on WhatsApp</a>
     <a class="btn-ghost" id="btnPreviewGift" href="#" target="_blank" rel="noopener">👀 Preview What They'll See</a>
     <a class="btn" href="home.html">Back to Eleganza</a>
   </section>
@@ -264,6 +265,15 @@
 <script>
 const $ = id => document.getElementById(id);
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+const digits = s => (s || "").replace(/\D/g, "");
+function intlPhone(phone) {
+  const d = digits(phone);
+  if (d.length === 7) return "1868" + d;
+  if (d.length === 10 && d.indexOf("868") === 0) return "1" + d;
+  if (d.length === 11 && d.indexOf("1868") === 0) return d;
+  if (d.length >= 10) return d;
+  return "";
+}
 
 /* Prefill the BUYER's own details if this device has them on file — the
    recipient is a different person, so never prefill that from identity. */
@@ -413,6 +423,21 @@ $("btnConfirmPaid").addEventListener("click", async () => {
       : `${state.recipientName} will receive it by email shortly.`;
     $("doneSummary").innerHTML = `<div class="v">Design <strong>${esc(DESIGN_NAMES[state.design])}</strong><br>Value <strong>${fmtMoney(state.amount)}</strong></div>`;
     $("btnPreviewGift").href = `view-gift.html?code=${giftRedemptionCode}`;
+
+    // Real automatic WhatsApp delivery needs an approved WhatsApp Business
+    // template (not set up yet) — until then, this one tap opens WhatsApp
+    // with the notification ready so you can send it yourself right now.
+    const waTo = intlPhone(state.recipientPhone);
+    if (waTo) {
+      const recipientFirst = (state.recipientName || "").split(" ")[0] || "there";
+      const openLink = `https://enbbrows.github.io/Eleganza-crm/view-gift.html?code=${giftRedemptionCode}`;
+      const waMsg = `Hi ${recipientFirst}! 💌 You've got mail from an admirer — someone sent you a gift from Eleganza Naturally Beautiful. Open it here:\n${openLink}`;
+      $("btnNotifyRecipientWa").href = `https://wa.me/${waTo}?text=${encodeURIComponent(waMsg)}`;
+      $("btnNotifyRecipientWa").style.display = "block";
+    } else {
+      $("btnNotifyRecipientWa").style.display = "none";
+    }
+
     showScreen("screen-done");
   } catch (err) {
     console.error(err);
