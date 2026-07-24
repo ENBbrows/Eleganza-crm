@@ -30,6 +30,12 @@
     28%{transform:scale(1.25) rotate(90deg);opacity:1}
     100%{transform:scale(.15) rotate(200deg);opacity:0}
   }
+  .confetti{position:absolute;top:-24px;opacity:.95;border-radius:1px;animation:confetti-fall linear forwards}
+  @keyframes confetti-fall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1}
+    85%{opacity:1}
+    100%{transform:translateY(var(--fall,560px)) rotate(var(--spin,540deg));opacity:0}
+  }
   .brand{font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:22px}
 
   /* ── envelope ── */
@@ -93,7 +99,7 @@
   .card[data-design="christmas"]{background:radial-gradient(ellipse at 50% 0%, rgba(140,150,115,.18), var(--ink) 70%)}
   .card[data-design="milestone"]{background:radial-gradient(ellipse at 50% 0%, rgba(201,162,107,.2), var(--ink) 70%)}
 
-  .card-logo{width:64px;height:64px;margin-bottom:6px;transition:transform .08s linear}
+  .card-logo{width:64px;height:64px;margin-bottom:20px;transition:transform .08s linear}
   .card-motif{width:74px;height:74px;margin:10px 0}
   .card-title{font-family:'Fraunces',serif;font-style:italic;font-size:1.9rem;color:var(--gold-bright)}
   .card-kicker{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ivory-dim);margin-top:10px}
@@ -216,22 +222,62 @@ function playTrack(design) {
   np.classList.add("show");
 }
 
+const CONFETTI_COLORS = ["#C9A26B", "#E0BE8A", "#8C9673", "#A8B48C", "#F4EDE4"];
+
+function spawnSparkle(layer, opts) {
+  const o = opts || {};
+  const s = document.createElement("span");
+  s.className = "sparkle";
+  s.textContent = Math.random() > 0.5 ? "✦" : "✧";
+  const angle = o.angle != null ? o.angle : Math.random() * Math.PI * 2;
+  const radius = o.radius != null ? o.radius : 24 + Math.random() * 42;
+  s.style.left = (50 + Math.cos(angle) * radius) + "%";
+  s.style.top = (50 + Math.sin(angle) * radius * 0.55) + "%";
+  s.style.fontSize = (0.75 + Math.random() * 0.95) + "rem";
+  s.style.animationDelay = (Math.random() * 0.45) + "s";
+  layer.appendChild(s);
+  setTimeout(() => s.remove(), 1900);
+}
+
 function burstSparkles() {
   const layer = $("sparkleLayer");
   if (!layer) return;
-  const count = 18;
+  for (let i = 0; i < 18; i++) spawnSparkle(layer);
+}
+
+/* A light trickle of extra sparkles for ~15s after the reveal, so the page
+   keeps a little bit of magic moving instead of going still right after
+   the initial burst. */
+function trickleSparkles() {
+  const layer = $("sparkleLayer");
+  if (!layer) return;
+  let ticks = 0;
+  const id = setInterval(() => {
+    ticks++;
+    spawnSparkle(layer);
+    if (Math.random() > 0.5) spawnSparkle(layer);
+    if (ticks >= 8) clearInterval(id);
+  }, 1700);
+}
+
+function burstConfetti() {
+  const layer = $("sparkleLayer");
+  if (!layer) return;
+  const count = 34;
   for (let i = 0; i < count; i++) {
-    const s = document.createElement("span");
-    s.className = "sparkle";
-    s.textContent = Math.random() > 0.5 ? "✦" : "✧";
-    const angle = Math.random() * Math.PI * 2;
-    const radius = 24 + Math.random() * 42;
-    s.style.left = (50 + Math.cos(angle) * radius) + "%";
-    s.style.top = (50 + Math.sin(angle) * radius * 0.55) + "%";
-    s.style.fontSize = (0.75 + Math.random() * 0.95) + "rem";
-    s.style.animationDelay = (Math.random() * 0.45) + "s";
-    layer.appendChild(s);
-    setTimeout(() => s.remove(), 1900);
+    const c = document.createElement("span");
+    c.className = "confetti";
+    const wide = Math.random() > 0.5;
+    c.style.width = (wide ? 9 : 5) + "px";
+    c.style.height = (wide ? 5 : 12) + "px";
+    c.style.left = Math.round(Math.random() * 100) + "%";
+    c.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    c.style.setProperty("--fall", (420 + Math.random() * 260) + "px");
+    c.style.setProperty("--spin", (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 360) + "deg");
+    c.style.animationDuration = (1.8 + Math.random() * 1.4) + "s";
+    c.style.animationDelay = (Math.random() * 0.6) + "s";
+    layer.appendChild(c);
+    setTimeout(() => c.remove(), 3600);
   }
 }
 
@@ -300,6 +346,8 @@ async function init() {
         stage.classList.add("show");
         $("pageDots").style.display = "flex";
         burstSparkles();
+        burstConfetti();
+        trickleSparkles();
       }, 750);
     });
   } catch (e) {
