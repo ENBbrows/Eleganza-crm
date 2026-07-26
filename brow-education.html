@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brow Education Library — Eleganza Naturally Beautiful</title>
+<meta name="description" content="50 in-depth, expert answers on microblading, brow mapping, and brow makeup — organized by topic." />
+<link rel="apple-touch-icon" href="app-icon-black-v2.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
+    --gold:#C9A26B; --gold-bright:#E0BE8A;
+    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
+    --sage:#8C9673; --sage-bright:#A8B48C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-weight:300;
+    letter-spacing:.01em;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 40%, rgba(140,150,115,.06), transparent 55%);
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:32px 20px 80px}
+  .brand{font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);text-align:center}
+  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.9rem,6.5vw,2.5rem);line-height:1.2;text-align:center;margin-top:18px}
+  h1 em{font-style:italic;color:var(--gold-bright)}
+  .hero-sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.7;text-align:center;margin-top:14px;max-width:480px;margin-left:auto;margin-right:auto}
+  .btn{
+    display:block;text-align:center;padding:17px;background:var(--gold);color:var(--ink);
+    text-decoration:none;border:none;border-radius:2px;font-weight:600;font-size:.8rem;
+    letter-spacing:.24em;text-transform:uppercase;cursor:pointer;transition:background .2s;
+  }
+  .btn:hover{background:var(--gold-bright)}
+  .btn-ghost{
+    display:block;text-align:center;padding:15px;background:transparent;color:var(--gold);
+    text-decoration:none;border:1px solid var(--gold);border-radius:2px;font-weight:600;font-size:.78rem;
+    letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;
+  }
+  .btn-ghost:hover{background:rgba(201,162,107,.08)}
+  .cta-row{display:flex;flex-direction:column;gap:12px;margin-top:28px;max-width:360px;margin-left:auto;margin-right:auto}
+
+  /* nav (shared pattern) */
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(23,18,16,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
+  .nav-toggle{
+    flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
+    border-radius:2px;padding:9px 12px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    cursor:pointer;font-family:'Karla',sans-serif;
+  }
+  .nav-search-form{flex:1}
+  .nav-search-form input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:20px;
+    color:var(--ivory);padding:9px 14px;font-size:.85rem;font-family:'Karla',sans-serif;outline:none;
+  }
+  .nav-search-form input:focus{border-color:var(--gold)}
+  .nav-dropdown{display:none;flex-direction:column;border-top:1px solid var(--line);background:var(--ink)}
+  .nav-dropdown.open{display:flex}
+  .nav-dropdown-inner{max-width:640px;margin:0 auto;display:flex;flex-direction:column}
+  .nav-dropdown a{
+    padding:14px 20px;color:var(--ivory-dim);text-decoration:none;font-size:.85rem;
+    letter-spacing:.03em;border-bottom:1px solid var(--line);
+  }
+  .nav-dropdown a:last-child{border-bottom:none}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(201,162,107,.05)}
+  .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
+
+  .rule{
+    width:52px;height:26px;margin:40px auto;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M2 13c9-11 39-11 48 0-9 11-39 11-48 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3Cpath d='M26 5v16M15 10c3.5 1.3 7.5 1.3 11 2.5M37 10c-3.5 1.3-7.5 1.3-11 2.5' fill='none' stroke='%23C9A26B' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
+
+  /* local library search */
+  .lib-search-wrap{max-width:520px;margin:28px auto 0}
+  .lib-search-wrap input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;
+    color:var(--ivory);padding:14px 16px;font-size:.92rem;font-family:'Karla',sans-serif;outline:none;
+  }
+  .lib-search-wrap input:focus{border-color:var(--gold)}
+  .lib-hint{font-size:.78rem;color:var(--ivory-dim);text-align:center;margin-top:8px}
+  .lib-no-results{display:none;text-align:center;color:var(--ivory-dim);font-size:.9rem;padding:30px 0;font-style:italic}
+
+  /* category accordions */
+  .lib-body{max-width:560px;margin:28px auto 0}
+  .cat-group{border:1px solid var(--gold);border-radius:14px 4px 14px 4px;margin-bottom:14px;overflow:hidden}
+  .cat-group summary{
+    font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;color:var(--gold-bright);
+    cursor:pointer;list-style:none;padding:18px 20px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:rgba(201,162,107,.06);
+  }
+  .cat-group summary::-webkit-details-marker{display:none}
+  .cat-count{
+    font-family:'Karla',sans-serif;font-style:normal;font-size:.72rem;letter-spacing:.05em;
+    color:var(--ink);background:var(--gold);border-radius:20px;padding:2px 10px;flex:none;
+  }
+  .cat-group[open] summary{border-bottom:1px solid var(--line)}
+
+  /* faq (question-level, matches home.html's Q&A styling) */
+  .faq-list{padding:4px 6px}
+  .faq-item{border-bottom:1px solid var(--line);padding:14px 12px}
+  .faq-item:last-child{border-bottom:none}
+  .faq-item summary{
+    font-family:'Fraunces',serif;font-size:.96rem;color:var(--ivory);cursor:pointer;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{content:"+";color:var(--gold);font-size:1.2rem;flex:none;transition:color .2s}
+  .faq-item[open] summary::after{content:"–";color:var(--sage-bright)}
+  .faq-item p{color:var(--ivory-dim);font-size:.87rem;line-height:1.65;margin-top:10px}
+  .faq-item p + p{margin-top:8px}
+
+  .back-link{display:block;text-align:center;margin-top:14px;color:var(--ivory-dim);font-size:.82rem;text-decoration:underline}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navDropdown">☰ Menu</button>
+    <form class="nav-search-form" id="navSearchForm" role="search">
+      <input type="search" id="navSearch" placeholder="Search (pricing, FAQ, location…)" aria-label="Search this page" />
+    </form>
+  </div>
+  <div class="nav-dropdown" id="navDropdown">
+    <div class="nav-dropdown-inner">
+      <a href="home.html">🏠 Home</a>
+      <a href="home.html#artist">Meet the Artist</a>
+      <a href="home.html#how">How It Works</a>
+      <a href="home.html#services">Services &amp; Pricing</a>
+      <a href="home.html#faq">Q &amp; A</a>
+      <a href="home.html#testimonials">Testimonials</a>
+      <a href="home.html#visit">Visit &amp; Policies</a>
+      <a href="home.html#work">See the Work</a>
+      <a href="home.html#reviews">Leave a Review</a>
+      <a href="gift-eleganza.html">🎁 Gift Certificates</a>
+      <a class="nav-book" href="book-eleganza.html">Book Now</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <p class="brand">Eleganza Naturally Beautiful</p>
+  <h1>The Brow <em>Education Library</em></h1>
+  <p class="hero-sub">50 in-depth, expert answers on microblading, brow mapping, and brow makeup — everything beyond the quick FAQ. Organized by topic and collapsed by default, so you only open what you're curious about.</p>
+
+  <div class="lib-search-wrap">
+    <input type="search" id="libSearch" placeholder="Search all 50 questions (e.g. 'pregnancy', 'oily skin', 'pain')" aria-label="Search the brow education library" />
+    <p class="lib-hint">Type to filter — matching topics open automatically.</p>
+  </div>
+
+  <div class="lib-body" id="libBody">
+  <details class="cat-group" id="cat-basics">
+    <summary><span>MICROBLADING — BASICS &amp; DECISIONS</span><span class="cat-count">10</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What microblading actually is vs. what people think it is</summary>
+        <p>Microblading is a semi-permanent cosmetic tattooing technique where a trained artist uses a handheld tool with a row of tiny needles to manually deposit pigment into the upper dermis of the skin, creating fine, hair-like strokes that mimic natural brow hair. It is NOT a traditional tattoo (which goes deeper), NOT permanent, and NOT a one-size-fits-all fix.</p>
+        <p>What people often think: they'll wake up with perfect brows forever, zero maintenance, and it looks identical to natural hair. The reality: microblading fades, requires a mandatory touch-up at 6–8 weeks, needs annual refreshes, and results vary significantly by skin type. On oily skin, strokes can blur and appear powdery over time. It's a skilled craft with a healing process — not an instant transformation.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Microblading vs. powder brows vs. combo brows — which is right for you</summary>
+        <p>Microblading uses a handheld blade to cut individual hair strokes into the skin, depositing pigment for a natural, feathery look. Best for: dry to normal skin, sparse brows, people wanting a natural appearance.</p>
+        <p>Powder brows (also called ombré brows) use a machine to create thousands of tiny dots, producing a soft, makeup-filled look — like you're wearing brow powder. Best for: oily skin, mature/textured skin, people who prefer a more defined or makeup-like finish. Lasts longer on most skin types.</p>
+        <p>Combo brows blend both techniques — hair strokes at the front, soft shading through the body and tail. Best for: people who want definition AND fullness, or those with sparse fronts but decent tail hair.</p>
+        <p>The honest answer: oily skin should lean powder or combo. Dry skin can do any of the three. Your artist should assess your skin during consultation — not just your aesthetic preference.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Microblading vs. nano brows — the difference most people don't know</summary>
+        <p>Both create individual hair strokes, but the tool is different. Microblading uses a physical blade (manual hand tool) that makes a small cut in the skin. Nano brows use a digital machine with a single ultra-fine needle that punctures the skin with rapid precision — no cutting.</p>
+        <p>Why it matters: nano brows cause less trauma to the skin, meaning less risk of scarring and better retention — especially on oily or sensitive skin. The strokes tend to be crisper and last longer. Nano brows are generally considered the more advanced, longer-lasting evolution of microblading. If your artist offers both, ask which is better for your specific skin type.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How long microblading really lasts (and why it varies per person)</summary>
+        <p>The honest answer: 12 to 24 months before a refresh is needed — but this varies widely. Here's why:</p>
+        <p>Skin type: oily skin breaks down pigment faster; expect closer to 12 months. Dry skin retains pigment longer, sometimes 18–24 months.</p>
+        <p>Sun exposure: UV breaks down pigment aggressively. If you're outdoors often or live somewhere sunny (like Trinidad), fading happens faster.</p>
+        <p>Skincare habits: retinols, AHAs, BHAs, and exfoliating acids accelerate pigment fade. Using these near your brows will shorten longevity.</p>
+        <p>Aftercare: improper healing (picking, wetting too soon, sweating excessively) affects how much pigment is retained after the first session.</p>
+        <p>Skin regeneration: everyone's skin cycles differently. Younger skin or those with faster cell turnover will fade faster.</p>
+        <p>This is why the 6–8 week touch-up exists — to fill in any areas that healed patchy.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much microblading costs and why the price ranges so widely</summary>
+        <p>Prices typically range from $300 to $1,200+ USD depending on location, artist experience, and what's included. Here's what drives the variation:</p>
+        <p>Artist experience and reputation: a master artist with 5+ years, international training, and a strong portfolio commands premium pricing. A newly certified artist will charge less.</p>
+        <p>What's included: some prices include the 6–8 week touch-up; others charge separately ($75–$200 extra). Always ask upfront.</p>
+        <p>Location: prices in New York, LA, or London are higher than in smaller markets. In the Caribbean, pricing varies widely based on whether artists are locally trained or internationally certified.</p>
+        <p>Studio overhead: a high-end studio with premium products, sterile equipment, and a professional environment will charge accordingly.</p>
+        <p>Pigment quality: premium pigments (like Li Pigments or PhiContour) cost more but produce better, safer results.</p>
+        <p>The rule: don't let price be your primary filter. Look at healed work from clients with your skin tone and type. A $400 result that fades beautifully beats an $800 result that turns grey.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is microblading worth it in 2025/2026?</summary>
+        <p>For the right person, absolutely. For others, not necessarily. It depends on these factors:</p>
+        <p>Worth it if: you have sparse brows, spend significant time drawing them daily, have dry to normal skin, and are committed to the aftercare and annual maintenance.</p>
+        <p>Less worth it if: you have very oily skin (powder brows will serve you better), you're prone to skincare trends and may want different shapes later, or you're not prepared for the healing process and touch-up costs.</p>
+        <p>The cultural conversation is shifting. Microblading has declined in popularity as the heavy filled-in brow trend fades and natural brows come back. Many people who got microbladed 5–7 years ago are now dealing with discolouration and are seeking removal. The lesson: choose a classic, face-flattering shape — not a trend shape.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why microblading is declining in popularity and what's replacing it</summary>
+        <p>Two reasons: the trend has shifted, and the long-term reality has caught up with people. The bold, filled, defined brow look of the 2015–2020 era has given way to softer, more natural, undone brows. People who microbladed for that look are now stuck with shapes that feel dated.</p>
+        <p>Additionally, many clients found that microblading didn't fade the way they were told — pigment turned blue-grey, strokes blurred on oily skin, or the shape simply no longer suited them years later.</p>
+        <p>What's replacing it: nano brows (more precise, less trauma), powder/ombré brows (better for oily skin), and brow lamination (non-permanent, reversible). There's also a growing movement toward embracing natural brows with strategic makeup rather than semi-permanent procedures.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What to expect at your first microblading consultation</summary>
+        <p>A proper consultation should include: a review of your medical history and any contraindications (blood thinners, skin conditions, recent Botox, etc.), a skin assessment to determine which technique is best for you, a discussion of your desired shape, arch, and colour, a brow mapping session where the artist draws out the shape before committing, a review of before and after photos of their previous clients (ask to see healed results), and a walkthrough of aftercare requirements.</p>
+        <p>Red flag: any artist who skips the mapping and jumps straight to the procedure. Another red flag: no patch test discussion for clients with sensitive skin or suspected pigment sensitivities.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Red flags to look for when choosing a microblading artist</summary>
+        <p>Before booking, watch for these warning signs:</p>
+        <p>No portfolio of healed work — fresh results look different from healed ones. Anyone can make brows look good day-of. Ask for 4–6 week post-healing photos.</p>
+        <p>No before-and-after photos on clients with your skin type/tone. Results on fair, dry skin look very different from results on brown or oily skin.</p>
+        <p>They can't explain their pigment brand or tools. Professional artists know and stand behind what they use.</p>
+        <p>They offer extremely low prices with no clear explanation. Cheap usually means undertrained or using low-quality pigments.</p>
+        <p>No consultation process — they just ask you what shape you want and proceed.</p>
+        <p>No mention of touch-ups being part of the process.</p>
+        <p>Working in an unregulated space with no visible hygiene protocols (sterile single-use tools, gloves, clean surfaces).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Questions you should ask before booking a microblading appointment</summary>
+        <p>Ask these before you commit:</p>
+        <p>Can I see healed results from clients with similar skin type and tone to mine? How many procedures do you perform per month? (Frequency = skill maintenance.) What brand of pigment do you use and why? Is the touch-up included in the price? What are the contraindications — do any of my current medications or skincare products disqualify me? What does the aftercare involve? What happens if I'm unhappy with the result? Are you licensed/certified, and by which governing body? How do you handle asymmetry corrections? What technique do you recommend for my specific skin and brow goals?</p>
+      </details>
+    </div>
+  </details>
+  <details class="cat-group" id="cat-process">
+    <summary><span>MICROBLADING — PROCESS &amp; PAIN</span><span class="cat-count">10</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Does microblading hurt? What the pain actually feels like</summary>
+        <p>Most clients describe it as uncomfortable rather than painful — a scratching sensation similar to threading or tweezing, but more persistent. The initial strokes (before numbing takes full effect) are the most noticeable. Once the topical anaesthetic is applied (usually between passes), the area becomes significantly more numb.</p>
+        <p>Pain tolerance varies person to person. Clients who have their period or are premenstrual tend to be more sensitive. Areas closer to the nose or tail of the brow can be slightly more tender. Overall, most people are surprised by how manageable it is. It's not a pain-free procedure, but it's rarely described as unbearable.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How long a microblading session takes from start to finish</summary>
+        <p>A full first session typically takes 2 to 3 hours. The breakdown: consultation and paperwork (15–20 minutes), brow mapping and shape approval (20–30 minutes), topical numbing (20 minutes), the actual microblading procedure (45–75 minutes), aftercare walkthrough and documentation (10–15 minutes).</p>
+        <p>Touch-up appointments at 6–8 weeks are shorter — usually 60 to 90 minutes — since the mapping is already established and only refinements are needed. Build the full day around the appointment; you'll want time to decompress and won't want to rush into something else immediately after.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why numbing is applied after brow mapping, not before</summary>
+        <p>This is a critical and often misunderstood point. Topical anaesthetic cannot be applied before brow mapping because it alters the skin. Numbing creams cause the skin to swell slightly and change texture, which distorts measurements and makes accurate mapping impossible. It can also alter facial muscle relaxation, shifting the natural position of the brows.</p>
+        <p>Mapping must be done on a neutral, un-numbed face so the artist can accurately measure proportions, check symmetry, and mark the correct points. Numbing is typically applied after the shape is drawn and approved, during a waiting period before the first strokes begin. This is standard professional protocol — any artist who numbs before mapping is skipping a critical accuracy step.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens during the touch-up appointment (and why it's essential)</summary>
+        <p>The 6–8 week touch-up is not optional — it is a fundamental part of the microblading process, and reputable artists include it or charge separately as an expected second session.</p>
+        <p>Here's why: during the initial healing, the skin goes through a process of regeneration. Pigment in some areas will fade significantly, appear patchy, or look uneven. This is completely normal. The touch-up allows the artist to: fill in areas where pigment didn't retain, refine the shape after seeing how your skin healed, adjust colour if needed, add strokes in sparse sections, and correct any asymmetry.</p>
+        <p>Skipping the touch-up means your final result will likely be incomplete. The full healed result cannot be assessed until after the touch-up has also healed.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why your brows look darker and bolder right after the procedure</summary>
+        <p>Immediately after microblading, the brows will look significantly darker, more defined, and more intense than the intended final result. This is normal and expected. The pigment is sitting in the upper layers of the skin before the healing process begins, which makes it appear more saturated. There is also some minor swelling and redness around the strokes.</p>
+        <p>Over the next 7–14 days, the brows will scab, flake, and the colour will appear to lighten dramatically — sometimes up to 40–50% lighter. This "ghost phase" (usually around days 5–12) where they look like they've almost disappeared is also normal. The true settled colour reveals itself around 4–6 weeks post-procedure, once the skin has fully healed.</p>
+      </details>
+      <details class="faq-item">
+        <summary>The healing timeline day by day — what's normal, what's not</summary>
+        <p>Days 1–2: brows appear dark, bold, and slightly swollen. Some redness around strokes. Normal.</p>
+        <p>Days 3–5: brows begin to feel itchy and tight. Light scabbing or flaking starts. Do not pick or scratch.</p>
+        <p>Days 5–10: the "ghost phase" — brows may look like they've almost completely faded or disappeared. The strokes seem very light or dull. This is normal; pigment is settling under a layer of new skin.</p>
+        <p>Days 10–14: flaking subsides, new skin forms. Colour begins to resurface but may look patchy.</p>
+        <p>Days 14–28: colour continues to clarify. Some areas may look uneven — this is why the touch-up exists.</p>
+        <p>Weeks 4–8: true healed result becomes visible. Assessment for touch-up is done here.</p>
+        <p>Not normal: excessive swelling beyond 48 hours, signs of infection (pus, intense heat, fever), bleeding beyond the day of procedure, or deep scarring.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why brows 'ghost' (fade) during healing and what to do about it</summary>
+        <p>The ghosting phase is one of the most panic-inducing parts of healing for first-time clients. It happens because as the skin heals, a fresh layer of epidermis forms over the pigment, temporarily obscuring the colour. The strokes aren't gone — they're just underneath a translucent veil of new skin regenerating over them.</p>
+        <p>What to do: absolutely nothing. This is the time when clients are most tempted to pick, scratch, or reapply anything — resist all of it. Let the skin complete its natural cycle. By weeks 4–6, the pigment will resurface through the new skin and the true result will be visible. If the brows still look extremely faint or patchy at 6 weeks, that's exactly what the touch-up appointment addresses.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Scabbing after microblading — what to do vs. what NOT to do</summary>
+        <p>DO: keep the area clean per your artist's instructions (dry healing or wet healing — your artist will specify their method). Apply any prescribed aftercare ointment sparingly if instructed. Sleep on a clean pillowcase. Let any scabs fall off on their own naturally.</p>
+        <p>DO NOT: pick, scratch, or peel scabs — this pulls pigment out with the scab, creating patchy results and potential scarring. Submerge the brows in water (no swimming, saunas, steam rooms) during the healing period (typically 10–14 days). Apply makeup over the brows during healing. Exercise heavily (sweat disrupts healing). Use skincare actives (retinol, acids) near the brow area during healing. Touch your brows with unwashed hands.</p>
+        <p>The scabs are thin and may look like small flakes. Picking them off early is the single most common cause of poor retention.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What pigments are used and why it matters for your skin tone</summary>
+        <p>Professional microblading artists use cosmetic-grade pigments specifically formulated for semi-permanent makeup — not tattoo ink. Reputable brands include PhiContour, Li Pigments, Perma Blend, and Tina Davies I Love Ink. These are formulated to fade naturally without turning unusual colours (an issue with low-quality or improperly matched pigments).</p>
+        <p>Why skin tone matters: pigment colour must be matched not just to your current brow hair colour but to your skin's undertone. Warm undertones (yellow, golden, olive) do best with warm-toned pigments. Cool undertones need slightly cooler pigments to avoid an ashy result. Dark skin tones need richer, deeper pigments to show through the melanin. Getting the undertone wrong is one of the most common causes of brows that turn red, blue, or grey over time.</p>
+        <p>Always ask your artist which pigment they're using and why they chose that specific colour for your skin.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Microblading on different skin types — oily, mature, sensitive</summary>
+        <p>Oily skin: the most challenging for microblading. Excess sebum pushes pigment out of the skin during healing, causing strokes to blur, fade faster, or heal with a powdery finish rather than crisp hair strokes. Powder brows or nano brows are generally better for oily skin types. If oily skin clients insist on hair strokes, combo brows are a reasonable compromise.</p>
+        <p>Mature/textured skin: skin with fine lines, enlarged pores, or reduced elasticity holds pigment differently. Strokes can look slightly less precise and may spread slightly into crepe-textured areas. Artists experienced in mature skin can adjust their depth and technique accordingly.</p>
+        <p>Sensitive skin: typically not a contraindication, but the artist should do a patch test first and use gentler, hypoallergenic pigments. Healing may involve more redness. Clients on certain medications (blood thinners, immunosuppressants) should always disclose before booking.</p>
+      </details>
+    </div>
+  </details>
+  <details class="cat-group" id="cat-longterm">
+    <summary><span>MICROBLADING — LONG-TERM &amp; REGRETS</span><span class="cat-count">7</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Microblading regrets — the most common complaints years later</summary>
+        <p>The most documented regrets fall into a few categories:</p>
+        <p>Shape regret: choosing a trendy shape (think overly arched 2017 brows) rather than a timeless shape that flatters the face. Trends change; microblading doesn't fade as fast as trends do.</p>
+        <p>Colour shift: pigment turning grey, blue, or reddish over time. Usually caused by low-quality pigments, improper colour matching for skin undertone, or pigment applied too deep.</p>
+        <p>Blurred strokes: strokes that were crisp at first have since spread into a shadow on oily skin types, eliminating the hair-stroke effect.</p>
+        <p>Didn't fade as expected: many clients were told microblading would "disappear" in 1–2 years. For some it does; for others, ghostly outlines remain for 4–6+ years, complicating new work or natural regrowth.</p>
+        <p>The lesson most regretters share: do more research, look at long-term healed photos, choose shape conservatively, and prioritise artist quality over price.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why microbladed brows turn grey, blue, or pink over time</summary>
+        <p>This is a pigment chemistry issue. Most microblading pigments are made with iron oxides. Over time, the pigment breaks down in the skin and different colour compounds oxidise at different rates, leaving behind colours that weren't originally visible.</p>
+        <p>Grey or blue: indicates that warm (red/yellow) pigment components have faded, leaving the cooler tones behind. Common in black or very dark brown pigments. Also seen when pigment is placed too deep — deep pigment behaves more like a traditional tattoo and tends to shift cooler.</p>
+        <p>Pink or red: the opposite — the cool tones have faded and warm iron oxides remain. Common in brown pigments used on cooler skin tones without proper warm correction.</p>
+        <p>Prevention: using high-quality pigments designed specifically for PMU (not tattoo ink), accurate colour matching at consultation, correct implantation depth, and regular touch-ups before pigment fades unevenly.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to fix bad or asymmetrical microblading</summary>
+        <p>Options depend on how bad the issue is and how healed the work is:</p>
+        <p>Minor asymmetry: often correctable at the touch-up session. If caught early enough, the artist can add strokes on the lighter side or adjust the shape.</p>
+        <p>Shape issues on healed work: saline removal can be used to lighten specific areas, then the shape can be reworked once the skin has healed. This requires a skilled correction artist.</p>
+        <p>Colour issues: a colour correction can be done — adding a warm-toned pigment over grey/blue brows to neutralise the shift, then re-doing the work in the correct tone. This is a specialist skill; not all artists offer it.</p>
+        <p>Full correction: for severe cases, laser removal or saline removal over multiple sessions is needed before starting fresh. This takes time (often 6–12 months) and multiple treatments.</p>
+        <p>The most important rule: do not book a colour correction or cover-up with just any artist. Seek someone who specialises specifically in correction work.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Microblading removal — laser vs. saline vs. letting it fade</summary>
+        <p>Laser removal: uses specific wavelengths (Q-switch or PicoSure lasers) to break up pigment particles. Effective but requires multiple sessions (often 5–10+), can be painful, and risks hypopigmentation on darker skin tones. Not all lasers are appropriate for all pigment colours or skin tones. Results vary.</p>
+        <p>Saline removal: a hypertonic saline solution is implanted into the skin over the microbladed area. It draws the pigment to the surface via osmosis, which then flakes off during healing. Less aggressive than laser, lower risk of skin discolouration, better for darker skin tones. Requires multiple sessions. Heals like a fresh microblading session each time.</p>
+        <p>Letting it fade naturally: the most patient option. Using retinol regularly (once healed), getting regular exfoliation, and sun exposure all accelerate natural fade. This can take 2–5+ years depending on how deep the pigment was placed.</p>
+        <p>The best option depends on your skin tone, the pigment colours involved, and your timeline.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What microblading looks like 2, 4, and 6 years later (honest review)</summary>
+        <p>2 years: for most people who maintained touch-ups, brows still look presentable but softer and lighter. Without a refresh, the strokes are noticeably faded but the shape is generally still visible. Oily skin types may see blurring already.</p>
+        <p>4 years: results split significantly here. Those with dry skin and high-quality pigment may still have a soft, natural shadow effect that reads as full brows. Those with oily skin or lower-quality pigment may see grey or reddish undertones, blurred strokes, or uneven patchiness.</p>
+        <p>6 years: for many people, visible remnants remain — particularly a shadow or ghost of the shape, sometimes with colour shifts (grey, blue, or pink cast). This surprises clients who expected the work to be "gone" by now. On oily skin with saline removal history, it may have faded more fully. On dry skin with deep pigment placement, visible traces are very common.</p>
+        <p>The honest takeaway: plan for semi-permanent to mean 2–4 years with maintenance, and be aware that traces can linger well beyond that.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can you get microblading over an existing eyebrow tattoo?</summary>
+        <p>It depends entirely on the existing tattoo — specifically the density, colour, and how raised or scarred the skin is. A professional correction artist needs to assess photos of the existing work (without makeup) before committing to anything.</p>
+        <p>In many cases, direct microblading over old work is not ideal because the existing pigment in the skin can alter how new pigment appears, and strokes placed over saturated skin won't show as clearly. Options include: waiting for the existing tattoo to fade further, undergoing saline or laser removal to lighten the area first, or opting for powder brows (which work better over existing work than hair strokes do, since shading is more forgiving than line work on a complex base).</p>
+        <p>Never let an artist proceed without fully examining the existing tattoo. Always share clear, unfiltered photos in good lighting.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Microblading and pregnancy — what artists recommend</summary>
+        <p>The professional standard is to not perform microblading on pregnant clients. There are several reasons: topical anaesthetics are not considered safe during pregnancy; pigment components and their interaction with a changing hormonal system are not sufficiently studied; pregnancy significantly alters the skin's behaviour — oilier, more sensitive, prone to melasma — meaning healing and pigment retention are unpredictable; and weight changes and hormonal fluctuations during and after pregnancy can shift the skin, affecting the final shape.</p>
+        <p>Postpartum timing is also important. Most artists recommend waiting until after breastfeeding is complete and hormones have stabilised (often 3–6 months postpartum) before booking. Baby weight and hormonal shifts can change the skin enough to affect healing significantly.</p>
+      </details>
+    </div>
+  </details>
+  <details class="cat-group" id="cat-mapping">
+    <summary><span>BROW MAPPING</span><span class="cat-count">10</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What brow mapping is and why it's the most important step</summary>
+        <p>Brow mapping is the process of measuring and marking the ideal start, arch, and end points of the eyebrows based on a client's facial structure before any pigment is applied. It is the blueprint for the entire procedure. A perfectly executed microblading technique applied to a poorly mapped shape will always produce a poor result. A technically average stroke applied to a beautifully mapped shape will always produce a more flattering result.</p>
+        <p>Mapping ensures: symmetry (or strategic correction of natural asymmetry), proportionality to the client's facial features, a shape that flatters face structure, client approval before the permanent work begins, and a clear reference point that minimises in-procedure corrections. It is why seasoned artists spend more time on mapping than on any other part of the process.</p>
+      </details>
+      <details class="faq-item">
+        <summary>The three key reference points of brow mapping (start, arch, tail)</summary>
+        <p>These are the three foundational landmarks used in every professional brow mapping method:</p>
+        <p>Start point: determined by placing a straight line from the outer edge of the nostril straight up. The brow should begin at or just inside this line. Starting too far inward creates a heavy, close-set look; starting too far out creates a gap.</p>
+        <p>Arch point: found by angling a line from the outer nostril through the outer edge of the iris (pupil) upward to the brow. This is where the highest point of the brow arc should sit. The arch position dramatically affects how the face reads — a misplaced arch is one of the most visually obvious mapping errors.</p>
+        <p>Tail (end) point: found by angling a line from the outer nostril to the outer corner of the eye, extending upward. The brow should end at or near this point. Extending the tail too far outward or downward past this line is a common mistake that ages the face or creates an unnatural look.</p>
+        <p>All three points should be measured symmetrically on both sides and marked clearly before any strokes are made.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How brow mapping is done for different face shapes</summary>
+        <p>Face shape guides brow architecture. The goal is always to create balance and harmony — using the brows to optically adjust proportions.</p>
+        <p>Round face: a higher, more defined arch elongates the face and creates lift. Avoid flat, straight brows which emphasise roundness.</p>
+        <p>Oval face: considered the most balanced face shape; most brow shapes work well. A soft natural arch enhances without overpowering.</p>
+        <p>Square face: softer, curved arches with slightly thicker fronts help balance strong jaw and forehead lines. Avoid sharp, angular arches.</p>
+        <p>Long/oblong face: flatter, more horizontal brows widen the face and break vertical length. Avoid high arches.</p>
+        <p>Heart face: softer, rounded arches with a tail that draws attention down and outward to balance a wider forehead. Avoid very high arches.</p>
+        <p>Inverted triangle: fuller fronts and medium-length tails help add visual weight to the lower portion of the face.</p>
+        <p>The mapping must adapt to both face shape AND bone structure — these are general guidelines, not absolute rules.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Tools used in professional brow mapping</summary>
+        <p>Professional brow artists use a combination of:</p>
+        <p>Mapping string or thread: pre-measured string dipped in pigment or ink, used to snap straight reference lines across the face. Allows for precise, replicable linear measurements.</p>
+        <p>Callipers or brow rulers: tools for measuring exact distances between points — ensuring the start of each brow is equidistant from the centre of the face, for example.</p>
+        <p>Mapping pencils or white liners: used to mark the key points and sketch the shape outline before committing. Easy to wipe and adjust.</p>
+        <p>Pre-drawn mapping templates: some artists use printed golden ratio guides or symmetry overlays as reference — particularly useful for training.</p>
+        <p>Straight edge tools: a thin straight stick or ruler held at angles from the nose to various facial landmarks to find the three key points.</p>
+        <p>Photography: many professional artists photograph the client straight-on during mapping to digitally assess symmetry — what the eye perceives as balanced in person may look different in a photograph.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to do basic brow mapping at home before an appointment</summary>
+        <p>You can do a simplified version at home to understand your natural brow framework before your consultation:</p>
+        <p>You'll need: a thin pencil or brow pen, a straight tool (chopstick, pencil, ruler).</p>
+        <p>Find your start: hold the pencil vertically from the outer edge of one nostril straight up. Mark where it crosses your brow.</p>
+        <p>Find your arch: angle the pencil from the same nostril point through the outer edge of your iris. Mark the highest point of your brow where the pencil intersects.</p>
+        <p>Find your tail: angle the pencil from the nostril through the outer corner of your eye toward your temple. Mark where it crosses or ends.</p>
+        <p>Connect the three dots lightly and repeat on the other side. Compare both sides — natural asymmetry is very common and completely normal. This exercise gives you informed context to participate in your consultation rather than leaving all decisions to the artist.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why brow symmetry doesn't mean making both brows identical</summary>
+        <p>This is one of the most important things to understand about professional brow work. The human face is inherently asymmetrical — no one's face is a perfect mirror image. Eyes sit at different heights, one side of the forehead may be slightly higher, bone structure varies from left to right.</p>
+        <p>True brow symmetry is not about making the two brows geometrically identical on paper. It's about making them appear balanced on the face. This means the artist may intentionally map one brow slightly differently than the other — slightly lower, slightly longer, slightly thicker — so that when viewed on the face in motion, they create a visual impression of harmony.</p>
+        <p>This is why skilled mapping artists look at the face from multiple angles and distances, not just straight-on measurements. Symmetrical measurements on a perfectly centred ruler often produce visually unbalanced results on an asymmetrical face.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to check brow symmetry from multiple angles</summary>
+        <p>The standard front-on view is important but insufficient on its own. Professional artists check brow symmetry from:</p>
+        <p>Direct front: the standard view — checking horizontal balance between left and right brows.</p>
+        <p>Slightly elevated (looking slightly down at the face): reveals how the brows look in the most common social interaction — when someone is speaking to you and slightly above your eye line.</p>
+        <p>Slightly from the side: checks that the tail length and arch height read proportionally to the side profile of the face.</p>
+        <p>Distance view: stepping back several feet allows the eye to process the brows as part of the whole face rather than as isolated features close-up.</p>
+        <p>Photography: a straight-on photograph is one of the most accurate tools because it removes the perceptual bias of three-dimensional proximity. Small 1–2mm asymmetries that are imperceptible in person often become visible in a photo.</p>
+        <p>Always confirm symmetry from all these angles before the client approves the mapping.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why you should always approve the mapped shape before the needle touches skin</summary>
+        <p>Client approval of the mapped brow shape is non-negotiable in professional practice. It exists to protect both the client and the artist.</p>
+        <p>For the client: once pigment is implanted, corrections are expensive, time-consuming, and sometimes impossible to fully reverse. Approving the shape while it's drawn in pencil takes minutes and allows you to request adjustments to arch height, tail length, width, or overall character before any permanent commitment is made.</p>
+        <p>For the artist: a signed or verbally confirmed approval protects against post-procedure disputes about shape. If a client approves a mapped shape and the executed work matches that shape, it is very difficult to claim the artist is responsible for shape dissatisfaction.</p>
+        <p>Trust your instincts during approval. If something feels off — even if you can't articulate it — ask for an adjustment. Take photos from multiple angles. Live with the drawn shape for a few minutes before giving final approval.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Brow mapping for sparse, uneven, or overplucked brows</summary>
+        <p>Sparse or overplucked brows present a specific mapping challenge: there is less natural reference hair to guide placement, so the artist must rely entirely on bone structure and facial proportions rather than following existing hair growth patterns.</p>
+        <p>The approach: use the three key mapping points as the primary framework. Work from the bone structure outward — identify where the brow bone ridge sits and use it as the foundation for the arch and start placement. For significantly overplucked brows where the frontal head of the brow is almost gone, the artist must rebuild the entire shape from scratch based on facial measurements alone.</p>
+        <p>For very uneven brows (one naturally fuller, one sparse): the artist will typically match the sparser side to the fuller side rather than the reverse, then use the touch-up session to refine as needed. Overcorrecting the fuller side often results in both brows looking too thin.</p>
+      </details>
+      <details class="faq-item">
+        <summary>The 'Golden Ratio' method of brow mapping explained simply</summary>
+        <p>The Golden Ratio (approximately 1:1.618) is a mathematical proportion found throughout nature and classical art. In brow mapping, it's used as an aesthetic guide — not a rigid rule — to determine proportionally pleasing brow dimensions.</p>
+        <p>In practice: the distance from the inner corner of the eye to the arch point, compared to the distance from the arch to the tail, should ideally reflect a harmonious ratio. Similarly, the thickness of the brow at the head compared to the tail should taper proportionally.</p>
+        <p>Some artists use pre-made Golden Ratio calipers or mapping tools that calculate these proportions for each face automatically. The method helps create brows that feel naturally balanced rather than arbitrarily placed.</p>
+        <p>Important note: the Golden Ratio is a guide, not a prescription. Anatomy, face shape, and individual features always take precedence. An artist who maps entirely by formula without considering the individual face often produces technically "correct" but visually generic results.</p>
+      </details>
+    </div>
+  </details>
+  <details class="cat-group" id="cat-makeup">
+    <summary><span>BROW MAKEUP — TECHNIQUES &amp; PRODUCTS</span><span class="cat-count">10</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How to apply makeup over microbladed brows without masking the strokes</summary>
+        <p>The key principle: work around the brows, not over them. Microbladed hair strokes are one of the most beautiful results of the procedure — covering them with foundation or powder erases that effect entirely.</p>
+        <p>For foundation: apply with a brush or sponge, carefully working up to the brow edge but not onto it. If product does get onto the brow, immediately use a clean fingertip or small brush to gently blend it off without pressing or dragging.</p>
+        <p>For powder/setting spray: avoid dragging powder puffs or brushes across the brow area. Use a light dusting technique and sweep downward — not across the brows.</p>
+        <p>For brow-specific makeup on microbladed brows: many clients don't need any additional product, especially in the first year. If brows have faded and need some filling, a very light application of a matching brow pencil using feather-light strokes is sufficient. Avoid heavy pomades or tinted brow gels that can clog the skin and accelerate fade.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to fill in sparse brows naturally (pencil vs. pomade vs. powder)</summary>
+        <p>Brow pencil: the most versatile and beginner-friendly tool. A micro-fine pencil (like Anastasia Beverly Hills Brow Wiz or NYX Micro Brow Pencil) allows you to draw individual hair-like strokes for the most natural result. Best for sparse fronts, gaps, and defining the tail. Use light pressure and short, upward flick strokes.</p>
+        <p>Brow pomade: a wax-based product applied with an angled brush. More pigment-dense and longer-lasting than pencil. Great for filling larger sparse areas and defining shape, but requires a slightly more skilled hand to avoid looking blocky. Best for defined brow looks or oily skin.</p>
+        <p>Brow powder: the softest, most natural-looking filler. Applied with an angled brush, it mimics the look of filled brows without visible strokes. Best for overall density and a soft diffused look. Less precise for detailed hair-stroke mimicry but the most forgiving product to use.</p>
+        <p>The pro technique: use a pencil for stroke definition and a powder to blend and soften the overall shape. Finish with a clear or tinted spoolie gel to blend everything into the natural hairs.</p>
+      </details>
+      <details class="faq-item">
+        <summary>The right way to use a spoolie — most people do it wrong</summary>
+        <p>A spoolie (the mascara-wand shaped brow brush) is the most underrated tool in brow grooming. Most people brush straight across — this is wrong.</p>
+        <p>The correct technique: brush upward first, not sideways. At the front of the brow, brush upward and slightly outward. In the middle, brush upward and follow the natural direction of hair growth. At the tail, brush straight outward or slightly downward. This lifts and separates the hairs for a full, natural look.</p>
+        <p>After filling in brows with pencil or pomade, run the spoolie lightly over the filled areas to blend product into the natural hairs — this removes the "drawn on" look and creates seamless integration.</p>
+        <p>For a laminated-brow effect without lamination: brush hairs straight up at the front and set with a clear brow gel. Brush middle and tail hairs outward and set. The result is an architecturally brushed, full brow look.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Brow lamination at home — does it work and is it safe?</summary>
+        <p>Professional brow lamination is a salon treatment that uses a chemical solution to relax and redirect brow hairs into a new upward position, set with a fixing solution — essentially a perm for the brows. Results last 6–8 weeks on average.</p>
+        <p>At-home brow lamination kits: they do work to a degree, and many people achieve satisfying results with them. The most popular are brands like Iconsign and Diami. The process uses the same basic chemistry (perming solution + fixing solution) in gentler concentrations.</p>
+        <p>Risks: over-processing is the main concern. Leaving the solution on too long can over-perm the hairs, making them brittle, frizzy, and prone to breakage. Patch testing for allergic reactions is essential. Those with very fine or already processed brow hairs should be cautious.</p>
+        <p>For beginners: follow timing instructions conservatively (slightly under the suggested time on the first attempt). Monitor constantly. Condition the brows heavily after with a nourishing oil (castor oil, argan oil).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Tinting vs. lamination vs. henna brows — what's the difference</summary>
+        <p>Brow tinting: a semi-permanent dye (usually oxidative or vegetable-based) applied to the brow hairs to darken or deepen their colour. Lasts 3–6 weeks on hairs, 1–2 weeks on skin. Great for giving sparse or light brows more definition without changing shape.</p>
+        <p>Brow lamination: a chemical treatment that straightens and lifts brow hairs, directing them upward for a fuller, more structured look. Does not change colour. Lasts 6–8 weeks. Ideal for unruly, downward-growing, or sparse brows that need architectural lift.</p>
+        <p>Henna brows: uses plant-based henna dye on both the hairs AND the skin beneath them, creating the appearance of fuller, tinted brows even in sparse areas. The skin stain lasts 1–2 weeks; the hair colour lasts 4–6 weeks. A natural, semi-permanent alternative to microblading for those who want definition without commitment.</p>
+        <p>Many artists combine lamination + tint in one session for a powerful but reversible transformation. Henna is a great entry point for clients curious about permanent brow work who want to test a shape first.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to draw realistic hair strokes on bare brows</summary>
+        <p>Drawing convincing hair strokes requires the right tool, the right technique, and understanding of natural hair growth direction.</p>
+        <p>Tool: use a micro-fine brow pencil (0.08–0.1mm tip) in a colour that matches your hair — never choose a shade darker than your hair colour. For dark brows, go one shade lighter than you think you need.</p>
+        <p>Technique: hold the pencil like a paintbrush, not a pen — lighter grip, lighter pressure. Draw in the direction of natural hair growth: upward at the front of the brow, angled outward in the middle, downward at the tail. Each stroke should be 2–8mm long, varying in length as natural hairs do.</p>
+        <p>Layering: draw lighter strokes first, then layer slightly darker or more defined strokes over the sparsest areas. Never start with bold lines.</p>
+        <p>Finishing: run a clean spoolie over the strokes to soften them. The goal is for the drawn strokes to blend with real hair so seamlessly that the filled areas are undetectable.</p>
+        <p>The front of the brow (inner head) is the hardest area to make look natural — use the lightest possible hand here.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Brow mapping for makeup — how to find your perfect brow shape with just a pencil</summary>
+        <p>You don't need professional tools to find your ideal brow shape for makeup. Here's the method:</p>
+        <p>Step 1 — Find the start: hold a straight pencil vertically from the outer edge of your nostril straight up. The inner edge of your brow should begin where the pencil crosses your brow bone.</p>
+        <p>Step 2 — Find the arch: angle the pencil from your nostril through the outer edge of your iris. Mark the highest point of your arch where the pencil reaches the brow area.</p>
+        <p>Step 3 — Find the tail: angle the pencil from your nostril to the outer corner of your eye and extend upward. The tail of your brow should end at this point.</p>
+        <p>Step 4: lightly connect the three marks with a brow pencil — a thin line defining the top and bottom edge of the brow. Fill in the shape, then soften with a spoolie.</p>
+        <p>Step 5: use concealer under and slightly above the brow to clean up edges and sharpen the shape.</p>
+        <p>Photograph yourself straight-on to assess balance from a neutral eye.</p>
+      </details>
+      <details class="faq-item">
+        <summary>The 2025/2026 brow trend: soft, natural, undone vs. defined</summary>
+        <p>The brow landscape in 2025/2026 has fractured — there's no single dominant trend. What's happening instead:</p>
+        <p>The soft, natural, undone brow: brushed up, slightly tousled, following the natural brow hair direction without heavy filling or sharp edges. Popularised by the "quiet luxury" and "clean girl" aesthetic. Achieved with clear or tinted brow gel and minimal product.</p>
+        <p>The defined but modern brow: sharp enough to frame the face but without the heavy, blocky density of the 2016 era. Think well-groomed, softly filled, with a clear but not severe arch.</p>
+        <p>What's out: the over-laminated, stiff upward brush look that became ubiquitous — artists and influencers have begun calling out "lamination overload." Also out: sharp, Instagram-arched, very dark-filled brows.</p>
+        <p>The bigger trend is authenticity — brows that look like your real brows, enhanced. Less reconstruction, more refinement. This explains the rising popularity of henna, tinting, and lamination over microblading.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Concealer under brows — why it's a game-changer and how to apply it</summary>
+        <p>Applying a light layer of concealer under the brow bone and just above the brow's lower edge is one of the most powerful and underused techniques in brow makeup. Here's what it does:</p>
+        <p>Cleans up the shape: even if brow filling isn't perfectly precise, a clean concealer edge underneath creates the illusion of a sharp, defined boundary — making the overall shape look more intentional and polished.</p>
+        <p>Lifts the eye area: a light concealer applied on the brow bone and blended upward subtly highlights the area below the arch, creating a lifted, more awake appearance.</p>
+        <p>How to apply: use a small, flat concealer brush or the tip of a beauty sponge. Apply a thin line of concealer (1–2 shades lighter than your foundation) directly beneath the lower edge of the brow, then blend downward toward the lid — not into the brow. Avoid going onto the brow itself.</p>
+        <p>Keep it minimal: this technique works with a light hand. Heavy concealer under the brow looks dated and can look harsh in natural light.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Brow products for people with fine or thinning brows</summary>
+        <p>Fine or thinning brow hairs require a different approach from those with full but sparse brows. The challenge: there aren't enough hairs to hold product or create the appearance of density easily.</p>
+        <p>Best products for fine/thinning brows:</p>
+        <p>Brow serums: containing peptides and biotin (like Vegamour GRO Brow Serum or Revitalash RevitaBrow) to encourage hair growth over time. Consistency over months is required.</p>
+        <p>Micro-precision pencils: only a micro-fine pencil can create strokes delicate enough for fine-haired brows. Anything thicker will overwhelm the sparse natural hairs.</p>
+        <p>Tinted brow serums: products like Benefit's Brow Microfilling Pen combine a hair-growth serum with a pigmented pen — functional and cosmetic in one.</p>
+        <p>Fibre brow gels: contain tiny fibres that adhere to existing brow hairs and extend their appearance, adding visible density without drawing on strokes. Grande Cosmetics GrandeBROW-FILL is a well-reviewed option.</p>
+        <p>Setting gel: always finish with a clear setting gel to hold fine hairs in place — they have less weight to anchor them and move easily.</p>
+      </details>
+    </div>
+  </details>
+  <details class="cat-group" id="cat-trust">
+    <summary><span>CLIENT EDUCATION &amp; TRUST-BUILDING</span><span class="cat-count">3</span></summary>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Aftercare mistakes that ruin microblading results (what clients keep doing wrong)</summary>
+        <p>The most common aftercare mistakes — and why they cause problems:</p>
+        <p>Wetting the brows too soon: water softens the scabs and disrupts pigment retention. Avoid washing the face over the brows, swimming, or sweating heavily for the first 10–14 days (specific timing varies by artist protocol).</p>
+        <p>Picking or peeling scabs: every scab carries pigment with it when removed prematurely. This causes patchy, uneven healing and can scar the skin.</p>
+        <p>Applying too much aftercare ointment: many clients over-apply. A thin layer is all that's needed. Excess ointment suffocates the skin and pulls pigment out through the scab layer.</p>
+        <p>Using the wrong skincare products near the brows: retinol, glycolic acid, salicylic acid, and Vitamin C serums all accelerate pigment fade. These should not go near the brow area during healing and should be used with caution long-term.</p>
+        <p>Exercising heavily in the first week: sweat acts as a solvent on fresh pigment and opens the skin's pores, allowing pigment to migrate or escape.</p>
+        <p>Sun exposure: UV breaks down pigment, especially in the early healing stages. Sunscreen over healed brows (or a hat) is essential for longevity.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why the 6-week touch-up isn't optional — what it actually fixes</summary>
+        <p>The 6–8 week touch-up is the second half of the microblading process — not an upsell. Here's what it specifically corrects:</p>
+        <p>Pigment retention gaps: no matter how skilled the artist, some areas of the skin will retain less pigment than others during the first healing cycle. The touch-up fills in these areas.</p>
+        <p>Stroke refinement: the artist can see how the pigment has settled under healed skin and add or deepen strokes where needed for a more cohesive, defined result.</p>
+        <p>Colour adjustment: if the healed result has come up slightly lighter, warmer, or cooler than intended, the touch-up is the moment to adjust the pigment tone.</p>
+        <p>Shape refinement: minor shape adjustments can be made while the overall structure is already established.</p>
+        <p>Without the touch-up, the result will almost always look unfinished. This is not a failure of the initial procedure — it's how the skin works. Consider the initial session as laying the foundation and the touch-up as completing the structure.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How to maintain microbladed brows between sessions to make them last longer</summary>
+        <p>Longevity is directly tied to how you treat your brows between appointments. Here's how to extend results:</p>
+        <p>Sun protection: UV is the single biggest accelerator of pigment fade. Apply SPF 30+ over the brow area daily or wear a hat when in direct sun. This alone can extend results by months.</p>
+        <p>Avoid skincare actives on the brow area: retinol, AHAs, BHAs, and chemical exfoliants all increase skin cell turnover, which pushes pigment out faster. Keep these products away from the brow region.</p>
+        <p>Moisturise the area: well-hydrated skin retains pigment better. A lightweight, non-comedogenic moisturiser over the brow area helps maintain skin health.</p>
+        <p>Book touch-ups before the brows look faded: waiting until the brows have almost completely faded means more pigment needs to be re-deposited, which is harder on the skin. Booking a refresh when the brows are at about 50–60% faded is more efficient and produces better results.</p>
+        <p>Avoid oil-based products over the brows: oil breaks down pigment over time. Use oil-free cleansers and avoid applying facial oils directly to the brow area.</p>
+        <p>No picking at flaking skin: even outside of the healing period, if the skin around the brows naturally exfoliates, let it happen naturally.</p>
+      </details>
+    </div>
+  </details>  </div>
+  <p class="lib-no-results" id="libNoResults">No matches — try a different word, like "healing" or "cost".</p>
+
+  <div class="rule"></div>
+
+  <p class="hero-sub">Have a question that's still not answered here? Reach out directly — happy to help before you book.</p>
+  <div class="cta-row">
+    <a class="btn" href="book-eleganza.html">Book Your Appointment</a>
+    <a class="btn-ghost" href="home.html#faq">← Back to Quick Answers</a>
+  </div>
+  <a class="back-link" href="home.html">← Back to Eleganza Naturally Beautiful</a>
+</div>
+
+<script src="nav.js"></script>
+<script>
+/* Local library search — filters across all 50 questions, auto-expanding
+   matches and collapsing everything back down when the box is cleared. */
+(function () {
+  const input = document.getElementById("libSearch");
+  const noResults = document.getElementById("libNoResults");
+  const catGroups = document.querySelectorAll(".cat-group");
+
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    let anyVisible = false;
+
+    catGroups.forEach(cat => {
+      let catHasMatch = false;
+      cat.querySelectorAll(".faq-item").forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const match = !q || text.includes(q);
+        item.style.display = match ? "" : "none";
+        item.open = !!q && match;
+        if (match) catHasMatch = true;
+      });
+      cat.style.display = catHasMatch ? "" : "none";
+      cat.open = !!q && catHasMatch;
+      if (catHasMatch) anyVisible = true;
+    });
+
+    noResults.style.display = (q && !anyVisible) ? "block" : "none";
+  });
+})();
+</script>
+</body>
+</html>
