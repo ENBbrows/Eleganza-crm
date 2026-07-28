@@ -16,8 +16,14 @@ const CONFIG = {
 
   /* Your own WhatsApp number (international format, digits only, no +).
      Used for the "message me on WhatsApp" links shown to local clients
-     before their appointment and after booking. e.g. "18685551234" */
-  BUSINESS_WHATSAPP_NUMBER: "18684733030",
+     before their appointment and after booking. e.g. "18685551234"
+     This is the WhatsApp Business number — separate from the studio's
+     regular call number (see CALL_NUMBER below). */
+  BUSINESS_WHATSAPP_NUMBER: "18684856301",
+
+  /* Your regular phone number for calls — shown separately from the
+     WhatsApp number above wherever the site displays "call us". */
+  CALL_NUMBER: "18684733030",
 
   /* Your WAM! handle/number clients send payment to (personal WAM! account —
      no merchant API, so this just displays instructions; you confirm receipt
