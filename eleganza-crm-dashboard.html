@@ -257,6 +257,11 @@ const SUPABASE_URL = CONFIG.SUPABASE_URL;
 const SUPABASE_KEY = CONFIG.SUPABASE_ANON_KEY;
 const SESSION_KEY = "eleganza-crm-session";
 const TZ = "America/Port_of_Spain";
+// The client-safe single-event calendar link — uses the booking's own
+// confirm_token, not the private CALENDAR_FEED_TOKEN used for Amii's own
+// full-feed subscription. Update the function name here if it's ever
+// redeployed under a different name than "calender-feed".
+const CALENDAR_EVENT_BASE = SUPABASE_URL + "/functions/v1/calender-feed";
 
 const STAGES = [
   { key: "lead", label: "New Lead", numeral: "I", color: "#8C8275" },
@@ -735,6 +740,11 @@ async function openBookingDrawer(id) {
       ${b.status==='confirmed' ? `<button data-act="noshow">No-show</button>` : ""}
       ${!['cancelled','completed'].includes(b.status) ? `<button class="danger" data-act="cancel">Cancel</button>` : ""}
     </div>
+    <div class="section-label">Calendar Link</div>
+    <div class="action-row">
+      <button id="btnCopyCalLink">📋 Copy Link</button>
+      ${intlPhone(b.client_phone) ? `<a class="wa" id="btnCalLinkWa" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;padding:9px 14px;border-radius:3px;border:1px solid var(--sage);color:#A8C3A0;font-size:13px">💬 Send via WhatsApp</a>` : ""}
+    </div>
     <div class="section-label">Reschedule</div>
     <input type="date" id="reDate" value="${fmtWhen(b.start_at,{year:'numeric',month:'2-digit',day:'2-digit'}).split('/').reverse().join('-')}">
     <input type="time" id="reTime" value="${fmtWhen(b.start_at,{hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}">
@@ -754,6 +764,17 @@ async function openBookingDrawer(id) {
   `;
   $("closeDrawer").onclick = closeDrawer;
   drawer.querySelectorAll("[data-act]").forEach(btn => btn.onclick = () => handleBookingAction(b, btn.dataset.act));
+  const calLink = `${CALENDAR_EVENT_BASE}?event=${b.confirm_token}`;
+  $("btnCopyCalLink").onclick = async () => {
+    try { await navigator.clipboard.writeText(calLink); showToast("Calendar link copied"); }
+    catch (e) { showToast("Couldn't copy — long-press to copy manually"); }
+  };
+  if ($("btnCalLinkWa")) {
+    const first = (b.client_name || "there").split(" ")[0];
+    const when = fmtWhen(b.start_at, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" });
+    const msg = `Hi ${first}! Here's your appointment on ${when} — tap to add it to your calendar:\n${calLink}`;
+    $("btnCalLinkWa").href = `https://wa.me/${intlPhone(b.client_phone)}?text=${encodeURIComponent(msg)}`;
+  }
   $("btnReschedule").onclick = async () => {
     const date = $("reDate").value, time = $("reTime").value;
     if (!date || !time) return;

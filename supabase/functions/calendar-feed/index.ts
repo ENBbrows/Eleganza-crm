@@ -1,28 +1,29 @@
 // ============================================================
 // calendar-feed — Supabase Edge Function
 //
-// Publishes upcoming/recent bookings (both businesses) as a standard
-// .ics calendar feed, so Amii can subscribe to it once from Apple
-// Calendar or Google Calendar and see every CRM booking alongside her
-// personal calendar, always kept in sync automatically.
+// Two modes, both producing a standard .ics calendar file:
 //
-// This is deliberately read-only and one-way (CRM -> calendar app) —
-// there's no write-back, so nothing about the booking system's own
-// logic (slots, buffers, gift redemption, etc.) is affected.
+// 1. FULL FEED (?token=<CALENDAR_FEED_TOKEN>) — every upcoming/recent
+//    booking across both businesses, for Amii's own Apple/Google
+//    Calendar subscription. Protected by a secret token since Apple/
+//    Google Calendar's "subscribe by URL" feature can't send auth
+//    headers.
 //
-// SECURITY: Apple Calendar / Google Calendar's "subscribe by URL"
-// feature cannot send an Authorization header, so this function must
-// be deployed with JWT verification OFF (a public URL). In its place,
-// the URL itself carries a long random ?token= value that must match
-// the CALENDAR_FEED_TOKEN secret — anyone without that exact token
-// gets nothing back. Treat the full URL (with token) as a password:
-// don't post it anywhere public.
+// 2. SINGLE EVENT (?event=<booking confirm_token>) — just one client's
+//    own upcoming appointment, safe to hand to that client so they can
+//    add it to their own phone's calendar. Uses the booking's own
+//    confirm_token as the access key — the same trust level already
+//    used for the confirm/reschedule/cancel links emailed and
+//    WhatsApp'd to clients elsewhere in this app, not the private
+//    feed secret.
+//
+// SECURITY: this function must be deployed with JWT verification OFF
+// (a public URL) for the same reason as above — calendar apps and
+// WhatsApp link previews can't send an Authorization header.
 //
 // Required secrets:
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided
-//   CALENDAR_FEED_TOKEN                        -- set this yourself,
-//                                                  same value that
-//                                                  goes in the URL
+//   CALENDAR_FEED_TOKEN                        -- for the full feed only
 // ============================================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -131,10 +132,50 @@ function buildEvent(b: BookingRow): string {
   return lines.map(foldLine).join("\r\n");
 }
 
+function icsResponse(events: string, filename?: string) {
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Eleganza CRM//Booking Calendar//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    ...(filename ? [] : ["X-WR-CALNAME:Eleganza + ENBfocus Bookings", "REFRESH-INTERVAL;VALUE=DURATION:PT15M", "X-PUBLISHED-TTL:PT15M"]),
+    events,
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "text/calendar; charset=utf-8",
+    "Cache-Control": "no-cache, max-age=0",
+  };
+  if (filename) headers["Content-Disposition"] = `attachment; filename="${filename}"`;
+
+  return new Response(ics, { headers });
+}
+
 Deno.serve(async (req) => {
   const url = new URL(req.url);
-  const token = url.searchParams.get("token");
+  const eventToken = url.searchParams.get("event");
 
+  // ---- Single-event mode: one client's own appointment ----
+  if (eventToken) {
+    try {
+      const res = await rest(
+        `/rest/v1/bookings?confirm_token=eq.${eventToken}&status=neq.cancelled` +
+          `&select=id,business,client_name,client_phone,start_at,end_at,status,notes,services(name,price,currency)`
+      );
+      const rows = (await res.json()) as BookingRow[];
+      const b = rows[0];
+      if (!b) return new Response("Not found", { status: 404 });
+      return icsResponse(buildEvent(b), "appointment.ics");
+    } catch (e) {
+      console.error("calendar-feed event error:", e);
+      return new Response("Server error", { status: 500 });
+    }
+  }
+
+  // ---- Full feed mode: Amii's own subscribed calendar ----
+  const token = url.searchParams.get("token");
   if (!CALENDAR_FEED_TOKEN || token !== CALENDAR_FEED_TOKEN) {
     return new Response("Not found", { status: 404 });
   }
@@ -146,27 +187,7 @@ Deno.serve(async (req) => {
         `&status=in.(tentative,confirmed,checked_in,completed)&start_at=gte.${from}&order=start_at.asc`
     );
     const rows = (await res.json()) as BookingRow[];
-
-    const events = rows.map(buildEvent).join("\r\n");
-    const ics = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Eleganza CRM//Booking Calendar//EN",
-      "CALSCALE:GREGORIAN",
-      "METHOD:PUBLISH",
-      "X-WR-CALNAME:Eleganza + ENBfocus Bookings",
-      "REFRESH-INTERVAL;VALUE=DURATION:PT15M",
-      "X-PUBLISHED-TTL:PT15M",
-      events,
-      "END:VCALENDAR",
-    ].join("\r\n");
-
-    return new Response(ics, {
-      headers: {
-        "Content-Type": "text/calendar; charset=utf-8",
-        "Cache-Control": "no-cache, max-age=0",
-      },
-    });
+    return icsResponse(rows.map(buildEvent).join("\r\n"));
   } catch (e) {
     console.error("calendar-feed error:", e);
     return new Response("Server error", { status: 500 });
