@@ -696,28 +696,33 @@ const app = {
   },
 
   /* ── 1 · LOOKUP ───────────────────────────── */
-  async lookup(e) {
-    e.preventDefault();
+  async lookup(e, opts) {
+    if (e) e.preventDefault();
+    const silent = !!(opts && opts.silent);
     $("lookup-error").classList.remove("show");
     const phone = $("lookup-phone").value.trim();
     if (last7(phone).length < 7) {
+      if (silent) return;
       return this.error("lookup-error", "Please enter your full phone number.");
     }
     this.phoneEntered = phone;
-    this.busy("btn-lookup", true, "Check In");
+    this.busy("btn-lookup", true, silent ? "Welcome back…" : "Check In");
     try {
       const match = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
       if (match) {
         this.current = match;
         this.showWelcome(match);
-      } else {
+      } else if (!silent) {
         $("reg-phone").value = phone;
         this.show("screen-register");
         $("reg-name").focus();
       }
+      // silent + no match: stale/wrong remembered number — stay put with the
+      // phone prefilled so they can just tap Check In themselves rather than
+      // getting bounced into registration on a number that isn't theirs.
     } catch (err) {
       console.error(err);
-      this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
+      if (!silent) this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
     } finally {
       this.busy("btn-lookup", false, "Check In");
     }
@@ -1070,6 +1075,16 @@ $("btn-discount").addEventListener("click", () => app.claimDiscount());
 $("rp-btn-google").addEventListener("click", () => app.markReviewedNow());
 $("rp-btn-facebook").addEventListener("click", () => app.markReviewedNow());
 $("rp-continue").addEventListener("click", () => app.finishAfterReviewPrompt());
+
+/* Each client checks in on their own device, so a remembered phone number
+   is safe to auto-fill and auto-submit — no re-typing on repeat visits. */
+(function tryAutoCheckIn() {
+  const identity = ClientIdentity.get();
+  if (identity && identity.phone) {
+    $("lookup-phone").value = identity.phone;
+    app.lookup(null, { silent: true });
+  }
+})();
 </script>
 <script src="nav.js"></script>
 </body>
