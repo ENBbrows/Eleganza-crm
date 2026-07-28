@@ -101,6 +101,19 @@
   .status-pill { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; border: 1px solid; flex-shrink: 0; }
   .status-tentative { border-color: var(--terracotta); color: #D98E78; }
   .status-confirmed { border-color: var(--gold); color: var(--gold); }
+
+  /* Month grid */
+  .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 4px; }
+  .month-dow { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2); text-align: center; padding-bottom: 6px; }
+  .month-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; min-height: 62px; padding: 6px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; transition: border-color 0.15s; }
+  .month-cell:hover { border-color: var(--gold); }
+  .month-cell.other-month { opacity: 0.35; }
+  .month-cell.today .month-cell-num { color: var(--gold); font-weight: 700; }
+  .month-cell.selected { border-color: var(--gold); background: rgba(201,161,74,0.08); }
+  .month-cell-num { font-family: var(--font-display); font-size: 13px; }
+  .month-dot-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
+  .month-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .month-count { font-size: 10px; color: var(--muted2); }
   .status-checked_in { border-color: var(--teal); color: var(--teal); }
   .status-completed { border-color: var(--sage); color: var(--sage); }
   .status-cancelled { border-color: var(--muted2); color: var(--muted2); }
@@ -194,16 +207,41 @@
   <main class="board" id="board"></main>
 
   <main class="wrap" id="calendarMain" style="display:none">
+    <div class="controls">
+      <div class="search-box">🔍 <input id="calSearchInput" placeholder="Search client name or phone…"></div>
+      <div class="tabs" id="calViewToggle">
+        <button class="tab active" data-calview="week">Week</button>
+        <button class="tab" data-calview="month">Month</button>
+      </div>
+    </div>
+    <div class="panel" id="searchResultsPanel" style="display:none">
+      <div class="panel-title">Search Results</div>
+      <div id="searchResultsList"></div>
+    </div>
     <div class="panel" id="duePanel">
       <div class="panel-title">Reminders due now</div>
       <div id="dueList"></div>
     </div>
-    <div class="week-nav">
-      <button id="prevWeek">← Prev</button>
-      <div class="week-label" id="weekLabel"></div>
-      <button id="nextWeek">Next →</button>
+    <div id="weekView">
+      <div class="week-nav">
+        <button id="prevWeek">← Prev</button>
+        <div class="week-label" id="weekLabel"></div>
+        <button id="nextWeek">Next →</button>
+      </div>
+      <div id="weekBoard"></div>
     </div>
-    <div id="weekBoard"></div>
+    <div id="monthView" style="display:none">
+      <div class="week-nav">
+        <button id="prevMonth">← Prev</button>
+        <div class="week-label" id="monthLabel"></div>
+        <button id="nextMonth">Next →</button>
+      </div>
+      <div class="month-grid" id="monthGrid"></div>
+      <div class="panel" id="monthDayPanel" style="display:none">
+        <div class="panel-title" id="monthDayTitle"></div>
+        <div id="monthDayList"></div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -241,6 +279,11 @@ let biz = "eleganza";
 let weekStart = startOfWeek(new Date());
 let bookings = [];
 let bookingSelectedId = null;
+let calView = "week";
+let monthStart = startOfMonth(new Date());
+let monthBookings = [];
+let selectedMonthDay = null;
+let calSearchTimer = null;
 
 function $(id) { return document.getElementById(id); }
 function esc(s) { return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -251,6 +294,7 @@ function tagColor(tag) { let h=0; for(let i=0;i<tag.length;i++) h=(h*31+tag.char
 function tagsToArr(t) { return (t||"").split(",").map(s=>s.trim()).filter(Boolean); }
 function arrToTags(a) { return a.join(","); }
 function startOfWeek(d) { const x = new Date(d); const day = x.getDay(); x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+function startOfMonth(d) { const x = new Date(d.getFullYear(), d.getMonth(), 1); x.setHours(0,0,0,0); return x; }
 function fmtWhen(iso, opts) { return new Date(iso).toLocaleString("en-US", { timeZone: TZ, ...opts }); }
 function digits(s) { return (s||"").replace(/\D/g,""); }
 function intlPhone(phone) {
@@ -481,15 +525,52 @@ function openAddModal() {
 }
 
 /* ───────────────────── Calendar ───────────────────── */
-document.querySelectorAll("#bizTabs .tab").forEach(t => t.onclick = () => { biz = t.dataset.biz; document.querySelectorAll("#bizTabs .tab").forEach(x=>x.classList.toggle("active", x===t)); loadAllCalendar(); });
+document.querySelectorAll("#bizTabs .tab").forEach(t => t.onclick = () => {
+  biz = t.dataset.biz;
+  document.querySelectorAll("#bizTabs .tab").forEach(x=>x.classList.toggle("active", x===t));
+  $("calSearchInput").value = ""; $("searchResultsPanel").style.display = "none";
+  selectedMonthDay = null; $("monthDayPanel").style.display = "none";
+  loadAllCalendar();
+});
 $("prevWeek").onclick = () => { weekStart = new Date(weekStart.getTime() - 7*86400000); loadWeek(); };
 $("nextWeek").onclick = () => { weekStart = new Date(weekStart.getTime() + 7*86400000); loadWeek(); };
+$("prevMonth").onclick = () => { monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth()-1, 1); selectedMonthDay = null; $("monthDayPanel").style.display = "none"; loadMonth(); };
+$("nextMonth").onclick = () => { monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth()+1, 1); selectedMonthDay = null; $("monthDayPanel").style.display = "none"; loadMonth(); };
+
+document.querySelectorAll("#calViewToggle .tab").forEach(t => t.onclick = () => {
+  calView = t.dataset.calview;
+  document.querySelectorAll("#calViewToggle .tab").forEach(x => x.classList.toggle("active", x === t));
+  $("weekView").style.display = calView === "week" ? "block" : "none";
+  $("monthView").style.display = calView === "month" ? "block" : "none";
+  if (calView === "month") loadMonth();
+});
+
+$("calSearchInput").addEventListener("input", () => {
+  clearTimeout(calSearchTimer);
+  const q = $("calSearchInput").value.trim();
+  calSearchTimer = setTimeout(() => runCalSearch(q), 300);
+});
+
+async function runCalSearch(q) {
+  const panel = $("searchResultsPanel");
+  if (!q) { panel.style.display = "none"; $("searchResultsList").innerHTML = ""; return; }
+  const term = q.replace(/[(),]/g, ""); // keep PostgREST's or=() filter list unambiguous
+  const rows = await api(`/rest/v1/bookings?business=eq.${biz}&status=neq.cancelled&or=(client_name.ilike.*${encodeURIComponent(term)}*,client_phone.ilike.*${encodeURIComponent(term)}*)&select=*,services(name)&order=start_at.desc&limit=25`);
+  panel.style.display = "block";
+  $("searchResultsList").innerHTML = rows.length ? rows.map(b => `
+    <div class="booking-row" data-id="${b.id}">
+      <div class="booking-time">${fmtWhen(b.start_at,{month:'short',day:'numeric'})}</div>
+      <div class="booking-info"><div class="name">${esc(b.client_name)}</div><div class="meta">${esc(b.services?.name||"")} · ${fmtWhen(b.start_at,{hour:'numeric',minute:'2-digit'})}</div></div>
+      <span class="status-pill status-${b.status}">${b.status.replace('_',' ')}</span>
+    </div>`).join("") : `<div class="empty">No matching bookings</div>`;
+  $("searchResultsList").querySelectorAll("[data-id]").forEach(row => row.onclick = () => { bookings = rows; openBookingDrawer(row.dataset.id); });
+}
 
 async function loadAllCalendar() {
   $("loadingState").style.display = "block";
   $("app").style.display = "none";
   try {
-    await Promise.all([loadDue(), loadWeek()]);
+    await Promise.all([loadDue(), loadWeek(), calView === "month" ? loadMonth() : Promise.resolve()]);
     $("loadingState").style.display = "none";
     $("app").style.display = "block";
   } catch (e) {
@@ -497,6 +578,55 @@ async function loadAllCalendar() {
     $("loadingState").innerHTML = "Couldn't load — session may have expired.<br><br>" +
       '<button class="btn-primary" style="width:auto;display:inline-flex" onclick="logout()">Log out and try again</button>';
   }
+}
+
+async function loadMonth() {
+  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth()+1, 1);
+  $("monthLabel").textContent = monthStart.toLocaleDateString("en-US",{month:'long',year:'numeric'});
+  monthBookings = await api(`/rest/v1/bookings?business=eq.${biz}&start_at=gte.${monthStart.toISOString()}&start_at=lt.${monthEnd.toISOString()}&status=neq.cancelled&select=*,services(name)&order=start_at.asc`);
+  renderMonth();
+  if (selectedMonthDay) showMonthDay(selectedMonthDay);
+}
+
+function renderMonth() {
+  const grid = $("monthGrid");
+  const gridStart = startOfWeek(monthStart);
+  const cells = [];
+  for (let i=0;i<42;i++) cells.push(new Date(gridStart.getTime()+i*86400000));
+  const todayD = todayStr();
+  const dowRow = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="month-dow">${d}</div>`).join("");
+  const cellsHtml = cells.map(d => {
+    const dStr = d.toLocaleDateString("en-CA",{timeZone:TZ});
+    const dayBookings = monthBookings.filter(b => new Date(b.start_at).toLocaleDateString("en-CA",{timeZone:TZ}) === dStr);
+    const isOther = d.getMonth() !== monthStart.getMonth();
+    const isToday = dStr === todayD;
+    const isSelected = dStr === selectedMonthDay;
+    const dots = dayBookings.slice(0,4).map(()=>`<span class="month-dot"></span>`).join("");
+    const extra = dayBookings.length ? `<span class="month-count">${dayBookings.length}</span>` : "";
+    return `<div class="month-cell${isOther?' other-month':''}${isToday?' today':''}${isSelected?' selected':''}" data-date="${dStr}">
+      <div class="month-cell-num">${d.getDate()}</div>
+      <div class="month-dot-row">${dots}${extra}</div>
+    </div>`;
+  }).join("");
+  grid.innerHTML = dowRow + cellsHtml;
+  grid.querySelectorAll("[data-date]").forEach(cell => cell.onclick = () => showMonthDay(cell.dataset.date));
+}
+
+function showMonthDay(dStr) {
+  selectedMonthDay = dStr;
+  renderMonth();
+  const dayBookings = monthBookings.filter(b => new Date(b.start_at).toLocaleDateString("en-CA",{timeZone:TZ}) === dStr);
+  const panel = $("monthDayPanel");
+  $("monthDayTitle").textContent = new Date(dStr+"T12:00:00").toLocaleDateString("en-US",{weekday:'long',month:'long',day:'numeric'});
+  $("monthDayList").innerHTML = dayBookings.length ? dayBookings.map(b => `
+    <div class="booking-row" data-id="${b.id}">
+      <div class="booking-time">${fmtWhen(b.start_at,{hour:'numeric',minute:'2-digit'})}</div>
+      <div class="booking-info"><div class="name">${esc(b.client_name)}</div><div class="meta">${esc(b.services?.name||"")}</div></div>
+      <span class="status-pill status-${b.status}">${b.status.replace('_',' ')}</span>
+    </div>`).join("") : `<div class="empty">No bookings</div>`;
+  panel.style.display = "block";
+  panel.querySelectorAll("[data-id]").forEach(row => row.onclick = () => { bookings = monthBookings; openBookingDrawer(row.dataset.id); });
+  panel.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 
 async function loadDue() {
