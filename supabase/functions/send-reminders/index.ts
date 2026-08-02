@@ -116,9 +116,9 @@ function twoWeekCopy(b: Booking) {
     ? `Please send a ${fmtMoney(deposit, currency)} deposit via WAM! to ${WAM_HANDLE} to secure it (balance due in cash at check-in), and confirm here:`
     : "Please confirm here:";
   return {
-    subject: "Time to confirm your follow-up",
+    subject: "Confirm your follow-up appointment",
     body:
-      `Hi ${name},\n\nYour follow-up appointment is coming up in 2 weeks: ${when}. ${instruction}\n${link}\n\n` +
+      `Hi ${name},\n\nYour follow-up appointment is two weeks away — ${when}. ${instruction}\n${link}\n\n` +
       `You can also reschedule or cancel from that same link.\n\nSee you soon,\nEleganza`,
   };
 }
@@ -136,16 +136,16 @@ function dayBeforeCopy(b: Booking) {
     };
   }
   const tentativeNote = b.status === "tentative"
-    ? " This time is being held for you — please confirm or pick a new one so we can lock it in."
+    ? " This time is being held for you — confirm it, or choose a new one, to lock it in."
     : "";
   const prepNote =
-    "\n\nBefore you come in, please avoid: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments." +
-    "\n\nReminder: 15-minute grace period. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.";
+    "\n\nBefore you come in, avoid: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments." +
+    "\n\n15-minute grace period. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.";
   return {
     subject: `Your appointment — ${fmtDate(b.start_at)}`,
     body:
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
-      `Please confirm, reschedule, or cancel here (you can let us know your reason if you cancel):\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
+      `Confirm, reschedule, or cancel here (let us know your reason if you cancel):\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
 }
 
@@ -159,11 +159,11 @@ function hourBeforeCopy(b: Booking) {
     };
   }
   const waLine = BUSINESS_WHATSAPP_NUMBER
-    ? `\n\nOn your way? Message me here: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}`
+    ? `\n\nQuestions before you arrive? Message here: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}`
     : "";
   return {
-    subject: `See you soon, ${name}!`,
-    body: `Hi ${name}, this is your 1-hour reminder — see you at ${time}!\n\nReminder: a $200 late fee applies after 15 minutes, and after 30 minutes you'll need to reschedule.${waLine}`,
+    subject: `Your appointment is in an hour`,
+    body: `Hi ${name},\n\nYour appointment is in one hour, at ${time}.\n\nA $200 late fee applies after 15 minutes; after 30 minutes you'll need to reschedule.${waLine}`,
   };
 }
 
@@ -229,7 +229,7 @@ function followupCopy(name: string) {
   return {
     subject: "Time to book your follow-up",
     body:
-      `Hi ${name},\n\nIt's been a few weeks since your visit — time to lock in your follow-up appointment.\n\n` +
+      `Hi ${name},\n\nIt's been a few weeks since your visit. Time to book your follow-up.\n\n` +
       `Book here:\n${link}\n\nSee you soon,\nEleganza`,
   };
 }
