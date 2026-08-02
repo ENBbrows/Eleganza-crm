@@ -1,0 +1,31 @@
+/* ═════════════════════════════════════════════════════════
+   ELEGANZA THEME — shared design tokens for every client-facing
+   page. Quiet-authority academy identity: charcoal + ivory field,
+   a single gold hairline accent, Georgia serif for headlines.
+   Linked, not duplicated — edit values here, every page updates.
+   (book-enbfocus.html is a separate sub-brand and does not use
+   this file.)
+   ═════════════════════════════════════════════════════════ */
+:root{
+  --ink:#1C1B19;
+  --ink-soft:#26241F;
+  --line:#3D3A33;
+  --gold:#B9924F;
+  --gold-bright:#D4B378;
+  --ivory:#F3EFE6;
+  --ivory-dim:#B7B0A2;
+  --error:#D98E7E;
+  --ok:#A8C3A0;
+  --sage:#8C9673;
+  --sage-bright:#A8B48C;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-body: 'Karla', sans-serif;
+}
+
+/* Golden-spiral hairline rule — the recurring motif, defined once.
+   Replaces the old leaf-scroll divider. Traces one quarter-turn of
+   a golden spiral in a single gold hairline. */
+.rule{
+  width:52px;height:34px;margin:56px auto;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='34' viewBox='0 0 52 34'%3E%3Cpath d='M50 2v13a13 13 0 0 1-13 13H24' fill='none' stroke='%23B9924F' stroke-width='1'/%3E%3Cpath d='M24 15v8a8 8 0 0 0 8 8h5' fill='none' stroke='%23B9924F' stroke-width='.8'/%3E%3Cpath d='M24 20v3a3 3 0 0 0 3 3h2' fill='none' stroke='%23B9924F' stroke-width='.6'/%3E%3C/svg%3E") no-repeat center/contain;
+}
