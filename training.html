@@ -8,25 +8,20 @@
 <link rel="apple-touch-icon" href="app-icon-black-v2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
 <style>
-  :root{
-    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
-    --gold:#C9A26B; --gold-bright:#E0BE8A;
-    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
-    --sage:#8C9673; --sage-bright:#A8B48C;
-  }
   *{margin:0;padding:0;box-sizing:border-box}
   body{
     background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;
     letter-spacing:.01em;padding:40px 20px 80px;
-    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%);
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(185,146,79,.09), transparent 60%);
   }
   .wrap{max-width:520px;margin:0 auto;text-align:center}
   .lotus{display:block;width:100px;height:auto;margin:0 auto 14px}
   .brand{font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ivory-dim)}
-  .tagline{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1.3rem;color:var(--gold);margin-top:8px}
-  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.8rem,6vw,2.4rem);line-height:1.2;margin-top:18px}
+  .tagline{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:1.3rem;color:var(--gold);margin-top:8px}
+  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.8rem,6vw,2.4rem);line-height:1.2;margin-top:18px}
   h1 em{font-style:italic;color:var(--gold-bright)}
   .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.7;margin-top:14px;max-width:440px;margin-left:auto;margin-right:auto}
   .coming-soon-tag{
@@ -35,10 +30,11 @@
   }
   .feature-video{width:100%;max-width:420px;margin:28px auto 0;display:block;border-radius:16px 4px 16px 4px;border:1px solid var(--gold)}
 
-  .rule{width:52px;height:26px;margin:48px auto;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M2 13c9-11 39-11 48 0-9 11-39 11-48 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3Cpath d='M26 5v16M15 10c3.5 1.3 7.5 1.3 11 2.5M37 10c-3.5 1.3-7.5 1.3-11 2.5' fill='none' stroke='%23C9A26B' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center/contain}
-
   .section-label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-  h2{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:1.4rem;color:var(--ivory);margin-bottom:22px}
+  h2{font-family:var(--font-serif);font-style:italic;font-weight:400;font-size:1.4rem;color:var(--ivory);margin-bottom:22px}
+
+  .villain-line{font-size:.82rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ivory-dim);font-weight:600;margin-top:18px}
+  .prophecy-line{font-family:var(--font-serif);font-style:italic;color:var(--gold-bright);font-size:1.15rem;line-height:1.5;margin-top:20px;max-width:420px;margin-left:auto;margin-right:auto}
 
   .offer-row{display:flex;flex-direction:column;gap:16px;max-width:420px;margin:0 auto}
   .offer-card{
@@ -48,7 +44,7 @@
     position:absolute;top:16px;right:16px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
     color:var(--sage-bright);border:1px solid var(--sage-bright);border-radius:20px;padding:4px 10px;
   }
-  .offer-name{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-bright)}
+  .offer-name{font-family:var(--font-serif);font-size:1.2rem;color:var(--gold-bright)}
   .offer-desc{color:var(--ivory-dim);font-size:.88rem;line-height:1.6;margin-top:10px}
 
   .kit-note{
@@ -86,9 +82,15 @@
   <div class="rule"></div>
 
   <section>
+    <svg width="72" height="72" viewBox="0 0 52 34" style="margin:0 auto 8px;opacity:.9" aria-hidden="true"><path d="M50 2v13a13 13 0 0 1-13 13H24" fill="none" stroke="#B9924F" stroke-width="1"/><path d="M24 15v8a8 8 0 0 0 8 8h5" fill="none" stroke="#B9924F" stroke-width=".8"/><path d="M24 20v3a3 3 0 0 0 3 3h2" fill="none" stroke="#B9924F" stroke-width=".6"/></svg>
     <p class="section-label">Eleganza Professional Education</p>
     <h2>The <em>Naturally Beautiful Method</em></h2>
-    <p class="sub" style="max-width:440px;margin-left:auto;margin-right:auto">Golden-ratio facial mapping and natural hair-stroke microblading, engineered from the ground up for Caribbean, multiracial, and melanin-rich skin — so healed results read as hair, never as the blotchy, blurry, blocky tattoo traditional training leaves behind.</p>
+    <p class="sub" style="max-width:440px;margin-left:auto;margin-right:auto">Golden-ratio facial mapping and natural hair-stroke microblading, engineered from the ground up for Caribbean, multiracial, and melanin-rich skin.</p>
+
+    <p class="villain-line">Blotchy. Blurry. Blocky.</p>
+    <p class="sub" style="max-width:420px;margin-left:auto;margin-right:auto;margin-top:6px">Three words for what shortcut certification produces on skin it was never calibrated for — and the exact failure The Method exists to end.</p>
+
+    <p class="prophecy-line">Brows engineered to heal clean, on every face that sits in the chair.</p>
 
     <div class="offer-row" style="max-width:420px;margin:24px auto 0;flex-direction:row;flex-wrap:wrap;gap:10px;justify-content:center">
       <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold-bright)">60 course hours</span>
