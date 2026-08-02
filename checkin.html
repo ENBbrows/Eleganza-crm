@@ -9,23 +9,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Eleganza Check-In">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#171210">
+<meta name="theme-color" content="#1C1B19">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-  :root{
-    --ink:#171210;          /* deep espresso black */
-    --ink-soft:#241C18;     /* raised surface */
-    --line:#3A2F28;         /* hairline */
-    --gold:#C9A26B;         /* champagne gold */
-    --gold-bright:#E0BE8A;
-    --ivory:#F4EDE4;        /* primary text */
-    --ivory-dim:#B9AC9D;    /* secondary text */
-    --error:#D98E7E;
-    --ok:#A8C3A0;
-  }
   *{margin:0;padding:0;box-sizing:border-box}
   html{height:100%}
   body{
@@ -35,7 +25,7 @@
     font-family:'Karla',sans-serif;
     font-weight:300;
     letter-spacing:.01em;
-    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,107,.08), transparent 60%);
+    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(185,146,79,.08), transparent 60%);
   }
   .page-center{
     display:flex;
@@ -50,7 +40,7 @@
   }
 
   /* nav */
-  .topnav{position:sticky;top:0;z-index:50;background:rgba(23,18,16,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(28,27,25,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
   .nav-toggle{
     flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
@@ -71,7 +61,7 @@
     letter-spacing:.03em;border-bottom:1px solid var(--line);
   }
   .nav-dropdown a:last-child{border-bottom:none}
-  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(201,162,107,.05)}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(185,146,79,.05)}
   .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
   /* ——— brand mark ——— */
   .lotus{
@@ -88,7 +78,7 @@
     border:1px solid var(--gold);
     position:relative;
   }
-  .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(201,162,107,.3);border-radius:50%}
+  .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(185,146,79,.3);border-radius:50%}
   .host img{
     width:100%;height:100%;
     border-radius:50%;
@@ -105,7 +95,7 @@
     margin-bottom:6px;
   }
   .tagline{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-style:italic;
     font-weight:300;
     font-size:.98rem;
@@ -130,7 +120,7 @@
   .rule::after{right:-12px}
 
   h1{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-weight:300;
     font-size:clamp(1.7rem,6vw,2.3rem);
     line-height:1.2;
@@ -180,7 +170,7 @@
   input:focus,select:focus{border-color:var(--gold)}
   input::placeholder{color:#6E6259}
   select{
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A26B' fill='none'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B9924F' fill='none'/%3E%3C/svg%3E");
     background-repeat:no-repeat;
     background-position:right 16px center;
   }
@@ -213,7 +203,7 @@
     border:1px solid var(--gold);
     margin-top:14px;
   }
-  .btn-ghost:hover{background:rgba(201,162,107,.08)}
+  .btn-ghost:hover{background:rgba(185,146,79,.08)}
   .linkline{
     display:inline-block;
     margin-top:22px;
@@ -246,7 +236,7 @@
     padding:10px 18px;
     border:1px solid var(--gold);
     border-radius:2px;
-    background:rgba(201,162,107,.1);
+    background:rgba(185,146,79,.1);
     color:var(--gold-bright);
     font-size:.82rem;
     letter-spacing:.14em;
@@ -293,10 +283,10 @@
     text-transform:uppercase;
     transition:background .2s;
   }
-  .review-btn:hover{background:rgba(201,162,107,.1)}
+  .review-btn:hover{background:rgba(185,146,79,.1)}
   .review-btn svg{flex:none}
   .stars{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     color:var(--gold);
     font-size:1.3rem;
     letter-spacing:.35em;
@@ -325,7 +315,7 @@
     color:var(--ivory-dim);
   }
   .price-line strong{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-size:1.25rem;
     color:var(--ivory);
     font-weight:400;
@@ -372,7 +362,7 @@
     line-height:1.6;
   }
   .discount-done strong{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-size:1.35rem;
     color:var(--gold-bright);
     font-weight:400;
@@ -382,10 +372,10 @@
     padding:20px 16px;
     border:1px solid var(--line);
     border-radius:2px;
-    background:rgba(201,162,107,.05);
+    background:rgba(185,146,79,.05);
   }
   .value-title{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-style:italic;
     font-size:1.05rem;
     color:var(--gold-bright);
@@ -403,7 +393,7 @@
     line-height:1.8;
   }
   .value-nums strong{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-serif);
     font-size:1.3rem;
     color:var(--gold-bright);
     font-weight:400;
@@ -491,11 +481,11 @@
     <p class="sub">Leave a review before you pay today and get <strong style="color:var(--gold-bright)">5% off</strong> your total right now.</p>
     <div class="review-row">
       <a class="review-btn" id="rp-btn-google" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
         Review us on Google
       </a>
       <a class="review-btn" id="rp-btn-facebook" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
         Review us on Facebook
       </a>
     </div>
@@ -551,10 +541,10 @@
       <p class="discount-done" id="discount-done">✓ Review reward applied — today's total is <strong id="price-final"></strong><br />Just show this screen at the counter. 🤍</p>
     </div>
 
-    <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(201,162,107,.12)">
+    <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(185,146,79,.12)">
       ❋ My Aftercare Guide — the next 10 days
     </a>
-    <a class="review-btn" id="btn-followup" href="#" style="margin-top:12px;border-style:solid;background:rgba(201,162,107,.12);display:none">
+    <a class="review-btn" id="btn-followup" href="#" style="margin-top:12px;border-style:solid;background:rgba(185,146,79,.12);display:none">
       📅 Book Your Follow-Up (~5 weeks)
     </a>
 
@@ -562,11 +552,11 @@
       <summary>⭐ Leave A Review — Unlock 5% Off</summary>
       <div class="review-row">
         <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
           Review us on Google
         </a>
         <a class="review-btn" id="btn-facebook" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
           Review us on Facebook
         </a>
       </div>
@@ -580,21 +570,21 @@
         <p class="value-nums"><strong id="save-money"></strong> in brow pencils &amp; fills<br /><strong id="save-time"></strong> of mirror time — mornings you wake up already done</p>
       </div>
       <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
         WhatsApp My Aftercare To Me
       </a>
       <p class="sub" style="margin-top:16px;text-align:left">Keep your results glowing — brow tips &amp; tricks live here:</p>
       <div class="review-row" style="margin-top:12px">
         <a class="review-btn" id="btn-youtube" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
           YouTube — Tips &amp; Tricks
         </a>
         <a class="review-btn" id="btn-instagram" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
           Instagram
         </a>
         <a class="review-btn" id="btn-fbpage" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#C9A26B" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
           Facebook
         </a>
       </div>

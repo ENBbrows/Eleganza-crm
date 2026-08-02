@@ -4,14 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Confirm Your Appointment</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
 <style>
-  :root{--ink:#171210;--ink-soft:#241C18;--line:#3A2F28;--gold:#C9A26B;--gold-bright:#E0BE8A;--ivory:#F4EDE4;--ivory-dim:#B9AC9D;--error:#D98E7E;--ok:#A8C3A0;}
   *{margin:0;padding:0;box-sizing:border-box}
   body{min-height:100vh;background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;display:flex;padding:24px 16px;}
   .card{width:100%;max-width:440px;margin:auto;text-align:center}
   .brand{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:10px}
-  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.5rem,6vw,2rem);line-height:1.25}
+  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.5rem,6vw,2rem);line-height:1.25}
   .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.6;margin-top:12px}
   .detail{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:4px;text-align:left}
   .detail div{font-size:.9rem;color:var(--ivory-dim);margin-bottom:6px}
@@ -74,7 +74,7 @@ async function load() {
 
 function render() {
   const brand = booking.business === "enbfocus" ? "ENBfocus" : "Eleganza";
-  const statusLabel = { tentative: "Tentative — needs confirming", confirmed: "Confirmed", checked_in: "Checked in", completed: "Completed", cancelled: "Cancelled" }[booking.status] || booking.status;
+  const statusLabel = { tentative: "Held — needs confirming", confirmed: "Confirmed", checked_in: "In the Chair", completed: "Completed", cancelled: "Cancelled" }[booking.status] || booking.status;
   const canAct = booking.status === "tentative" || booking.status === "confirmed";
   card.innerHTML = `
     <div class="brand">${brand}</div>

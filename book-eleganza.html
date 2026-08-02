@@ -4,15 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Book an Appointment — Eleganza</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
 <style>
-  :root{--ink:#171210;--ink-soft:#241C18;--line:#3A2F28;--gold:#C9A26B;--gold-bright:#E0BE8A;--ivory:#F4EDE4;--ivory-dim:#B9AC9D;--error:#D98E7E;--ok:#A8C3A0;}
   *{margin:0;padding:0;box-sizing:border-box}
   body{min-height:100vh;background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;}
   .card{width:100%;max-width:520px;margin:0 auto;padding:24px 16px}
 
   /* nav */
-  .topnav{position:sticky;top:0;z-index:50;background:rgba(23,18,16,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(28,27,25,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
   .nav-toggle{
     flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
@@ -33,10 +33,10 @@
     letter-spacing:.03em;border-bottom:1px solid var(--line);
   }
   .nav-dropdown a:last-child{border-bottom:none}
-  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(201,162,107,.05)}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(185,146,79,.05)}
   .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
   .brand{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);text-align:center;margin-bottom:6px}
-  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.6rem,6vw,2.1rem);text-align:center;line-height:1.25}
+  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.6rem,6vw,2.1rem);text-align:center;line-height:1.25}
   .sub{color:var(--ivory-dim);font-size:.92rem;text-align:center;margin-top:10px;line-height:1.6}
   .steps{display:flex;justify-content:center;gap:6px;margin:22px 0}
   .step-dot{width:6px;height:6px;border-radius:50%;background:var(--line)}
@@ -45,14 +45,14 @@
   .screen.active{display:block}
   .service-card{width:100%;text-align:left;background:var(--ink-soft);border:1px solid var(--line);border-radius:4px;padding:16px;margin-bottom:10px;cursor:pointer;color:var(--ivory)}
   .service-card:hover,.service-card.selected{border-color:var(--gold)}
-  .service-name{font-family:'Fraunces',serif;font-size:1.05rem}
+  .service-name{font-family:var(--font-serif);font-size:1.05rem}
   .service-meta{color:var(--ivory-dim);font-size:.82rem;margin-top:4px}
   .tag-tentative{display:inline-block;margin-top:6px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:2px 8px}
   .date-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
   .date-pill{flex:0 0 auto;text-align:center;background:var(--ink-soft);border:1px solid var(--line);border-radius:4px;padding:10px 14px;cursor:pointer;color:var(--ivory)}
   .date-pill .dow{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ivory-dim)}
-  .date-pill .num{font-family:'Fraunces',serif;font-size:1.2rem;margin-top:2px}
-  .date-pill.selected{border-color:var(--gold);background:rgba(201,162,107,.1)}
+  .date-pill .num{font-family:var(--font-serif);font-size:1.2rem;margin-top:2px}
+  .date-pill.selected{border-color:var(--gold);background:rgba(185,146,79,.1)}
   .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
   .slot-btn{padding:11px 4px;background:var(--ink-soft);border:1px solid var(--line);border-radius:3px;color:var(--ivory);font-size:.85rem;cursor:pointer}
   .slot-btn:hover,.slot-btn.selected{border-color:var(--gold);color:var(--gold-bright)}
@@ -219,11 +219,11 @@
     </div>
     <div class="summary" id="voucherPanel" style="display:none;border-color:var(--gold);text-align:center">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Give 10% — Get 10%</div>
-      <div style="font-family:'Fraunces',serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold-bright)" id="voucherCode"></div>
+      <div style="font-family:var(--font-serif);font-size:1.6rem;letter-spacing:.08em;color:var(--gold-bright)" id="voucherCode"></div>
       <div style="margin-top:6px;font-size:.85rem;color:var(--ivory-dim)" id="voucherSub"></div>
       <a class="review-btn" id="btnShareVoucher" href="#" target="_blank" rel="noopener" style="margin-top:12px">💬 Share With A Friend</a>
     </div>
-    <a class="review-btn" id="btnAftercare" href="aftercare.html" style="border-style:solid;background:rgba(201,162,107,.12)">❋ My Aftercare Guide — Email &amp; WhatsApp</a>
+    <a class="review-btn" id="btnAftercare" href="aftercare.html" style="border-style:solid;background:rgba(185,146,79,.12)">❋ My Aftercare Guide — Email &amp; WhatsApp</a>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
     <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Appointment</button>
