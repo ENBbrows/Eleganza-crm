@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Eleganza Naturally Beautiful — The Circle</title>
+<title>Eleganza Naturally Beautiful — Client Check-In</title>
 <link rel="apple-touch-icon" href="app-icon-black-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Eleganza Circle">
+<meta name="apple-mobile-web-app-title" content="Eleganza Check-In">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1C1B19">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="theme.css" />
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html{height:100%}
@@ -26,146 +27,597 @@
     letter-spacing:.01em;
     background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(185,146,79,.08), transparent 60%);
   }
-  .page-center{display:flex;min-height:100vh;padding:24px 16px}
-  .card{width:100%;max-width:480px;text-align:center;margin:auto}
+  .page-center{
+    display:flex;
+    min-height:100vh;
+    padding:24px 16px;
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+    text-align:center;
+    margin:auto;   /* safe centering — never clips tall content */
+  }
 
-  .lotus{display:block;width:150px;height:auto;margin:0 auto 16px}
-  .brand{font-family:'Karla',sans-serif;font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:6px}
-  .tagline{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:.98rem;color:var(--gold);letter-spacing:.03em;margin-bottom:14px}
+  /* nav */
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(28,27,25,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
+  .nav-toggle{
+    flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
+    border-radius:2px;padding:9px 12px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    cursor:pointer;font-family:'Karla',sans-serif;
+  }
+  .nav-search-form{flex:1}
+  .nav-search-form input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:20px;
+    color:var(--ivory);padding:9px 14px;font-size:.85rem;font-family:'Karla',sans-serif;outline:none;
+  }
+  .nav-search-form input:focus{border-color:var(--gold)}
+  .nav-dropdown{display:none;flex-direction:column;border-top:1px solid var(--line);background:var(--ink)}
+  .nav-dropdown.open{display:flex}
+  .nav-dropdown-inner{max-width:640px;margin:0 auto;display:flex;flex-direction:column}
+  .nav-dropdown a{
+    padding:14px 20px;color:var(--ivory-dim);text-decoration:none;font-size:.85rem;
+    letter-spacing:.03em;border-bottom:1px solid var(--line);
+  }
+  .nav-dropdown a:last-child{border-bottom:none}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(185,146,79,.05)}
+  .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
+  /* ——— brand mark ——— */
+  .lotus{
+    display:block;
+    width:150px;
+    height:auto;
+    margin:0 auto 16px;
+  }
+  .host{
+    width:118px;height:118px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    padding:5px;
+    border:1px solid var(--gold);
+    position:relative;
+  }
+  .host::after{content:"";position:absolute;inset:2px;border:1px solid rgba(185,146,79,.3);border-radius:50%}
+  .host img{
+    width:100%;height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    object-position:center 20%;
+    display:block;
+  }
+  .brand{
+    font-family:'Karla',sans-serif;
+    font-size:.72rem;
+    letter-spacing:.38em;
+    text-transform:uppercase;
+    color:var(--ivory-dim);
+    margin-bottom:6px;
+  }
+  .tagline{
+    font-family:var(--font-serif);
+    font-style:italic;
+    font-weight:300;
+    font-size:.98rem;
+    color:var(--gold);
+    letter-spacing:.03em;
+    margin-bottom:14px;
+  }
+  .rule{
+    width:56px;height:1px;
+    background:var(--gold);
+    margin:22px auto;
+    position:relative;
+  }
+  .rule::before,.rule::after{
+    content:"";
+    position:absolute;top:-2px;
+    width:5px;height:5px;
+    background:var(--gold);
+    transform:rotate(45deg);
+  }
+  .rule::before{left:-12px}
+  .rule::after{right:-12px}
 
-  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.2;color:var(--ivory)}
+  h1{
+    font-family:var(--font-serif);
+    font-weight:300;
+    font-size:clamp(1.7rem,6vw,2.3rem);
+    line-height:1.2;
+    color:var(--ivory);
+  }
   h1 em{font-style:italic;color:var(--gold-bright)}
-  .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.6;margin-top:12px}
+  .sub{
+    color:var(--ivory-dim);
+    font-size:.95rem;
+    line-height:1.6;
+    margin-top:12px;
+  }
 
+  /* ——— screens ——— */
   .screen{display:none;animation:rise .45s ease both}
   .screen.active{display:block}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.screen{animation:none}}
-
-  form{margin-top:26px;text-align:left}
-  label{display:block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:18px 0 8px}
-  input{
-    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;
-    color:var(--ivory);font-family:'Karla',sans-serif;font-size:1.05rem;font-weight:300;
-    padding:15px 16px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+  @media (prefers-reduced-motion:reduce){
+    .screen{animation:none}
   }
-  input:focus{border-color:var(--gold)}
+
+  /* ——— form ——— */
+  form{margin-top:26px;text-align:left}
+  label{
+    display:block;
+    font-size:.68rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:18px 0 8px;
+  }
+  input,select{
+    width:100%;
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:2px;
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-size:1.05rem;
+    font-weight:300;
+    padding:15px 16px;
+    outline:none;
+    transition:border-color .2s;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  input:focus,select:focus{border-color:var(--gold)}
   input::placeholder{color:#6E6259}
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B9924F' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+  }
+  .hint{font-size:.8rem;color:var(--ivory-dim);margin-top:8px}
 
   .btn{
-    display:block;width:100%;margin-top:28px;padding:17px;background:var(--gold);color:var(--ink);
-    border:none;border-radius:2px;font-family:'Karla',sans-serif;font-size:.8rem;font-weight:600;
-    letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:background .2s, transform .1s;
+    display:block;
+    width:100%;
+    margin-top:28px;
+    padding:17px;
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:2px;
+    font-family:'Karla',sans-serif;
+    font-size:.8rem;
+    font-weight:600;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .2s, transform .1s;
   }
   .btn:hover{background:var(--gold-bright)}
   .btn:active{transform:scale(.99)}
   .btn:disabled{opacity:.45;cursor:wait}
-
-  .banner{display:none;margin-top:20px;padding:13px 16px;border:1px solid var(--error);color:var(--error);font-size:.88rem;text-align:left;border-radius:2px}
-  .banner.show{display:block}
-
-  .rule{width:56px;height:1px;background:var(--gold);margin:22px auto;position:relative}
-  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
-  .rule::before{left:-12px}
-  .rule::after{right:-12px}
-
-  .status-badge{
-    display:inline-block;margin:14px auto 0;padding:9px 18px;border:1px solid var(--gold);border-radius:2px;
-    background:rgba(185,146,79,.1);color:var(--gold-bright);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;
+  .btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
+  .btn-ghost{
+    background:transparent;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    margin-top:14px;
   }
-
-  .content-list{margin-top:28px;text-align:left;display:flex;flex-direction:column;gap:14px}
-  .content-card{
-    padding:18px 16px;border:1px solid var(--line);border-radius:2px;background:rgba(185,146,79,.04);
-  }
-  .content-card-title{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;color:var(--gold-bright);margin-bottom:6px}
-  .content-card p{font-size:.86rem;color:var(--ivory-dim);line-height:1.6}
-  .content-card a{
-    display:inline-block;margin-top:10px;color:var(--gold);font-size:.78rem;letter-spacing:.12em;
-    text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px;
-  }
-
-  .locked-icon{font-size:2.4rem;margin-bottom:6px}
+  .btn-ghost:hover{background:rgba(185,146,79,.08)}
   .linkline{
-    display:inline-block;margin-top:22px;background:none;border:none;color:var(--ivory-dim);
-    font-family:'Karla',sans-serif;font-size:.85rem;letter-spacing:.04em;cursor:pointer;
-    text-decoration:underline;text-underline-offset:4px;
+    display:inline-block;
+    margin-top:22px;
+    background:none;border:none;
+    color:var(--ivory-dim);
+    font-family:'Karla',sans-serif;
+    font-size:.85rem;
+    letter-spacing:.04em;
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:4px;
   }
   .linkline:hover{color:var(--ivory)}
+
+  .banner{
+    display:none;
+    margin-top:20px;
+    padding:13px 16px;
+    border:1px solid var(--error);
+    color:var(--error);
+    font-size:.88rem;
+    text-align:left;
+    border-radius:2px;
+  }
+  .banner.show{display:block}
+
+  .reward-badge{
+    display:none;
+    margin:14px auto 0;
+    padding:10px 18px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+    background:rgba(185,146,79,.1);
+    color:var(--gold-bright);
+    font-size:.82rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    max-width:fit-content;
+  }
+  .visits{
+    font-size:.72rem;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:16px;
+  }
+
+  /* ——— collapsible "more" sections, so the done screen isn't a wall of buttons ——— */
+  .more-section{margin-top:18px;border:1px solid var(--line);border-radius:2px;text-align:left}
+  .more-section summary{
+    padding:15px 16px;cursor:pointer;color:var(--gold);font-size:.78rem;font-weight:600;
+    letter-spacing:.15em;text-transform:uppercase;list-style:none;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .more-section summary::-webkit-details-marker{display:none}
+  .more-section summary::after{content:"▾";font-size:.9rem;color:var(--ivory-dim);transition:transform .2s}
+  .more-section[open] summary::after{transform:rotate(180deg)}
+  .more-section > *:not(summary){margin-left:16px;margin-right:16px}
+  .more-section > summary + *{margin-top:2px}
+  .more-section > *:last-child{margin-bottom:16px}
+
+  /* ——— review buttons ——— */
+  .review-row{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+  .review-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:16px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:.82rem;
+    font-weight:500;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    transition:background .2s;
+  }
+  .review-btn:hover{background:rgba(185,146,79,.1)}
+  .review-btn svg{flex:none}
+  .stars{
+    font-family:var(--font-serif);
+    color:var(--gold);
+    font-size:1.3rem;
+    letter-spacing:.35em;
+    margin-top:18px;
+  }
+  .email-note{
+    margin-top:24px;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    font-size:.86rem;
+    color:var(--ivory-dim);
+    line-height:1.6;
+  }
+  .email-note strong{color:var(--ivory);font-weight:500}
+
+  /* ——— price + review discount ——— */
+  .price-box{
+    margin-top:24px;
+    padding:18px 16px;
+    border:1px solid var(--gold);
+    border-radius:2px;
+  }
+  .price-line{
+    font-size:.95rem;
+    color:var(--ivory-dim);
+  }
+  .price-line strong{
+    font-family:var(--font-serif);
+    font-size:1.25rem;
+    color:var(--ivory);
+    font-weight:400;
+    letter-spacing:.02em;
+  }
+  .price-line strong.struck{
+    text-decoration:line-through;
+    color:var(--ivory-dim);
+    font-size:1rem;
+  }
+  .btn-discount{
+    display:block;
+    width:100%;
+    margin-top:14px;
+    padding:14px;
+    background:transparent;
+    border:1px dashed var(--gold);
+    border-radius:2px;
+    color:var(--gold);
+    font-family:'Karla',sans-serif;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .2s;
+  }
+  .btn-discount:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    border-style:dashed;
+  }
+  .btn-discount.ready{
+    border-style:solid;
+    background:var(--gold);
+    color:var(--ink);
+    opacity:1;
+  }
+  .discount-done{
+    display:none;
+    margin-top:14px;
+    font-size:.92rem;
+    color:var(--ok);
+    line-height:1.6;
+  }
+  .discount-done strong{
+    font-family:var(--font-serif);
+    font-size:1.35rem;
+    color:var(--gold-bright);
+    font-weight:400;
+  }
+  .value-box{
+    margin-top:18px;
+    padding:20px 16px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:rgba(185,146,79,.05);
+  }
+  .value-title{
+    font-family:var(--font-serif);
+    font-style:italic;
+    font-size:1.05rem;
+    color:var(--gold-bright);
+    margin-bottom:8px;
+  }
+  .value-line{
+    font-size:.85rem;
+    color:var(--ivory-dim);
+    line-height:1.6;
+  }
+  .value-nums{
+    margin-top:10px;
+    font-size:.9rem;
+    color:var(--ivory);
+    line-height:1.8;
+  }
+  .value-nums strong{
+    font-family:var(--font-serif);
+    font-size:1.3rem;
+    color:var(--gold-bright);
+    font-weight:400;
+  }
 </style>
 </head>
 <body>
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navDropdown">☰ Menu</button>
+    <form class="nav-search-form" id="navSearchForm" role="search">
+      <input type="search" id="navSearch" placeholder="Search (pricing, FAQ, location…)" aria-label="Search this page" />
+    </form>
+  </div>
+  <div class="nav-dropdown" id="navDropdown">
+    <div class="nav-dropdown-inner">
+      <a href="home.html">🏠 Home</a>
+      <a href="home.html#artist">Meet the Artist</a>
+      <a href="home.html#how">How It Works</a>
+      <a href="home.html#services">Services &amp; Pricing</a>
+      <a href="home.html#faq">Q &amp; A</a>
+      <a href="home.html#testimonials">Testimonials</a>
+      <a href="home.html#visit">Visit &amp; Policies</a>
+      <a href="home.html#work">See the Work</a>
+      <a href="home.html#reviews">Leave a Review</a>
+      <a href="gift-eleganza.html">🎁 Gift Certificates</a>
+      <a href="training.html">🎓 Training</a>
+      <a class="nav-book" href="book-eleganza.html">Book Now</a>
+    </div>
+  </div>
+</nav>
 <div class="page-center">
 <main class="card">
 
   <!-- ═══ SCREEN 1 · LOOKUP ═══ -->
-  <section class="screen active" id="screen-lookup" aria-label="Enter the Circle">
+  <section class="screen active" id="screen-lookup" aria-label="Check in">
     <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
     <p class="brand">Eleganza Naturally Beautiful</p>
     <p class="tagline">What once was, is not all lost</p>
-    <h1>The <em>Circle</em></h1>
-    <p class="sub">A private space for those who've walked the full journey with us. Enter your phone number to check your status.</p>
+    <h1>Welcome, <em>beautiful</em></h1>
+    <p class="sub">Enter your phone number to check in.</p>
+    <img src="photo-prep.jpg" alt="Amii preparing for your procedure" style="width:100%;max-width:360px;display:block;margin:16px auto;border-radius:14px 4px 14px 4px;border:1px solid var(--gold)" />
     <form id="form-lookup" novalidate>
       <label for="lookup-phone">Phone number</label>
       <input id="lookup-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 868-555-1234" required />
-      <button class="btn" id="btn-lookup" type="submit">Check My Status</button>
+      <button class="btn" id="btn-lookup" type="submit">Check In</button>
     </form>
     <div class="banner" id="lookup-error" role="alert"></div>
   </section>
 
-  <!-- ═══ SCREEN 2 · LOCKED ═══ -->
-  <section class="screen" id="screen-locked" aria-label="Not yet unlocked">
-    <p class="locked-icon">🔒</p>
-    <p class="brand">Eleganza Naturally Beautiful</p>
-    <h1>Almost <em>there</em></h1>
-    <p class="sub" id="locked-message">The Circle opens once your journey reaches Alchemy — after your procedure heals and you've shared a review. You're not far.</p>
-    <div class="rule"></div>
-    <p class="sub">In the meantime, your aftercare guide has everything you need.</p>
-    <a class="btn" href="aftercare.html" style="text-decoration:none;display:block">View My Aftercare Guide</a>
-    <button class="linkline" type="button" onclick="app.reset()">Check a different number</button>
-  </section>
-
-  <!-- ═══ SCREEN 3 · UNLOCKED ═══ -->
-  <section class="screen" id="screen-unlocked" aria-label="Welcome to the Circle">
+  <!-- ═══ SCREEN 2 · RETURNING CLIENT ═══ -->
+  <section class="screen" id="screen-welcome" aria-label="Welcome back">
     <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
     <p class="brand">Eleganza Naturally Beautiful</p>
-    <h1>Welcome, <em id="unlocked-name">love</em></h1>
-    <p class="status-badge" id="status-badge">Mapped Client</p>
-    <p class="sub" style="margin-top:16px">You're in. This is where we share what doesn't go on the public feed.</p>
+    <h1>Welcome back, <em id="welcome-name">love</em></h1>
+    <p class="visits" id="welcome-visits"></p>
+    <p class="reward-badge" id="reward-badge">🎁 Review reward — 5% off today's visit</p>
+    <form id="form-welcome" novalidate>
+      <div id="welcome-email-wrap" style="display:none">
+        <label for="welcome-email">Email for your aftercare instructions</label>
+        <input id="welcome-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+      </div>
+      <label for="welcome-service">Today's service</label>
+      <select id="welcome-service">
+        <option>Microblading</option>
+        <option>Combo Brows</option>
+        <option>Powder / Ombré Brows</option>
+        <option>Touch-Up</option>
+        <option>Consultation</option>
+        <option>Other</option>
+      </select>
+      <label for="welcome-price">Today's price (TT$)</label>
+      <input id="welcome-price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 500" />
+      <button class="btn" id="btn-welcome" type="submit">Complete Check-In</button>
+    </form>
+    <button class="linkline" type="button" onclick="app.reset()">Not you? Start over</button>
+    <div class="banner" id="welcome-error" role="alert"></div>
+  </section>
 
-    <div class="content-list">
-      <div class="content-card">
-        <p class="content-card-title">The Eleganza Method — behind the technique</p>
-        <p>Notes on mapping-first thinking that don't make it into public posts.</p>
-      </div>
-      <div class="content-card">
-        <p class="content-card-title">Early access</p>
-        <p>Circle members hear about new services, availability, and offers before anyone else.</p>
-      </div>
-      <div class="content-card">
-        <p class="content-card-title">Referral rewards</p>
-        <p>Know someone who'd love this? Share your journey — referral perks live here too.</p>
-      </div>
+  <!-- ═══ SCREEN 2.5 · REVIEW BEFORE PAYMENT (returning clients only) ═══ -->
+  <section class="screen" id="screen-review-prompt" aria-label="Leave a review before payment">
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>One quick <em>favor?</em></h1>
+    <p class="sub">Leave a review before you pay today and get <strong style="color:var(--gold-bright)">5% off</strong> your total right now.</p>
+    <div class="review-row">
+      <a class="review-btn" id="rp-btn-google" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+        Review us on Google
+      </a>
+      <a class="review-btn" id="rp-btn-facebook" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+        Review us on Facebook
+      </a>
+    </div>
+    <button class="btn" id="rp-continue" type="button">Skip — Continue to Payment</button>
+  </section>
+
+  <!-- ═══ SCREEN 3 · NEW CLIENT ═══ -->
+  <section class="screen" id="screen-register" aria-label="New client registration">
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Lovely to <em>meet you</em></h1>
+    <p class="sub">Let's get you registered — it takes 30 seconds.</p>
+    <form id="form-register" novalidate>
+      <label for="reg-name">Full name</label>
+      <input id="reg-name" type="text" autocomplete="name" placeholder="Your name" required />
+      <label for="reg-phone">Phone number</label>
+      <input id="reg-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 868-555-1234" required />
+      <label for="reg-email">Email</label>
+      <input id="reg-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+      <label for="reg-birthday">Birthday <span style="color:var(--ivory-dim);text-transform:none;letter-spacing:0">(for a little annual love — optional)</span></label>
+      <input id="reg-birthday" type="date" />
+      <label for="reg-service">Today's service</label>
+      <select id="reg-service">
+        <option>Microblading</option>
+        <option>Combo Brows</option>
+        <option>Powder / Ombré Brows</option>
+        <option>Touch-Up</option>
+        <option>Consultation</option>
+        <option>Other</option>
+      </select>
+      <label for="reg-price">Today's price (TT$)</label>
+      <input id="reg-price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 500" />
+      <label for="reg-voucher">Referral code <span style="color:var(--ivory-dim);text-transform:none;letter-spacing:0">(from a friend — optional)</span></label>
+      <input id="reg-voucher" type="text" placeholder="e.g. A1B2C3" style="text-transform:uppercase" />
+      <button class="btn" id="btn-register" type="submit">Complete Check-In</button>
+    </form>
+    <button class="linkline" type="button" onclick="app.reset()">Back</button>
+    <div class="banner" id="register-error" role="alert"></div>
+  </section>
+
+  <!-- ═══ SCREEN 4 · DONE + REVIEWS ═══ -->
+  <section class="screen" id="screen-done" aria-label="Checked in">
+    <div class="host"><img src="amii.jpg" alt="Amii, founder of Eleganza" /></div>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <p class="tagline">What once was, is not all lost</p>
+    <h1>All done, <em id="done-name">love</em></h1>
+    <p class="stars" aria-hidden="true">★ ★ ★ ★ ★</p>
+    <p class="sub">Thank you for trusting me with your brows — it means everything. <em style="color:var(--gold-bright)">— Amii</em></p>
+
+    <div class="price-box" id="price-box" style="display:none">
+      <p class="price-line">Today's service · <strong id="price-original"></strong></p>
+      <button class="btn-discount" id="btn-discount" type="button" disabled>Leave a review below to unlock 5% off</button>
+      <p class="discount-done" id="discount-done">✓ Review reward applied — today's total is <strong id="price-final"></strong><br />Just show this screen at the counter. 🤍</p>
     </div>
 
-    <button class="linkline" type="button" onclick="app.reset()">Not you? Check a different number</button>
+    <a class="review-btn" id="btn-aftercare" href="aftercare.html" style="margin-top:22px;border-style:solid;background:rgba(185,146,79,.12)">
+      ❋ My Aftercare Guide — the next 10 days
+    </a>
+    <a class="review-btn" id="btn-followup" href="#" style="margin-top:12px;border-style:solid;background:rgba(185,146,79,.12);display:none">
+      📅 Book Your Follow-Up (~5 weeks)
+    </a>
+
+    <details class="more-section">
+      <summary>⭐ Leave A Review — Unlock 5% Off</summary>
+      <div class="review-row">
+        <a class="review-btn" id="btn-google" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 3.9-5.35 3.9a6 6 0 1 1 0-12c1.5 0 2.9.55 3.95 1.55l2.15-2.15A9 9 0 1 0 12 21c5.2 0 8.65-3.65 8.65-8.8 0-.4-.05-.75-.3-1.1z"/></svg>
+          Review us on Google
+        </a>
+        <a class="review-btn" id="btn-facebook" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          Review us on Facebook
+        </a>
+      </div>
+    </details>
+
+    <details class="more-section">
+      <summary>More For You</summary>
+      <div class="value-box" id="value-box" style="display:none">
+        <p class="value-title">The Eleganza Effect ✨</p>
+        <p class="value-line">You're walking out with more than beautiful brows — you're reclaiming your mornings. Over the next year, today's investment saves you roughly:</p>
+        <p class="value-nums"><strong id="save-money"></strong> in brow pencils &amp; fills<br /><strong id="save-time"></strong> of mirror time — mornings you wake up already done</p>
+      </div>
+      <a class="review-btn" id="btn-whatsapp" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9 1.7.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
+        WhatsApp My Aftercare To Me
+      </a>
+      <p class="sub" style="margin-top:16px;text-align:left">Keep your results glowing — brow tips &amp; tricks live here:</p>
+      <div class="review-row" style="margin-top:12px">
+        <a class="review-btn" id="btn-youtube" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M21.6 7.2s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 4.1 12 4.1 12 4.1s-4.2 0-6.9.2c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2.2 8.9 2.2 10.5v1.5c0 1.7.2 3.3.2 3.3s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.7.2 6.7.2s4.2 0 6.9-.2c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.3v-1.5c0-1.7-.2-3.3-.2-3.3zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg>
+          YouTube — Tips &amp; Tricks
+        </a>
+        <a class="review-btn" id="btn-instagram" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0-2.1a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm6.8-.2a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0zM12 4.2c-2.1 0-2.4 0-3.3.1-.8 0-1.3.2-1.6.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.6-.1.9-.1 1.2-.1 3.3s0 2.4.1 3.3c0 .8.2 1.3.3 1.6.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.6.3.9.1 1.2.1 3.3.1s2.4 0 3.3-.1c.8 0 1.3-.2 1.6-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.6.1-.9.1-1.2.1-3.3s0-2.4-.1-3.3c0-.8-.2-1.3-.3-1.6-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.6-.3-.9-.1-1.2-.1-3.3-.1z"/></svg>
+          Instagram
+        </a>
+        <a class="review-btn" id="btn-fbpage" href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#B9924F" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.47-4.05 4.17v2.25H7.5V13h2.7v8h3.3z"/></svg>
+          Facebook
+        </a>
+      </div>
+    </details>
+
+    <div class="email-note" id="done-email-note" style="display:none">
+      Your <strong>aftercare instructions</strong> are on their way to <strong id="done-email"></strong> — the review links are in there too, whenever you're ready. ✨
+    </div>
+    <button class="linkline" type="button" onclick="app.reset()">Check in the next client</button>
   </section>
 
 </main>
 </div>
 
 <script src="config.js"></script>
+<script src="client-identity.js"></script>
 <script>
-const $ = id => document.getElementById(id);
-const digits = s => (s || "").replace(/\D/g, "");
-const last7 = s => digits(s).slice(-7);
+/* Settings live in config.js — edit that file, not this one. */
 
+emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
+
+const C = CONFIG.COLUMNS;
 const HEADERS = {
   "apikey": CONFIG.SUPABASE_ANON_KEY,
   "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY,
   "Content-Type": "application/json"
 };
+const REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONFIG.TABLE);
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+
+const $ = id => document.getElementById(id);
+const digits = s => (s || "").replace(/\D/g, "");
+const last7 = s => digits(s).slice(-7);
 
 async function rpc(fn, body) {
   const res = await fetch(RPC + fn, { method: "POST", headers: HEADERS, body: JSON.stringify(body) });
@@ -173,7 +625,38 @@ async function rpc(fn, body) {
   return res.json();
 }
 
+/* Services that count as a "1st application" visit — these get a follow-up
+   booking reminder sent automatically ~3 weeks later (see send-reminders). */
+const FOLLOWUP_ELIGIBLE = s => !["Touch-Up", "Consultation", "Other", ""].includes(s || "");
+
+/* Match today's booking by phone, mark it checked-in, and log a receipt
+   so the appointment calendar and the CRM stay in sync automatically. */
+async function linkBookingAndReceipt(ctx) {
+  if (!ctx.phone) return;
+  try {
+    const rows = await rpc("checkin_booking_by_phone", { p_business: "eleganza", p_phone_last7: last7(ctx.phone) });
+    const match = Array.isArray(rows) ? rows[0] : rows;
+    const bookingId = match && match.booking_id;
+    if (ctx.price > 0) {
+      await rpc("log_receipt", {
+        p_booking_id: bookingId || null,
+        p_business: "eleganza",
+        p_client_id: ctx.clientId || null,
+        p_client_name: ctx.name || "",
+        p_service_name: ctx.service || "",
+        p_amount: ctx.price,
+        p_needs_followup: FOLLOWUP_ELIGIBLE(ctx.service)
+      });
+    }
+  } catch (err) {
+    console.warn("Booking/receipt link skipped:", err);
+  }
+}
+
 const app = {
+  current: null,   // matched client record
+  phoneEntered: "",
+
   show(id) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     $(id).classList.add("active");
@@ -181,8 +664,11 @@ const app = {
   },
 
   reset() {
+    this.current = null;
+    this.phoneEntered = "";
     $("form-lookup").reset();
-    $("lookup-error").classList.remove("show");
+    $("form-register").reset();
+    document.querySelectorAll(".banner").forEach(b => b.classList.remove("show"));
     this.show("screen-lookup");
     $("lookup-phone").focus();
   },
@@ -196,54 +682,430 @@ const app = {
   busy(btnId, on, label) {
     const b = $(btnId);
     b.disabled = on;
-    b.textContent = on ? "Checking…" : label;
+    b.textContent = on ? "One moment…" : label;
   },
 
-  async lookup(e) {
-    e.preventDefault();
+  /* ── 1 · LOOKUP ───────────────────────────── */
+  async lookup(e, opts) {
+    if (e) e.preventDefault();
+    const silent = !!(opts && opts.silent);
     $("lookup-error").classList.remove("show");
     const phone = $("lookup-phone").value.trim();
     if (last7(phone).length < 7) {
+      if (silent) return;
       return this.error("lookup-error", "Please enter your full phone number.");
     }
-    this.busy("btn-lookup", true, "Check My Status");
+    this.phoneEntered = phone;
+    this.busy("btn-lookup", true, silent ? "Welcome back…" : "Check In");
     try {
-      const client = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
-      if (!client) {
-        return this.error("lookup-error", "We couldn't find that number. Double check it, or reach out if you think this is a mistake.");
+      const match = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
+      if (match) {
+        this.current = match;
+        this.showWelcome(match);
+      } else if (!silent) {
+        $("reg-phone").value = phone;
+        this.show("screen-register");
+        $("reg-name").focus();
       }
-      if (client.community_access) {
-        this.showUnlocked(client);
-      } else {
-        this.showLocked(client);
-      }
+      // silent + no match: stale/wrong remembered number — stay put with the
+      // phone prefilled so they can just tap Check In themselves rather than
+      // getting bounced into registration on a number that isn't theirs.
     } catch (err) {
       console.error(err);
-      this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
+      if (!silent) this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
     } finally {
-      this.busy("btn-lookup", false, "Check My Status");
+      this.busy("btn-lookup", false, "Check In");
     }
   },
 
-  showLocked(client) {
-    const stage = client.milestone_stage || "Origin";
-    const messages = {
-      "Origin": "The Circle opens once your journey reaches Alchemy — after your procedure heals and you share a review. You're just getting started.",
-      "Magic": "You're so close. Once your results heal and you leave a review, the Circle opens automatically."
-    };
-    $("locked-message").textContent = messages[stage] || messages["Origin"];
-    this.show("screen-locked");
+  showWelcome(client) {
+    const name = client[C.name] || "love";
+    const first = name.split(" ")[0];
+    $("welcome-name").textContent = first;
+    const visits = Number(client[C.visitCount]) || 0;
+    $("welcome-visits").textContent = visits > 0
+      ? `Visit nº ${visits + 1}`
+      : "So glad you're back";
+    $("welcome-email-wrap").style.display = client[C.email] ? "none" : "block";
+    const pendingPct = this.pendingRewardPct(client);
+    const badge = $("reward-badge");
+    if (pendingPct > 0) {
+      badge.textContent = `🎁 ${pendingPct}% off today's visit`;
+      badge.style.display = "block";
+    } else {
+      badge.style.display = "none";
+    }
+    this.show("screen-welcome");
   },
 
-  showUnlocked(client) {
-    const name = (client.name || client.full_name || "love").split(" ")[0];
-    $("unlocked-name").textContent = name;
-    $("status-badge").textContent = client.client_status || "Mapped Client";
-    this.show("screen-unlocked");
+  /* A referral reward (10%, earned when a friend uses their shared code)
+     takes priority over a review reward (5%) if somehow both are pending. */
+  pendingRewardPct(client) {
+    const referralPct = Number(client.referral_reward_pct) || 0;
+    if (referralPct > 0) return referralPct;
+    return client[C.nextDiscount] ? 5 : 0;
+  },
+
+  /* ── 2 · RETURNING CLIENT CHECK-IN ────────── */
+  async checkinReturning(e) {
+    e.preventDefault();
+    $("welcome-error").classList.remove("show");
+    const client = this.current;
+    let email = client[C.email] || $("welcome-email").value.trim();
+    const price = parseFloat($("welcome-price").value);
+    if (isNaN(price) || price < 0) {
+      return this.error("welcome-error", "Please enter today's price to lock in the visit.");
+    }
+    this.busy("btn-welcome", true, "Complete Check-In");
+    try {
+      const hadRewardPct = this.pendingRewardPct(client);
+      // A client who has already reached Alchemy (reviewed once) or earned a
+      // referral reward (sent someone our way) is showing advocacy, not just
+      // repeat business — reflect that as Prophecy instead of resetting to Magic.
+      const priorStage = client.milestone_stage || "Origin";
+      const isAdvocate = priorStage === "Alchemy" || priorStage === "Prophecy" || Number(client.referral_reward_pct) > 0;
+      const nextStage = isAdvocate ? "Prophecy" : "Magic";
+      const patch = {
+        [C.lastVisit]: new Date().toISOString(),
+        [C.visitCount]: (Number(client[C.visitCount]) || 0) + 1,
+        [C.service]: $("welcome-service").value,
+        [C.price]: price,
+        [C.totalSpent]: (Number(client[C.totalSpent]) || 0) + price,
+        [C.nextDiscount]: false,
+        referral_reward_pct: null,
+        client_status: "Returning Client",
+        milestone_stage: nextStage,
+        milestone_updated_at: new Date().toISOString()
+      };
+      if (nextStage === "Prophecy") patch.community_access = true;
+      if (!client[C.email] && email) patch[C.email] = email;
+      const res = await fetch(`${REST}?id=eq.${client.id}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify(patch)
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      this.showReviewPrompt(client[C.name], email, {
+        clientId: client.id,
+        name: client[C.name],
+        price: price,
+        hadRewardPct: hadRewardPct,
+        service: $("welcome-service").value,
+        phone: client[C.phone] || this.phoneEntered
+      });
+    } catch (err) {
+      console.error(err);
+      this.error("welcome-error", "Something went wrong saving your check-in. Please try again.");
+      this.busy("btn-welcome", false, "Complete Check-In");
+    }
+  },
+
+  /* ── 2.5 · REVIEW PROMPT BEFORE PAYMENT (returning clients) ── */
+  showReviewPrompt(name, email, ctx) {
+    this.pendingFinish = { name, email, ctx };
+    this.reviewPromptClaimed = false;
+    $("rp-btn-google").href = CONFIG.GOOGLE_REVIEW_URL;
+    $("rp-btn-facebook").href = CONFIG.FACEBOOK_REVIEW_URL;
+    $("rp-continue").textContent = "Skip — Continue to Payment";
+    this.show("screen-review-prompt");
+  },
+
+  markReviewedNow() {
+    if (this.reviewPromptClaimed) return;
+    this.reviewPromptClaimed = true;
+    $("rp-continue").textContent = "Continue to Payment — 5% Applied ✓";
+  },
+
+  finishAfterReviewPrompt() {
+    if (!this.pendingFinish) return;
+    const { name, email, ctx } = this.pendingFinish;
+    ctx.reviewedNow = this.reviewPromptClaimed;
+    this.pendingFinish = null;
+    this.finish(name, email, ctx);
+  },
+
+  /* ── 3 · NEW CLIENT REGISTRATION ──────────── */
+  async register(e) {
+    e.preventDefault();
+    $("register-error").classList.remove("show");
+    const name = $("reg-name").value.trim();
+    const phone = $("reg-phone").value.trim();
+    const email = $("reg-email").value.trim();
+    let price = parseFloat($("reg-price").value);
+    const voucherCode = $("reg-voucher").value.trim();
+    if (!name || last7(phone).length < 7 || !/.+@.+\..+/.test(email)) {
+      return this.error("register-error", "Please fill in your name, phone, and a valid email.");
+    }
+    if (isNaN(price) || price < 0) {
+      return this.error("register-error", "Please enter today's price to lock in the visit.");
+    }
+    this.busy("btn-register", true, "Complete Check-In");
+    let voucherPct = null;
+    if (voucherCode) {
+      try {
+        const result = await rpc("redeem_referral_voucher", { p_code: voucherCode, p_redeemed_by_name: name });
+        if (result && result.valid) {
+          voucherPct = result.discount_pct;
+          price = Math.round(price * (1 - voucherPct / 100) * 100) / 100;
+        }
+      } catch (err) {
+        console.warn("Voucher redemption skipped:", err);
+      }
+    }
+    try {
+      const row = {
+        [C.name]: name,
+        [C.phone]: phone,
+        [C.email]: email,
+        [C.service]: $("reg-service").value,
+        [C.lastVisit]: new Date().toISOString(),
+        [C.visitCount]: 1,
+        [C.price]: price,
+        [C.totalSpent]: price,
+        [C.nextDiscount]: false,
+        client_status: "Mapped Client",
+        milestone_stage: "Origin",
+        milestone_updated_at: new Date().toISOString()
+      };
+      const bday = $("reg-birthday").value;
+      if (bday) row[C.birthday] = bday;
+      const res = await fetch(REST, {
+        method: "POST",
+        headers: { ...HEADERS, "Prefer": "return=representation" },
+        body: JSON.stringify(row)
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      let newId = null;
+      try { const created = await res.json(); newId = created && created[0] && created[0].id; } catch (_) {}
+      await this.finish(name, email, {
+        clientId: newId,
+        name: name,
+        price: price,
+        hadRewardPct: 0,
+        service: $("reg-service").value,
+        phone: phone,
+        voucherPct: voucherPct
+      });
+    } catch (err) {
+      console.error(err);
+      this.error("register-error", "Something went wrong saving your details. Please try again.");
+      this.busy("btn-register", false, "Complete Check-In");
+    }
+  },
+
+  /* ── 4 · FINISH: email, price, reward, value, socials ── */
+  fmt(n) { return "TT$" + (Math.round(n * 100) / 100).toLocaleString(); },
+
+  setLink(id, url) {
+    const el = $(id);
+    if (!url || url.indexOf("PASTE_") === 0) { el.style.display = "none"; }
+    else { el.href = url; }
+  },
+
+  async finish(name, email, ctx) {
+    this.ctx = ctx || {};
+    this.reviewClicked = false;
+
+    // Match today's booking on the calendar and log a receipt — this is what
+    // keeps the CRM in sync automatically the moment a client checks in.
+    linkBookingAndReceipt(this.ctx);
+
+    // Remember this client's own details on this device, and hand them off
+    // to the aftercare page so it can send itself with zero extra typing.
+    ClientIdentity.save({ name: name, phone: this.ctx.phone, email: email });
+    const aftercareParams = new URLSearchParams();
+    if (this.ctx.phone) aftercareParams.set("phone", this.ctx.phone);
+    if (name) aftercareParams.set("name", name);
+    if (email) aftercareParams.set("email", email);
+    const aftercareQs = aftercareParams.toString();
+    $("btn-aftercare").href = "aftercare.html" + (aftercareQs ? "?" + aftercareQs : "");
+
+    /* price + reward — computed early so the receipt (email + WhatsApp) can use it.
+       A pre-existing reward (referral 10%, or a review reward saved from a past
+       visit) takes priority; otherwise a review claimed just now is worth 5%. */
+    const price = Number(this.ctx.price) || 0;
+    const appliedPct = Math.max(Number(this.ctx.hadRewardPct) || 0, this.ctx.reviewedNow ? 5 : 0);
+    const discountNow = appliedPct > 0;
+    const finalAmount = discountNow ? price * (1 - appliedPct / 100) : price;
+    const receiptDate = new Date().toLocaleDateString("en-US", { timeZone: "America/Port_of_Spain", month: "long", day: "numeric", year: "numeric" });
+
+    // Reviewed before payment (screen 2.5) — same milestone as the post-payment button
+    if (this.ctx.clientId && this.ctx.reviewedNow) {
+      fetch(`${REST}?id=eq.${this.ctx.clientId}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify({
+          milestone_stage: "Alchemy",
+          community_access: true,
+          milestone_updated_at: new Date().toISOString()
+        })
+      }).catch(err => console.warn("Milestone update skipped:", err));
+    }
+
+    // Aftercare email with review links + payment receipt (won't block check-in if it fails)
+    if (email) {
+      try {
+        await emailjs.send(CONFIG.EMAILJS_SERVICE, CONFIG.EMAILJS_TEMPLATE, {
+          to_name: name,
+          name: name,
+          to_email: email,
+          email: email,
+          service: this.ctx.service || "",
+          google_review_url: CONFIG.GOOGLE_REVIEW_URL,
+          facebook_review_url: CONFIG.FACEBOOK_REVIEW_URL,
+          receipt_date: receiptDate,
+          amount: price > 0 ? this.fmt(finalAmount) : "",
+          amount_before_discount: (price > 0 && discountNow) ? this.fmt(price) : ""
+        });
+      } catch (err) {
+        console.error("EmailJS:", err);
+      }
+    }
+    $("done-name").textContent = (name || "love").split(" ")[0];
+    $("btn-google").href = CONFIG.GOOGLE_REVIEW_URL;
+    $("btn-facebook").href = CONFIG.FACEBOOK_REVIEW_URL;
+    this.setLink("btn-youtube", CONFIG.YOUTUBE_URL);
+    this.setLink("btn-instagram", CONFIG.INSTAGRAM_URL);
+    this.setLink("btn-fbpage", CONFIG.FACEBOOK_PAGE_URL);
+
+    /* WhatsApp the aftercare guide + payment receipt to the client's own number */
+    const wa = $("btn-whatsapp");
+    const d = digits(this.ctx.phone || "");
+    let intl = "";
+    if (d.length === 7) intl = "1868" + d;
+    else if (d.length === 10 && d.indexOf("868") === 0) intl = "1" + d;
+    else if (d.length === 11 && d.indexOf("1868") === 0) intl = d;
+    else if (d.length >= 10) intl = d;
+    if (intl) {
+      const first = (name || "love").split(" ")[0];
+      let msg = "Hi " + first + "! \uD83E\uDD0D Here is your Eleganza aftercare guide — your ritual for the next 5 days:\n\nhttps://enbbrows.github.io/Eleganza-crm/aftercare.html";
+      if (price > 0) {
+        const voucherNote = this.ctx.voucherPct ? " (" + this.ctx.voucherPct + "% referral code applied)" : "";
+        msg += "\n\n\uD83E\uDDFE Receipt — " + receiptDate + "\n" + (this.ctx.service || "Service") + ": " +
+          (discountNow ? this.fmt(price) + " \u2192 " : "") + this.fmt(finalAmount) + (discountNow ? " (" + appliedPct + "% reward applied)" : voucherNote) +
+          "\nEleganza Naturally Beautiful — thank you for your payment! \uD83E\uDD0D";
+      }
+      msg += "\n\nWhat once was, is not all lost. \u2728";
+      wa.href = "https://wa.me/" + intl + "?text=" + encodeURIComponent(msg);
+      wa.style.display = "flex";
+    } else {
+      wa.style.display = "none";
+    }
+
+    /* Prompt to book the follow-up (~5 weeks out, tentative until paid/confirmed) after a 1st-application visit */
+    const followupBtn = $("btn-followup");
+    if (FOLLOWUP_ELIGIBLE(this.ctx.service)) {
+      followupBtn.href = "book-eleganza.html?category=touch_up&suggestDays=35";
+      followupBtn.style.display = "flex";
+    } else {
+      followupBtn.style.display = "none";
+    }
+
+
+    /* price box on screen (reuses price/discountNow computed above) */
+    const box = $("price-box"), btnD = $("btn-discount"), done = $("discount-done");
+    if (price > 0) {
+      box.style.display = "block";
+      if (discountNow) {
+        const final = price * (1 - appliedPct / 100);
+        $("price-original").innerHTML =
+          '<span class="struck" style="text-decoration:line-through;color:var(--ivory-dim);font-size:1rem">' +
+          this.fmt(price) + '</span> → ' + this.fmt(final);
+        btnD.style.display = "none";
+        done.innerHTML = '✓ ' + appliedPct + '% reward applied — today\'s total is <strong>' + this.fmt(final) +
+          '</strong><br />Just show this screen at the counter. 🤍';
+        done.style.display = "block";
+      } else {
+        $("price-original").textContent = this.fmt(price);
+        btnD.style.display = "block";
+        btnD.disabled = true;
+        btnD.classList.remove("ready");
+        btnD.textContent = "Leave a review below to unlock 5% off your next visit";
+        done.style.display = "none";
+      }
+    } else {
+      box.style.display = "none";
+    }
+
+    /* The Eleganza Effect */
+    const vm = CONFIG.VALUE_MATH;
+    if ((this.ctx.service || "") !== "Consultation") {
+      const money = vm.pencilCost * vm.pencilsPerYear;
+      const hours = Math.round(vm.minutesPerDay * 365 / 60);
+      $("save-money").textContent = "≈ " + this.fmt(money);
+      $("save-time").textContent = "≈ " + hours + " hours";
+      $("value-box").style.display = "block";
+    } else {
+      $("value-box").style.display = "none";
+    }
+
+    if (email) {
+      $("done-email").textContent = email;
+      $("done-email-note").style.display = "block";
+    } else {
+      $("done-email-note").style.display = "none";
+    }
+    this.show("screen-done");
+  },
+
+  /* review buttons unlock the next-visit reward */
+  unlockDiscount() {
+    if (this.reviewClicked || !this.ctx || !(Number(this.ctx.price) > 0) || Number(this.ctx.hadRewardPct) > 0) return;
+    this.reviewClicked = true;
+    const btnD = $("btn-discount");
+    if (!this.ctx.clientId) return; // can't save without a record id
+    btnD.disabled = false;
+    btnD.classList.add("ready");
+    btnD.textContent = "Claim 5% off my next visit";
+  },
+
+  async claimDiscount() {
+    if (!this.ctx || !this.ctx.clientId) return;
+    const btnD = $("btn-discount"), done = $("discount-done");
+    btnD.disabled = true;
+    btnD.textContent = "Saving…";
+    try {
+      const res = await fetch(`${REST}?id=eq.${this.ctx.clientId}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify({
+          [C.nextDiscount]: true,
+          milestone_stage: "Alchemy",
+          community_access: true,
+          milestone_updated_at: new Date().toISOString()
+        })
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status);
+      btnD.style.display = "none";
+      done.innerHTML = '✓ Locked in! <strong>5% off</strong> is saved to your profile — we\'ll apply it automatically on your next visit. 🤍';
+      done.style.display = "block";
+    } catch (err) {
+      console.error(err);
+      btnD.disabled = false;
+      btnD.textContent = "Claim 5% off my next visit";
+    }
   }
 };
 
 $("form-lookup").addEventListener("submit", e => app.lookup(e));
+$("form-welcome").addEventListener("submit", e => app.checkinReturning(e));
+$("form-register").addEventListener("submit", e => app.register(e));
+$("btn-google").addEventListener("click", () => app.unlockDiscount());
+$("btn-facebook").addEventListener("click", () => app.unlockDiscount());
+$("btn-discount").addEventListener("click", () => app.claimDiscount());
+$("rp-btn-google").addEventListener("click", () => app.markReviewedNow());
+$("rp-btn-facebook").addEventListener("click", () => app.markReviewedNow());
+$("rp-continue").addEventListener("click", () => app.finishAfterReviewPrompt());
+
+/* Each client checks in on their own device, so a remembered phone number
+   is safe to auto-fill and auto-submit — no re-typing on repeat visits. */
+(function tryAutoCheckIn() {
+  const identity = ClientIdentity.get();
+  if (identity && identity.phone) {
+    $("lookup-phone").value = identity.phone;
+    app.lookup(null, { silent: true });
+  }
+})();
 </script>
 <script src="nav.js"></script>
 </body>
