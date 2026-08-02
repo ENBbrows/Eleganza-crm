@@ -264,13 +264,25 @@ const TZ = "America/Port_of_Spain";
 const CALENDAR_EVENT_BASE = SUPABASE_URL + "/functions/v1/calender-feed";
 
 const STAGES = [
-  { key: "lead", label: "New Lead", numeral: "I", color: "#8C8275" },
-  { key: "contacted", label: "Contacted", numeral: "II", color: "#6E8C8A" },
+  { key: "lead", label: "Inquiry", numeral: "I", color: "#8C8275" },
+  { key: "contacted", label: "In Conversation", numeral: "II", color: "#6E8C8A" },
   { key: "booked", label: "Booked", numeral: "III", color: "#C9A14A" },
-  { key: "active", label: "Active Client", numeral: "IV", color: "#7C9473" },
-  { key: "lapsed", label: "Lapsed", numeral: "V", color: "#B5654A" },
+  { key: "active", label: "Mapped Client", numeral: "IV", color: "#7C9473" },
+  { key: "lapsed", label: "Due to Return", numeral: "V", color: "#B5654A" },
 ];
 const TAG_PALETTE = ["#C9A14A", "#7C9473", "#6E8C8A", "#B5654A", "#9B8AA3"];
+
+// Display labels for booking.status — DB enum values (tentative/confirmed/
+// checked_in/completed/cancelled/no_show) never change; only the text shown
+// to Amii does. CSS classes stay tied to the raw status-${b.status} value.
+const STATUS_LABELS = {
+  tentative: "Held",
+  confirmed: "Confirmed",
+  checked_in: "In the Chair",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  no_show: "No-Show",
+};
 
 let session = null;
 let activeView = "clients";
@@ -566,7 +578,7 @@ async function runCalSearch(q) {
     <div class="booking-row" data-id="${b.id}">
       <div class="booking-time">${fmtWhen(b.start_at,{month:'short',day:'numeric'})}</div>
       <div class="booking-info"><div class="name">${esc(b.client_name)}</div><div class="meta">${esc(b.services?.name||"")} · ${fmtWhen(b.start_at,{hour:'numeric',minute:'2-digit'})}</div></div>
-      <span class="status-pill status-${b.status}">${b.status.replace('_',' ')}</span>
+      <span class="status-pill status-${b.status}">${STATUS_LABELS[b.status] || b.status.replace('_',' ')}</span>
     </div>`).join("") : `<div class="empty">No matching bookings</div>`;
   $("searchResultsList").querySelectorAll("[data-id]").forEach(row => row.onclick = () => { bookings = rows; openBookingDrawer(row.dataset.id); });
 }
@@ -627,7 +639,7 @@ function showMonthDay(dStr) {
     <div class="booking-row" data-id="${b.id}">
       <div class="booking-time">${fmtWhen(b.start_at,{hour:'numeric',minute:'2-digit'})}</div>
       <div class="booking-info"><div class="name">${esc(b.client_name)}</div><div class="meta">${esc(b.services?.name||"")}</div></div>
-      <span class="status-pill status-${b.status}">${b.status.replace('_',' ')}</span>
+      <span class="status-pill status-${b.status}">${STATUS_LABELS[b.status] || b.status.replace('_',' ')}</span>
     </div>`).join("") : `<div class="empty">No bookings</div>`;
   panel.style.display = "block";
   panel.querySelectorAll("[data-id]").forEach(row => row.onclick = () => { bookings = monthBookings; openBookingDrawer(row.dataset.id); });
@@ -705,7 +717,7 @@ function renderWeek() {
         <div class="booking-row" data-id="${b.id}">
           <div class="booking-time">${fmtWhen(b.start_at,{hour:'numeric',minute:'2-digit'})}</div>
           <div class="booking-info"><div class="name">${esc(b.client_name)}</div><div class="meta">${esc(b.services?.name||"")}</div></div>
-          <span class="status-pill status-${b.status}">${b.status.replace('_',' ')}</span>
+          <span class="status-pill status-${b.status}">${STATUS_LABELS[b.status] || b.status.replace('_',' ')}</span>
         </div>`).join("")
       : `<div class="empty">No bookings</div>`;
     return `<div class="day-group">
@@ -730,7 +742,7 @@ async function openBookingDrawer(id) {
     <div class="field-row">📞 <strong>${esc(b.client_phone)||"—"}</strong></div>
     <div class="field-row">✉️ <strong>${esc(b.client_email)||"—"}</strong></div>
     <div class="field-row">💼 <strong>${esc(b.services?.name||"")}</strong> · ${fmtWhen(b.start_at,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
-    <div class="field-row">Status <strong>${b.status.replace('_',' ')}</strong></div>
+    <div class="field-row">Status <strong>${STATUS_LABELS[b.status] || b.status.replace('_',' ')}</strong></div>
     ${b.notes ? `<div class="field-row">Notes <strong>${esc(b.notes)}</strong></div>` : ""}
     <div class="section-label">Actions</div>
     <div class="action-row">
