@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eleganza Naturally Beautiful — The Circle</title>
+<link rel="apple-touch-icon" href="app-icon-black-v2.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Eleganza Circle">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1C1B19">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{height:100%}
+  body{
+    min-height:100%;
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Karla',sans-serif;
+    font-weight:300;
+    letter-spacing:.01em;
+    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(185,146,79,.08), transparent 60%);
+  }
+  .page-center{display:flex;min-height:100vh;padding:24px 16px}
+  .card{width:100%;max-width:480px;text-align:center;margin:auto}
+
+  .lotus{display:block;width:150px;height:auto;margin:0 auto 16px}
+  .brand{font-family:'Karla',sans-serif;font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:6px}
+  .tagline{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:.98rem;color:var(--gold);letter-spacing:.03em;margin-bottom:14px}
+
+  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.2;color:var(--ivory)}
+  h1 em{font-style:italic;color:var(--gold-bright)}
+  .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.6;margin-top:12px}
+
+  .screen{display:none;animation:rise .45s ease both}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen{animation:none}}
+
+  form{margin-top:26px;text-align:left}
+  label{display:block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:18px 0 8px}
+  input{
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;
+    color:var(--ivory);font-family:'Karla',sans-serif;font-size:1.05rem;font-weight:300;
+    padding:15px 16px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+  }
+  input:focus{border-color:var(--gold)}
+  input::placeholder{color:#6E6259}
+
+  .btn{
+    display:block;width:100%;margin-top:28px;padding:17px;background:var(--gold);color:var(--ink);
+    border:none;border-radius:2px;font-family:'Karla',sans-serif;font-size:.8rem;font-weight:600;
+    letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:background .2s, transform .1s;
+  }
+  .btn:hover{background:var(--gold-bright)}
+  .btn:active{transform:scale(.99)}
+  .btn:disabled{opacity:.45;cursor:wait}
+
+  .banner{display:none;margin-top:20px;padding:13px 16px;border:1px solid var(--error);color:var(--error);font-size:.88rem;text-align:left;border-radius:2px}
+  .banner.show{display:block}
+
+  .rule{width:56px;height:1px;background:var(--gold);margin:22px auto;position:relative}
+  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
+  .rule::before{left:-12px}
+  .rule::after{right:-12px}
+
+  .status-badge{
+    display:inline-block;margin:14px auto 0;padding:9px 18px;border:1px solid var(--gold);border-radius:2px;
+    background:rgba(185,146,79,.1);color:var(--gold-bright);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;
+  }
+
+  .content-list{margin-top:28px;text-align:left;display:flex;flex-direction:column;gap:14px}
+  .content-card{
+    padding:18px 16px;border:1px solid var(--line);border-radius:2px;background:rgba(185,146,79,.04);
+  }
+  .content-card-title{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;color:var(--gold-bright);margin-bottom:6px}
+  .content-card p{font-size:.86rem;color:var(--ivory-dim);line-height:1.6}
+  .content-card a{
+    display:inline-block;margin-top:10px;color:var(--gold);font-size:.78rem;letter-spacing:.12em;
+    text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px;
+  }
+
+  .locked-icon{font-size:2.4rem;margin-bottom:6px}
+  .linkline{
+    display:inline-block;margin-top:22px;background:none;border:none;color:var(--ivory-dim);
+    font-family:'Karla',sans-serif;font-size:.85rem;letter-spacing:.04em;cursor:pointer;
+    text-decoration:underline;text-underline-offset:4px;
+  }
+  .linkline:hover{color:var(--ivory)}
+</style>
+</head>
+<body>
+<div class="page-center">
+<main class="card">
+
+  <!-- ═══ SCREEN 1 · LOOKUP ═══ -->
+  <section class="screen active" id="screen-lookup" aria-label="Enter the Circle">
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <p class="tagline">What once was, is not all lost</p>
+    <h1>The <em>Circle</em></h1>
+    <p class="sub">A private space for those who've walked the full journey with us. Enter your phone number to check your status.</p>
+    <form id="form-lookup" novalidate>
+      <label for="lookup-phone">Phone number</label>
+      <input id="lookup-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 868-555-1234" required />
+      <button class="btn" id="btn-lookup" type="submit">Check My Status</button>
+    </form>
+    <div class="banner" id="lookup-error" role="alert"></div>
+  </section>
+
+  <!-- ═══ SCREEN 2 · LOCKED ═══ -->
+  <section class="screen" id="screen-locked" aria-label="Not yet unlocked">
+    <p class="locked-icon">🔒</p>
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Almost <em>there</em></h1>
+    <p class="sub" id="locked-message">The Circle opens once your journey reaches Alchemy — after your procedure heals and you've shared a review. You're not far.</p>
+    <div class="rule"></div>
+    <p class="sub">In the meantime, your aftercare guide has everything you need.</p>
+    <a class="btn" href="aftercare.html" style="text-decoration:none;display:block">View My Aftercare Guide</a>
+    <button class="linkline" type="button" onclick="app.reset()">Check a different number</button>
+  </section>
+
+  <!-- ═══ SCREEN 3 · UNLOCKED ═══ -->
+  <section class="screen" id="screen-unlocked" aria-label="Welcome to the Circle">
+    <img class="lotus" src="logo-gold.png" alt="Eleganza lotus" />
+    <p class="brand">Eleganza Naturally Beautiful</p>
+    <h1>Welcome, <em id="unlocked-name">love</em></h1>
+    <p class="status-badge" id="status-badge">Mapped Client</p>
+    <p class="sub" style="margin-top:16px">You're in. This is where we share what doesn't go on the public feed.</p>
+
+    <div class="content-list">
+      <div class="content-card">
+        <p class="content-card-title">The Eleganza Method — behind the technique</p>
+        <p>Notes on mapping-first thinking that don't make it into public posts.</p>
+      </div>
+      <div class="content-card">
+        <p class="content-card-title">Early access</p>
+        <p>Circle members hear about new services, availability, and offers before anyone else.</p>
+      </div>
+      <div class="content-card">
+        <p class="content-card-title">Referral rewards</p>
+        <p>Know someone who'd love this? Share your journey — referral perks live here too.</p>
+      </div>
+    </div>
+
+    <button class="linkline" type="button" onclick="app.reset()">Not you? Check a different number</button>
+  </section>
+
+</main>
+</div>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const digits = s => (s || "").replace(/\D/g, "");
+const last7 = s => digits(s).slice(-7);
+
+const HEADERS = {
+  "apikey": CONFIG.SUPABASE_ANON_KEY,
+  "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY,
+  "Content-Type": "application/json"
+};
+const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
+
+async function rpc(fn, body) {
+  const res = await fetch(RPC + fn, { method: "POST", headers: HEADERS, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+const app = {
+  show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  },
+
+  reset() {
+    $("form-lookup").reset();
+    $("lookup-error").classList.remove("show");
+    this.show("screen-lookup");
+    $("lookup-phone").focus();
+  },
+
+  error(id, msg) {
+    const el = $(id);
+    el.textContent = msg;
+    el.classList.add("show");
+  },
+
+  busy(btnId, on, label) {
+    const b = $(btnId);
+    b.disabled = on;
+    b.textContent = on ? "Checking…" : label;
+  },
+
+  async lookup(e) {
+    e.preventDefault();
+    $("lookup-error").classList.remove("show");
+    const phone = $("lookup-phone").value.trim();
+    if (last7(phone).length < 7) {
+      return this.error("lookup-error", "Please enter your full phone number.");
+    }
+    this.busy("btn-lookup", true, "Check My Status");
+    try {
+      const client = await rpc("lookup_client_by_phone", { p_phone_last7: last7(phone) });
+      if (!client) {
+        return this.error("lookup-error", "We couldn't find that number. Double check it, or reach out if you think this is a mistake.");
+      }
+      if (client.community_access) {
+        this.showUnlocked(client);
+      } else {
+        this.showLocked(client);
+      }
+    } catch (err) {
+      console.error(err);
+      this.error("lookup-error", "Couldn't reach the studio system. Check the connection and try again.");
+    } finally {
+      this.busy("btn-lookup", false, "Check My Status");
+    }
+  },
+
+  showLocked(client) {
+    const stage = client.milestone_stage || "Origin";
+    const messages = {
+      "Origin": "The Circle opens once your journey reaches Alchemy — after your procedure heals and you share a review. You're just getting started.",
+      "Magic": "You're so close. Once your results heal and you leave a review, the Circle opens automatically."
+    };
+    $("locked-message").textContent = messages[stage] || messages["Origin"];
+    this.show("screen-locked");
+  },
+
+  showUnlocked(client) {
+    const name = (client.name || client.full_name || "love").split(" ")[0];
+    $("unlocked-name").textContent = name;
+    $("status-badge").textContent = client.client_status || "Mapped Client";
+    this.show("screen-unlocked");
+  }
+};
+
+$("form-lookup").addEventListener("submit", e => app.lookup(e));
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
