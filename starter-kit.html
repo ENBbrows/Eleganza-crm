@@ -8,14 +8,9 @@
 <link rel="apple-touch-icon" href="app-icon-black-v2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="theme.css" />
 <style>
-  :root{
-    --ink:#171210; --ink-soft:#241C18; --line:#3A2F28;
-    --gold:#C9A26B; --gold-bright:#E0BE8A;
-    --ivory:#F4EDE4; --ivory-dim:#B9AC9D; --ok:#A8C3A0;
-    --sage:#8C9673; --sage-bright:#A8B48C;
-  }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
@@ -25,17 +20,17 @@
     font-weight:300;
     letter-spacing:.01em;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,107,.09), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(185,146,79,.09), transparent 60%),
       radial-gradient(ellipse 70% 45% at 85% 40%, rgba(140,150,115,.06), transparent 55%);
   }
   .wrap{max-width:640px;margin:0 auto;padding:32px 20px 80px}
   .brand{font-size:.72rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ivory-dim);text-align:center}
-  h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.9rem,6.5vw,2.5rem);line-height:1.2;text-align:center;margin-top:18px}
+  h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.9rem,6.5vw,2.5rem);line-height:1.2;text-align:center;margin-top:18px}
   h1 em{font-style:italic;color:var(--gold-bright)}
   .hero-sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.7;text-align:center;margin-top:14px;max-width:480px;margin-left:auto;margin-right:auto}
 
   /* nav (shared pattern) */
-  .topnav{position:sticky;top:0;z-index:50;background:rgba(23,18,16,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(28,27,25,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
   .nav-toggle{
     flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
@@ -56,13 +51,8 @@
     letter-spacing:.03em;border-bottom:1px solid var(--line);
   }
   .nav-dropdown a:last-child{border-bottom:none}
-  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(201,162,107,.05)}
+  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(185,146,79,.05)}
   .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
-
-  .rule{
-    width:52px;height:26px;margin:40px auto;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M2 13c9-11 39-11 48 0-9 11-39 11-48 0z' fill='none' stroke='%23C9A26B' stroke-width='1'/%3E%3Cpath d='M26 5v16M15 10c3.5 1.3 7.5 1.3 11 2.5M37 10c-3.5 1.3-7.5 1.3-11 2.5' fill='none' stroke='%23C9A26B' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center/contain;
-  }
 
   .disclosure{
     max-width:520px;margin:26px auto 0;padding:12px 16px;border:1px dashed var(--line);border-radius:10px 4px 10px 4px;
@@ -72,7 +62,7 @@
   .kit-body{max-width:560px;margin:28px auto 0}
   .kit-cat{margin-bottom:30px}
   .kit-cat-title{
-    font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--gold-bright);
+    font-family:var(--font-serif);font-style:italic;font-size:1.1rem;color:var(--gold-bright);
     margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line);
   }
   .kit-item{
@@ -87,7 +77,7 @@
     text-decoration:none;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
     transition:background .2s;white-space:nowrap;
   }
-  .kit-item-link:hover{background:rgba(201,162,107,.1)}
+  .kit-item-link:hover{background:rgba(185,146,79,.1)}
 
   .stationery-box{
     border:1px solid var(--line);border-radius:14px 4px 14px 4px;padding:18px 20px;
