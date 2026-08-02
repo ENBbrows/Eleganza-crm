@@ -766,7 +766,10 @@ const app = {
         [C.price]: price,
         [C.totalSpent]: (Number(client[C.totalSpent]) || 0) + price,
         [C.nextDiscount]: false,
-        referral_reward_pct: null
+        referral_reward_pct: null,
+        client_status: "Returning Client",
+        milestone_stage: "Magic",
+        milestone_updated_at: new Date().toISOString()
       };
       if (!client[C.email] && email) patch[C.email] = email;
       const res = await fetch(`${REST}?id=eq.${client.id}`, {
@@ -852,7 +855,10 @@ const app = {
         [C.visitCount]: 1,
         [C.price]: price,
         [C.totalSpent]: price,
-        [C.nextDiscount]: false
+        [C.nextDiscount]: false,
+        client_status: "Mapped Client",
+        milestone_stage: "Origin",
+        milestone_updated_at: new Date().toISOString()
       };
       const bday = $("reg-birthday").value;
       if (bday) row[C.birthday] = bday;
@@ -915,6 +921,19 @@ const app = {
     const discountNow = appliedPct > 0;
     const finalAmount = discountNow ? price * (1 - appliedPct / 100) : price;
     const receiptDate = new Date().toLocaleDateString("en-US", { timeZone: "America/Port_of_Spain", month: "long", day: "numeric", year: "numeric" });
+
+    // Reviewed before payment (screen 2.5) — same milestone as the post-payment button
+    if (this.ctx.clientId && this.ctx.reviewedNow) {
+      fetch(`${REST}?id=eq.${this.ctx.clientId}`, {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify({
+          milestone_stage: "Alchemy",
+          community_access: true,
+          milestone_updated_at: new Date().toISOString()
+        })
+      }).catch(err => console.warn("Milestone update skipped:", err));
+    }
 
     // Aftercare email with review links + payment receipt (won't block check-in if it fails)
     if (email) {
@@ -1042,7 +1061,12 @@ const app = {
       const res = await fetch(`${REST}?id=eq.${this.ctx.clientId}`, {
         method: "PATCH",
         headers: HEADERS,
-        body: JSON.stringify({ [C.nextDiscount]: true })
+        body: JSON.stringify({
+          [C.nextDiscount]: true,
+          milestone_stage: "Alchemy",
+          community_access: true,
+          milestone_updated_at: new Date().toISOString()
+        })
       });
       if (!res.ok) throw new Error("Supabase " + res.status);
       btnD.style.display = "none";
