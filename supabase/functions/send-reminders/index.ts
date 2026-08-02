@@ -24,7 +24,12 @@
 // and just log what *would* have gone out, so nothing crashes.
 // Manual sending in the meantime happens from the CRM's Calendar tab
 // (eleganza-crm-dashboard.html?view=calendar).
+//
+// The gift-delivery email body is shared with notify-gift's immediate send
+// via _shared/copy.ts — edit the copy there, not in both files.
 // ============================================================
+
+import { giftDeliveryEmail } from "../_shared/copy.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -306,11 +311,6 @@ async function markSent(id: string, field: SentField) {
 }
 
 const STUDIO_ADDRESS = "4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo & Associates office.";
-const GIFT_DESIGN_NAMES: Record<string, string> = {
-  love: "Because I Love You",
-  christmas: "Season's Greetings",
-  milestone: "Congratulations",
-};
 
 type GiftRow = {
   id: string;
@@ -351,24 +351,18 @@ async function deliverGiftToRecipient(g: GiftRow) {
   const openLink = `${SITE_URL}/view-gift.html?code=${g.redemption_code}`;
 
   if (g.recipient_email) {
-    const referralLine = g.referral_voucher_code
-      ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
-      : "";
-    const contactCard =
-      `Eleganza Naturally Beautiful\n` +
-      `Location: ${STUDIO_ADDRESS}\n` +
-      (BUSINESS_WHATSAPP_NUMBER ? `WhatsApp: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}\n` : "") +
-      `Website: ${SITE_URL}/home.html`;
-
-    await sendEmail(
-      g.recipient_email,
-      `You've received an Eleganza gift certificate! 🤍`,
-      `Hi ${name},\n\n${buyerFirst} sent you a ${GIFT_DESIGN_NAMES[g.design] || g.design} gift certificate worth TT$${g.amount.toLocaleString()} at Eleganza Naturally Beautiful.\n\n` +
-        `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
-        `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
-        `${contactCard}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`,
-      "eleganza"
-    );
+    const { subject, body } = giftDeliveryEmail({
+      recipientName: g.recipient_name,
+      buyerName: g.buyer_name,
+      design: g.design,
+      amount: g.amount,
+      openLink,
+      referralVoucherCode: g.referral_voucher_code,
+      studioAddress: STUDIO_ADDRESS,
+      businessWhatsappNumber: BUSINESS_WHATSAPP_NUMBER,
+      siteUrl: SITE_URL,
+    });
+    await sendEmail(g.recipient_email, subject, body, "eleganza");
   }
 
   if (g.recipient_phone) {

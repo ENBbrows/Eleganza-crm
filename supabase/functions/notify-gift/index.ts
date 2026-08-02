@@ -10,15 +10,17 @@
 // delivery is left for the scheduled sweep (see send-reminders) to pick
 // up once that time arrives, and only the buyer's receipt goes out now.
 //
-// Delivery also tries a WhatsApp notification alongside the email, like a
-// delivery concierge arriving right on schedule — but WhatsApp's rules
-// require an approved message template before a business can message
-// someone who hasn't messaged first, so this stays a silent no-op until
-// WHATSAPP_TOKEN + WHATSAPP_TEMPLATE_GIFT_RECEIVED are actually set. Once
-// they are, gift delivery starts sending WhatsApp automatically — no code
-// changes needed then. Suggested template text (submit this for approval):
-//   "Hi {{1}}! You've got mail from an admirer — {{2}} sent you a gift
-//    from Eleganza Naturally Beautiful. Open it here: {{3}}"
+// Delivery also tries a WhatsApp notification alongside the email — but
+// WhatsApp's rules require an approved message template before a business
+// can message someone who hasn't messaged first, so this stays a silent
+// no-op until WHATSAPP_TOKEN + WHATSAPP_TEMPLATE_GIFT_RECEIVED are actually
+// set. Once they are, gift delivery starts sending WhatsApp automatically —
+// no code changes needed then. Suggested template text (submit for approval):
+//   "Hi {{1}}, {{2}} sent you a gift certificate from Eleganza Naturally
+//    Beautiful. Open it here: {{3}}"
+//
+// The gift-delivery email body is shared with send-reminders' scheduled
+// sweep via _shared/copy.ts — edit the copy there, not in both files.
 //
 // Required secrets (same as send-reminders / notify-payment):
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided
@@ -26,6 +28,8 @@
 //   BUSINESS_WHATSAPP_NUMBER, WAM_HANDLE
 //   WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_TEMPLATE_GIFT_RECEIVED  -- optional, for the concierge WhatsApp send
 // ============================================================
+
+import { firstName, giftDeliveryEmail, GIFT_DESIGN_NAMES } from "../_shared/copy.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -40,12 +44,6 @@ const TZ = "America/Port_of_Spain";
 
 const STUDIO_ADDRESS = "4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo & Associates office.";
 
-const DESIGN_NAMES: Record<string, string> = {
-  love: "Because I Love You",
-  christmas: "Season's Greetings",
-  milestone: "Congratulations",
-};
-
 const rest = (path: string, init: RequestInit = {}) =>
   fetch(`${SUPABASE_URL}${path}`, {
     ...init,
@@ -59,9 +57,6 @@ const rest = (path: string, init: RequestInit = {}) =>
 
 function fmtMoney(n: number) {
   return "TT$" + n.toLocaleString();
-}
-function firstName(name: string) {
-  return (name || "there").split(" ")[0];
 }
 function digits(s: string) {
   return (s || "").replace(/\D/g, "");
@@ -124,33 +119,24 @@ type GiftRow = {
   referral_voucher_code: string | null;
 };
 
-function contactCardBlock() {
-  return (
-    `Eleganza Naturally Beautiful\n` +
-    `Location: ${STUDIO_ADDRESS}\n` +
-    (BUSINESS_WHATSAPP_NUMBER ? `WhatsApp: https://wa.me/${BUSINESS_WHATSAPP_NUMBER}\n` : "") +
-    `Website: ${SITE_URL}/home.html`
-  );
-}
-
 async function deliverToRecipient(g: GiftRow) {
   const name = firstName(g.recipient_name);
   const buyerFirst = firstName(g.buyer_name);
   const openLink = `${SITE_URL}/view-gift.html?code=${g.redemption_code}`;
 
   if (g.recipient_email) {
-    const referralLine = g.referral_voucher_code
-      ? `\n\nAs a little extra, here's a code to share with a friend for 10% off their first visit (expires in 24 hours): ${g.referral_voucher_code}`
-      : "";
-
-    await sendEmail(
-      g.recipient_email,
-      `You've received an Eleganza gift certificate! 🤍`,
-      `Hi ${name},\n\n${buyerFirst} sent you a ${DESIGN_NAMES[g.design] || g.design} gift certificate worth ${fmtMoney(g.amount)} at Eleganza Naturally Beautiful.\n\n` +
-        `Open your gift here (tap to reveal — with a little something to set the mood):\n${openLink}\n\n` +
-        `Once you're ready, booking is linked right from there. Before you come in, take a look at the prep info and studio location on the booking page.\n\n` +
-        `${contactCardBlock()}${referralLine}\n\nWhat once was, is not all lost.\nEleganza`
-    );
+    const { subject, body } = giftDeliveryEmail({
+      recipientName: g.recipient_name,
+      buyerName: g.buyer_name,
+      design: g.design,
+      amount: g.amount,
+      openLink,
+      referralVoucherCode: g.referral_voucher_code,
+      studioAddress: STUDIO_ADDRESS,
+      businessWhatsappNumber: BUSINESS_WHATSAPP_NUMBER,
+      siteUrl: SITE_URL,
+    });
+    await sendEmail(g.recipient_email, subject, body);
   }
 
   if (g.recipient_phone) {
@@ -164,11 +150,11 @@ async function sendBuyerReceipt(g: GiftRow) {
   await sendEmail(
     g.buyer_email,
     "Your Eleganza gift certificate receipt",
-    `Hi ${name},\n\nThis confirms your ${fmtMoney(g.amount)} ${DESIGN_NAMES[g.design] || g.design} gift certificate for ${g.recipient_name}.\n\n` +
+    `Hi ${name},\n\nThis confirms your ${fmtMoney(g.amount)} ${GIFT_DESIGN_NAMES[g.design] || g.design} gift certificate for ${g.recipient_name}.\n\n` +
       (g.sent_at || !g.send_at || new Date(g.send_at) <= new Date()
         ? `It's on its way to them now.`
-        : `It'll be delivered on ${new Date(g.send_at).toLocaleString("en-US", { timeZone: TZ, dateStyle: "long", timeStyle: "short" })}.`) +
-      `\n\nThank you for the gift,\nEleganza`
+        : `It will be delivered on ${new Date(g.send_at).toLocaleString("en-US", { timeZone: TZ, dateStyle: "long", timeStyle: "short" })}.`) +
+      `\n\nThank you,\nEleganza`
   );
 }
 
