@@ -9,10 +9,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Eleganza Circle">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1C1B19">
+<meta name="theme-color" content="#F7FAF5">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="theme.css" />
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -24,7 +24,7 @@
     font-family:'Karla',sans-serif;
     font-weight:300;
     letter-spacing:.01em;
-    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(185,146,79,.08), transparent 60%);
+    background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(168,83,47,.08), transparent 60%);
   }
   .page-center{display:flex;min-height:100vh;padding:24px 16px}
   .card{width:100%;max-width:480px;text-align:center;margin:auto}
@@ -45,7 +45,7 @@
   form{margin-top:26px;text-align:left}
   label{display:block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:18px 0 8px}
   input{
-    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;
     color:var(--ivory);font-family:'Karla',sans-serif;font-size:1.05rem;font-weight:300;
     padding:15px 16px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;
   }
@@ -54,31 +54,26 @@
 
   .btn{
     display:block;width:100%;margin-top:28px;padding:17px;background:var(--gold);color:var(--ink);
-    border:none;border-radius:2px;font-family:'Karla',sans-serif;font-size:.8rem;font-weight:600;
+    border:none;border-radius:999px;font-family:'Karla',sans-serif;font-size:.8rem;font-weight:600;
     letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:background .2s, transform .1s;
   }
-  .btn:hover{background:var(--gold-bright)}
+  .btn:hover{filter:brightness(.92)}
   .btn:active{transform:scale(.99)}
   .btn:disabled{opacity:.45;cursor:wait}
 
-  .banner{display:none;margin-top:20px;padding:13px 16px;border:1px solid var(--error);color:var(--error);font-size:.88rem;text-align:left;border-radius:2px}
+  .banner{display:none;margin-top:20px;padding:13px 16px;border:1px solid var(--error);color:var(--error);font-size:.88rem;text-align:left;border-radius:8px}
   .banner.show{display:block}
 
-  .rule{width:56px;height:1px;background:var(--gold);margin:22px auto;position:relative}
-  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}
-  .rule::before{left:-12px}
-  .rule::after{right:-12px}
-
   .status-badge{
-    display:inline-block;margin:14px auto 0;padding:9px 18px;border:1px solid var(--gold);border-radius:2px;
-    background:rgba(185,146,79,.1);color:var(--gold-bright);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;
+    display:inline-block;margin:14px auto 0;padding:9px 18px;border:1px solid var(--gold);border-radius:8px;
+    background:rgba(168,83,47,.1);color:var(--gold);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;
   }
 
   .content-list{margin-top:28px;text-align:left;display:flex;flex-direction:column;gap:14px}
   .content-card{
-    padding:18px 16px;border:1px solid var(--line);border-radius:2px;background:rgba(185,146,79,.04);
+    padding:18px 16px;border:1px solid var(--line);border-radius:8px;background:rgba(168,83,47,.04);
   }
-  .content-card-title{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;color:var(--gold-bright);margin-bottom:6px}
+  .content-card-title{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;color:var(--gold);margin-bottom:6px}
   .content-card p{font-size:.86rem;color:var(--ivory-dim);line-height:1.6}
   .content-card a{
     display:inline-block;margin-top:10px;color:var(--gold);font-size:.78rem;letter-spacing:.12em;
