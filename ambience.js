@@ -39,7 +39,7 @@
     .amb-badge{
       position:fixed;bottom:20px;right:20px;z-index:80;
       width:60px;height:60px;border-radius:50%;
-      background:#1C1B19;border:1px solid #B9924F;
+      background:#F7FAF5;border:1px solid #A8532F;
       display:flex;align-items:center;justify-content:center;
       cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5);
       animation:amb-idle 1.6s ease-in-out infinite;
@@ -47,15 +47,15 @@
     .amb-badge img{width:30px;height:auto;display:block;transition:transform .08s linear}
     .amb-hint{
       position:absolute;bottom:72px;right:0;white-space:nowrap;
-      background:#26241F;border:1px solid #B9924F;color:#D4B378;
+      background:#FFFFFF;border:1px solid #A8532F;color:#C1703F;
       font-family:'Karla',sans-serif;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
       padding:7px 12px;border-radius:14px;opacity:0;pointer-events:none;
     }
     .amb-hint.show{opacity:1;animation:amb-flash 1.4s ease-in-out infinite}
     @keyframes amb-flash{0%,100%{opacity:1}50%{opacity:.35}}
     @keyframes amb-idle{
-      0%,100%{transform:scale(1);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 0 rgba(185,146,79,.45)}
-      50%{transform:scale(1.12);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 14px rgba(185,146,79,0)}
+      0%,100%{transform:scale(1);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 0 rgba(168,83,47,.45)}
+      50%{transform:scale(1.12);box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 14px rgba(168,83,47,0)}
     }
     .amb-badge.playing{animation:amb-idle 1.6s ease-in-out infinite}
     .lotus{transition:transform .08s linear}

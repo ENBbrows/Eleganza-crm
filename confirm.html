@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Confirm Your Appointment</title>
-<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="theme.css" />
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -13,15 +13,15 @@
   .brand{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:10px}
   h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.5rem,6vw,2rem);line-height:1.25}
   .sub{color:var(--ivory-dim);font-size:.95rem;line-height:1.6;margin-top:12px}
-  .detail{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:4px;text-align:left}
+  .detail{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:8px;text-align:left}
   .detail div{font-size:.9rem;color:var(--ivory-dim);margin-bottom:6px}
   .detail strong{color:var(--ivory);font-weight:500}
   .actions{margin-top:24px;display:flex;flex-direction:column;gap:10px}
   button,select,input{font-family:'Karla',sans-serif}
-  .btn{padding:15px;background:var(--gold);color:var(--ink);border:none;border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+  .btn{padding:15px;background:var(--gold);color:var(--ink);border:none;border-radius:999px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
   .btn:disabled{opacity:.5;cursor:wait}
-  .btn-ghost{padding:15px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
-  select{width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:10px}
+  .btn-ghost{padding:15px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:999px;font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+  select{width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:8px;margin-top:10px}
   .msg{margin-top:16px;font-size:.88rem}
   .msg.error{color:var(--error)}
   .msg.ok{color:var(--ok)}
@@ -93,11 +93,11 @@ function render() {
       <button class="btn-ghost" id="btnCancel" style="color:var(--error);border-color:var(--error)">Cancel this appointment</button>
     </div>
     <div id="rescheduleBox" class="hidden">
-      <input type="datetime-local" id="newTime" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:14px" />
+      <input type="datetime-local" id="newTime" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:8px;margin-top:14px" />
       <button class="btn" id="btnSubmitReschedule" style="width:100%;margin-top:10px">Save new time</button>
     </div>
     <div id="cancelBox" class="hidden">
-      <textarea id="cancelReason" rows="3" placeholder="Let us know why (optional) — helps us serve you better" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:2px;margin-top:14px;font-family:inherit;resize:vertical"></textarea>
+      <textarea id="cancelReason" rows="3" placeholder="Let us know why (optional) — helps us serve you better" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:8px;margin-top:14px;font-family:inherit;resize:vertical"></textarea>
       <button class="btn" id="btnSubmitCancel" style="width:100%;margin-top:10px;background:var(--error)">Confirm Cancellation</button>
     </div>
     ` : `<p class="msg ok" style="margin-top:20px">This appointment is ${esc(statusLabel).toLowerCase()} — no action needed.</p>`}

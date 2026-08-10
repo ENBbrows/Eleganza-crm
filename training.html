@@ -8,14 +8,14 @@
 <link rel="apple-touch-icon" href="app-icon-black-v2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="theme.css" />
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{
     background:var(--ink);color:var(--ivory);font-family:'Karla',sans-serif;font-weight:300;
     letter-spacing:.01em;padding:40px 20px 80px;
-    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(185,146,79,.09), transparent 60%);
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(168,83,47,.09), transparent 60%);
   }
   .wrap{max-width:520px;margin:0 auto;text-align:center}
   .lotus{display:block;width:100px;height:auto;margin:0 auto 14px}
@@ -34,7 +34,7 @@
   h2{font-family:var(--font-serif);font-style:italic;font-weight:400;font-size:1.4rem;color:var(--ivory);margin-bottom:22px}
 
   .villain-line{font-size:.82rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ivory-dim);font-weight:600;margin-top:18px}
-  .prophecy-line{font-family:var(--font-serif);font-style:italic;color:var(--gold-bright);font-size:1.15rem;line-height:1.5;margin-top:20px;max-width:420px;margin-left:auto;margin-right:auto}
+  .prophecy-line{font-family:var(--font-serif);font-style:italic;color:var(--gold);font-size:1.15rem;line-height:1.5;margin-top:20px;max-width:420px;margin-left:auto;margin-right:auto}
 
   .offer-row{display:flex;flex-direction:column;gap:16px;max-width:420px;margin:0 auto}
   .offer-card{
@@ -44,7 +44,7 @@
     position:absolute;top:16px;right:16px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
     color:var(--sage-bright);border:1px solid var(--sage-bright);border-radius:20px;padding:4px 10px;
   }
-  .offer-name{font-family:var(--font-serif);font-size:1.2rem;color:var(--gold-bright)}
+  .offer-name{font-family:var(--font-serif);font-size:1.2rem;color:var(--gold)}
   .offer-desc{color:var(--ivory-dim);font-size:.88rem;line-height:1.6;margin-top:10px}
 
   .kit-note{
@@ -55,13 +55,13 @@
 
   .notify-form{margin-top:32px;max-width:360px;margin-left:auto;margin-right:auto}
   .notify-form input{
-    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;color:var(--ivory);
+    width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;color:var(--ivory);
     font-family:'Karla',sans-serif;font-size:1rem;padding:13px 14px;outline:none;
   }
   .notify-form input:focus{border-color:var(--gold)}
   .btn{
     display:block;width:100%;margin-top:12px;padding:15px;background:var(--gold);color:var(--ink);
-    border:none;border-radius:2px;font-weight:600;font-size:.78rem;letter-spacing:.22em;
+    border:none;border-radius:999px;font-weight:600;font-size:.78rem;letter-spacing:.22em;
     text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center;
   }
   .btn:disabled{opacity:.5;cursor:wait}
@@ -82,7 +82,7 @@
   <div class="rule"></div>
 
   <section>
-    <svg width="72" height="72" viewBox="0 0 52 34" style="margin:0 auto 8px;opacity:.9" aria-hidden="true"><path d="M50 2v13a13 13 0 0 1-13 13H24" fill="none" stroke="#B9924F" stroke-width="1"/><path d="M24 15v8a8 8 0 0 0 8 8h5" fill="none" stroke="#B9924F" stroke-width=".8"/><path d="M24 20v3a3 3 0 0 0 3 3h2" fill="none" stroke="#B9924F" stroke-width=".6"/></svg>
+    <svg width="72" height="72" viewBox="0 0 52 34" style="margin:0 auto 8px;opacity:.9" aria-hidden="true"><path d="M50 2v13a13 13 0 0 1-13 13H24" fill="none" stroke="#A8532F" stroke-width="1"/><path d="M24 15v8a8 8 0 0 0 8 8h5" fill="none" stroke="#A8532F" stroke-width=".8"/><path d="M24 20v3a3 3 0 0 0 3 3h2" fill="none" stroke="#A8532F" stroke-width=".6"/></svg>
     <p class="section-label">Eleganza Professional Education</p>
     <h2>The <em>Naturally Beautiful Method</em></h2>
     <p class="sub" style="max-width:440px;margin-left:auto;margin-right:auto">Golden-ratio facial mapping and natural hair-stroke microblading, engineered from the ground up for Caribbean, multiracial, and melanin-rich skin.</p>
@@ -93,10 +93,10 @@
     <p class="prophecy-line">Brows engineered to heal clean, on every face that sits in the chair.</p>
 
     <div class="offer-row" style="max-width:420px;margin:24px auto 0;flex-direction:row;flex-wrap:wrap;gap:10px;justify-content:center">
-      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold-bright)">60 course hours</span>
-      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold-bright)">9 modules</span>
-      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold-bright)">1.618 golden ratio</span>
-      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold-bright)">Fitzpatrick I–VI</span>
+      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold)">60 course hours</span>
+      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold)">9 modules</span>
+      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold)">1.618 golden ratio</span>
+      <span class="coming-soon-tag" style="border-color:var(--gold);color:var(--gold)">Fitzpatrick I–VI</span>
     </div>
   </section>
 
@@ -119,7 +119,7 @@
     </div>
 
     <div class="kit-note">
-      <strong>Starting from scratch?</strong> The full starter kit — practice skins, tools, pigments, and aftercare — runs about USD $37. <a href="starter-kit.html" style="color:var(--gold-bright)">See the full kit →</a>
+      <strong>Starting from scratch?</strong> The full starter kit — practice skins, tools, pigments, and aftercare — runs about USD $37. <a href="starter-kit.html" style="color:var(--gold)">See the full kit →</a>
     </div>
   </section>
 

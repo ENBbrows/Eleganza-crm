@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Book an Appointment — Eleganza</title>
-<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="theme.css" />
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -12,11 +12,11 @@
   .card{width:100%;max-width:520px;margin:0 auto;padding:24px 16px}
 
   /* nav */
-  .topnav{position:sticky;top:0;z-index:50;background:rgba(28,27,25,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(247,250,245,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .topnav-inner{max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
   .nav-toggle{
     flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);
-    border-radius:2px;padding:9px 12px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    border-radius:8px;padding:9px 12px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
     cursor:pointer;font-family:'Karla',sans-serif;
   }
   .nav-search-form{flex:1}
@@ -33,7 +33,7 @@
     letter-spacing:.03em;border-bottom:1px solid var(--line);
   }
   .nav-dropdown a:last-child{border-bottom:none}
-  .nav-dropdown a:hover{color:var(--gold-bright);background:rgba(185,146,79,.05)}
+  .nav-dropdown a:hover{color:var(--gold);background:rgba(168,83,47,.05)}
   .nav-dropdown a.nav-book{color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.15em;font-size:.75rem}
   .brand{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ivory-dim);text-align:center;margin-bottom:6px}
   h1{font-family:var(--font-serif);font-weight:300;font-size:clamp(1.6rem,6vw,2.1rem);text-align:center;line-height:1.25}
@@ -43,34 +43,34 @@
   .step-dot.active{background:var(--gold)}
   .screen{display:none}
   .screen.active{display:block}
-  .service-card{width:100%;text-align:left;background:var(--ink-soft);border:1px solid var(--line);border-radius:4px;padding:16px;margin-bottom:10px;cursor:pointer;color:var(--ivory)}
+  .service-card{width:100%;text-align:left;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:10px;cursor:pointer;color:var(--ivory)}
   .service-card:hover,.service-card.selected{border-color:var(--gold)}
   .service-name{font-family:var(--font-serif);font-size:1.05rem}
   .service-meta{color:var(--ivory-dim);font-size:.82rem;margin-top:4px}
   .tag-tentative{display:inline-block;margin-top:6px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:2px 8px}
   .date-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
-  .date-pill{flex:0 0 auto;text-align:center;background:var(--ink-soft);border:1px solid var(--line);border-radius:4px;padding:10px 14px;cursor:pointer;color:var(--ivory)}
+  .date-pill{flex:0 0 auto;text-align:center;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer;color:var(--ivory)}
   .date-pill .dow{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ivory-dim)}
   .date-pill .num{font-family:var(--font-serif);font-size:1.2rem;margin-top:2px}
-  .date-pill.selected{border-color:var(--gold);background:rgba(185,146,79,.1)}
+  .date-pill.selected{border-color:var(--gold);background:rgba(168,83,47,.1)}
   .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-  .slot-btn{padding:11px 4px;background:var(--ink-soft);border:1px solid var(--line);border-radius:3px;color:var(--ivory);font-size:.85rem;cursor:pointer}
-  .slot-btn:hover,.slot-btn.selected{border-color:var(--gold);color:var(--gold-bright)}
+  .slot-btn{padding:11px 4px;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-size:.85rem;cursor:pointer}
+  .slot-btn:hover,.slot-btn.selected{border-color:var(--gold);color:var(--gold)}
   .empty-slots{color:var(--ivory-dim);font-size:.88rem;text-align:center;padding:20px 0;font-style:italic}
   label{display:block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:16px 0 8px}
-  input,select{width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:2px;color:var(--ivory);font-family:'Karla',sans-serif;font-size:1rem;padding:14px;outline:none}
+  input,select{width:100%;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Karla',sans-serif;font-size:1rem;padding:14px;outline:none}
   input:focus{border-color:var(--gold)}
-  .btn{display:block;width:100%;margin-top:22px;padding:16px;background:var(--gold);color:var(--ink);border:none;border-radius:2px;font-weight:600;font-size:.8rem;letter-spacing:.24em;text-transform:uppercase;cursor:pointer}
+  .btn{display:block;width:100%;margin-top:22px;padding:16px;background:var(--gold);color:var(--ink);border:none;border-radius:999px;font-weight:600;font-size:.8rem;letter-spacing:.24em;text-transform:uppercase;cursor:pointer}
   .btn:disabled{opacity:.5;cursor:wait}
-  .btn-ghost{display:block;width:100%;margin-top:10px;padding:14px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:2px;font-weight:600;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;text-align:center}
+  .btn-ghost{display:block;width:100%;margin-top:10px;padding:14px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:999px;font-weight:600;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;text-align:center}
   .linkline{display:inline-block;margin-top:16px;background:none;border:none;color:var(--ivory-dim);font-size:.85rem;text-decoration:underline;cursor:pointer}
-  .banner{display:none;margin-top:16px;padding:12px 14px;border:1px solid var(--error);color:var(--error);font-size:.85rem;border-radius:2px}
+  .banner{display:none;margin-top:16px;padding:12px 14px;border:1px solid var(--error);color:var(--error);font-size:.85rem;border-radius:8px}
   .banner.show{display:block}
-  .summary{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:4px}
+  .summary{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:8px}
   .summary div{font-size:.9rem;color:var(--ivory-dim);margin-bottom:6px}
   .summary strong{color:var(--ivory);font-weight:500}
   .done-icon{text-align:center;font-size:2.4rem;margin-top:10px}
-  .review-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border:1px solid var(--gold);border-radius:2px;color:var(--ivory);text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;margin-top:12px}
+  .review-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border:1px solid var(--gold);border-radius:999px;color:var(--ivory);text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;margin-top:12px}
   .check-row{display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer}
   .check-row input[type=checkbox]{width:auto;margin-top:3px;flex-shrink:0;accent-color:var(--gold)}
   .check-row span{font-size:.88rem;color:var(--ivory-dim);line-height:1.5}
@@ -106,7 +106,7 @@
   <div class="steps"><span class="step-dot" data-step="1"></span><span class="step-dot" data-step="2"></span><span class="step-dot" data-step="3"></span><span class="step-dot" data-step="4"></span></div>
 
   <section class="screen active" id="screen-service">
-    <h1>Book Your <em style="font-style:italic;color:var(--gold-bright)">Appointment</em></h1>
+    <h1>Book Your <em style="font-style:italic;color:var(--gold)">Appointment</em></h1>
     <p class="sub">Step 1 of 4 — Tap a service below to get started.</p>
     <img src="portfolio/turn-back-time-before-after.jpg" alt="Real before and after — microblading transformation" style="width:100%;max-width:420px;display:block;margin:18px auto;border-radius:14px 4px 14px 4px;border:1px solid var(--gold)" />
     <div class="summary" id="giftBanner" style="display:none;border-color:var(--gold);text-align:center"></div>
@@ -123,7 +123,7 @@
   </section>
 
   <section class="screen" id="screen-eligibility">
-    <h1>Quick <em style="font-style:italic;color:var(--gold-bright)">Eligibility Check</em></h1>
+    <h1>Quick <em style="font-style:italic;color:var(--gold)">Eligibility Check</em></h1>
     <p class="sub">Step 1 of 4 — Before booking, check any that apply to you. If none apply, you can book right away.</p>
     <form id="eligibilityForm">
       <label class="check-row"><input type="checkbox" class="elig-check"><span>I have problematic or sensitive skin (eczema, psoriasis, active acne, or very oily skin) in the eyebrow area</span></label>
@@ -150,7 +150,7 @@
   </section>
 
   <section class="screen" id="screen-time">
-    <h1>Choose a <em style="font-style:italic;color:var(--gold-bright)">Date &amp; Time</em></h1>
+    <h1>Choose a <em style="font-style:italic;color:var(--gold)">Date &amp; Time</em></h1>
     <p class="sub">Step 2 of 4 — Tap a date below, then tap an available time.</p>
     <div class="date-strip" id="dateStrip"></div>
     <div class="slots" id="slotGrid"></div>
@@ -158,7 +158,7 @@
   </section>
 
   <section class="screen" id="screen-details">
-    <h1>Your <em style="font-style:italic;color:var(--gold-bright)">Details</em></h1>
+    <h1>Your <em style="font-style:italic;color:var(--gold)">Details</em></h1>
     <p class="sub">Step 3 of 4 — Just a few details to lock in your spot.</p>
     <div class="summary" id="detailsSummary"></div>
     <div class="summary" style="border-color:var(--line)">
@@ -219,11 +219,11 @@
     </div>
     <div class="summary" id="voucherPanel" style="display:none;border-color:var(--gold);text-align:center">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">🎁 Give 10% — Get 10%</div>
-      <div style="font-family:var(--font-serif);font-size:1.6rem;letter-spacing:.08em;color:var(--gold-bright)" id="voucherCode"></div>
+      <div style="font-family:var(--font-serif);font-size:1.6rem;letter-spacing:.08em;color:var(--gold)" id="voucherCode"></div>
       <div style="margin-top:6px;font-size:.85rem;color:var(--ivory-dim)" id="voucherSub"></div>
       <a class="review-btn" id="btnShareVoucher" href="#" target="_blank" rel="noopener" style="margin-top:12px">💬 Share With A Friend</a>
     </div>
-    <a class="review-btn" id="btnAftercare" href="aftercare.html" style="border-style:solid;background:rgba(185,146,79,.12)">❋ My Aftercare Guide — Email &amp; WhatsApp</a>
+    <a class="review-btn" id="btnAftercare" href="aftercare.html" style="border-style:solid;background:rgba(168,83,47,.12)">❋ My Aftercare Guide — Email &amp; WhatsApp</a>
     <a class="review-btn" id="waButton" href="#" target="_blank" rel="noopener" style="display:none">💬 Message Us On WhatsApp</a>
     <button class="btn" type="button" id="btnAllDone">Done — Till Next Time 🤍</button>
     <button class="btn-ghost" type="button" onclick="location.reload()">Book Another Appointment</button>

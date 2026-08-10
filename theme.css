@@ -1,31 +1,36 @@
 /* ═════════════════════════════════════════════════════════
    ELEGANZA THEME — shared design tokens for every client-facing
-   page. Quiet-authority academy identity: charcoal + ivory field,
-   a single gold hairline accent, Georgia serif for headlines.
-   Linked, not duplicated — edit values here, every page updates.
+   page. Airy, light identity: warm off-white field, deep terracotta
+   accent, thin-line sunburst motif. Linked, not duplicated — edit
+   values here, every page updates.
    (book-enbfocus.html is a separate sub-brand and does not use
    this file.)
+
+   Contrast note: every "-bright" token sits at the ~3-3.7:1
+   (large-text/UI-component) tier by design; base tokens sit at
+   ~4.7-5.6:1 (normal-text AA). Don't use a "-bright" token for
+   body-size text without rechecking contrast.
    ═════════════════════════════════════════════════════════ */
 :root{
-  --ink:#1C1B19;
-  --ink-soft:#26241F;
-  --line:#3D3A33;
-  --gold:#B9924F;
-  --gold-bright:#D4B378;
-  --ivory:#F3EFE6;
-  --ivory-dim:#B7B0A2;
-  --error:#D98E7E;
-  --ok:#A8C3A0;
-  --sage:#8C9673;
-  --sage-bright:#A8B48C;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --ink:#F7FAF5;
+  --ink-soft:#FFFFFF;
+  --line:#7E8A74;
+  --gold:#A8532F;
+  --gold-bright:#C1703F;
+  --ivory:#23201C;
+  --ivory-dim:#6B6459;
+  --error:#B23B23;
+  --ok:#467043;
+  --sage:#5C6B45;
+  --sage-bright:#7C8A5E;
+  --font-serif: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Karla', sans-serif;
 }
+*{margin:0;padding:0;box-sizing:border-box}
 
-/* Golden-spiral hairline rule — the recurring motif, defined once.
-   Replaces the old leaf-scroll divider. Traces one quarter-turn of
-   a golden spiral in a single gold hairline. */
+/* Sunburst hairline rule — the recurring motif, defined once.
+   Replaces the old golden spiral. Eight thin radiating strokes. */
 .rule{
-  width:52px;height:34px;margin:56px auto;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='34' viewBox='0 0 52 34'%3E%3Cpath d='M50 2v13a13 13 0 0 1-13 13H24' fill='none' stroke='%23B9924F' stroke-width='1'/%3E%3Cpath d='M24 15v8a8 8 0 0 0 8 8h5' fill='none' stroke='%23B9924F' stroke-width='.8'/%3E%3Cpath d='M24 20v3a3 3 0 0 0 3 3h2' fill='none' stroke='%23B9924F' stroke-width='.6'/%3E%3C/svg%3E") no-repeat center/contain;
+  width:34px;height:34px;margin:56px auto;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cg stroke='%23A8532F' stroke-width='1' stroke-linecap='round' fill='none'%3E%3Cline x1='17' y1='2' x2='17' y2='9'/%3E%3Cline x1='17' y1='25' x2='17' y2='32'/%3E%3Cline x1='2' y1='17' x2='9' y2='17'/%3E%3Cline x1='25' y1='17' x2='32' y2='17'/%3E%3Cline x1='6.5' y1='6.5' x2='11.5' y2='11.5'/%3E%3Cline x1='22.5' y1='22.5' x2='27.5' y2='27.5'/%3E%3Cline x1='27.5' y1='6.5' x2='22.5' y2='11.5'/%3E%3Cline x1='11.5' y1='27.5' x2='6.5' y2='22.5'/%3E%3C/g%3E%3C/svg%3E") no-repeat center/contain;
 }

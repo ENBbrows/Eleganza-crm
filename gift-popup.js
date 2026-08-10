@@ -18,17 +18,17 @@
     }
     .gift-popup-overlay.show{display:flex}
     .gift-popup{
-      position:relative;max-width:300px;width:100%;background:#1C1B19;
-      border:1px solid #B9924F;border-radius:16px 4px 16px 4px;padding:30px 22px 26px;text-align:center;
+      position:relative;max-width:300px;width:100%;background:#F7FAF5;
+      border:1px solid #A8532F;border-radius:16px 4px 16px 4px;padding:30px 22px 26px;text-align:center;
       animation:gift-pop-in .35s ease both;font-family:'Karla',sans-serif;
     }
     @keyframes gift-pop-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
     .gift-popup-close{
-      position:absolute;top:8px;right:8px;background:transparent;border:none;color:#B7B0A2;
+      position:absolute;top:8px;right:8px;background:transparent;border:none;color:#6B6459;
       font-size:1.1rem;cursor:pointer;width:34px;height:34px;line-height:1;
     }
     .gift-popup-sparkle{position:absolute;inset:0;pointer-events:none;overflow:visible}
-    .gift-popup .spark{position:absolute;color:#D4B378;font-size:.9rem;opacity:0;animation:spark-twinkle 2.6s ease-in-out infinite}
+    .gift-popup .spark{position:absolute;color:#C1703F;font-size:.9rem;opacity:0;animation:spark-twinkle 2.6s ease-in-out infinite}
     .gift-popup .s1{top:6%;left:8%;animation-delay:0s}
     .gift-popup .s2{top:12%;right:12%;animation-delay:.5s;font-size:.7rem}
     .gift-popup .s3{bottom:22%;left:6%;animation-delay:1s;font-size:1.1rem}
@@ -37,10 +37,10 @@
     .gift-popup .s6{top:40%;right:6%;animation-delay:.8s;font-size:.8rem}
     @keyframes spark-twinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
     .gift-popup-motif{width:52px;height:52px;margin:6px auto 0}
-    .gift-popup-title{font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#D4B378;font-size:1.25rem;margin-top:14px}
-    .gift-popup-sub{color:#B7B0A2;font-size:.84rem;line-height:1.5;margin-top:8px}
+    .gift-popup-title{font-family:'Plus Jakarta Sans',sans-serif;font-style:italic;color:#A8532F;font-size:1.25rem;margin-top:14px}
+    .gift-popup-sub{color:#6B6459;font-size:.84rem;line-height:1.5;margin-top:8px}
     .gift-popup-btn{
-      display:block;width:100%;margin-top:18px;padding:14px;background:#B9924F;color:#1C1B19;
+      display:block;width:100%;margin-top:18px;padding:14px;background:#A8532F;color:#F7FAF5;
       text-decoration:none;border-radius:2px;font-weight:600;font-size:.78rem;letter-spacing:.2em;
       text-transform:uppercase;
     }
@@ -57,7 +57,7 @@
         <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span>
         <span class="spark s4">✦</span><span class="spark s5">✦</span><span class="spark s6">✦</span>
       </div>
-      <svg class="gift-popup-motif" viewBox="0 0 64 64" fill="none"><path d="M32 54s-22-13-22-29c0-8 6-14 14-14 4 0 8 2 8 6 0-4 4-6 8-6 8 0 14 6 14 14 0 16-22 29-22 29z" stroke="#B9924F" stroke-width="1.4"/></svg>
+      <svg class="gift-popup-motif" viewBox="0 0 64 64" fill="none"><path d="M32 54s-22-13-22-29c0-8 6-14 14-14 4 0 8 2 8 6 0-4 4-6 8-6 8 0 14 6 14 14 0 16-22 29-22 29z" stroke="#A8532F" stroke-width="1.4"/></svg>
       <p class="gift-popup-title">Give the Gift of Confidence</p>
       <p class="gift-popup-sub">Eleganza gift certificates — the perfect surprise for someone who deserves it.</p>
       <a class="gift-popup-btn" href="gift-eleganza.html">Give A Gift</a>
