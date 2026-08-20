@@ -248,8 +248,10 @@ const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
 const MIN_LEAD_DAYS = 14; // clients must book at least 2 weeks ahead
 const ANNUAL_TOUCHUP_LEAD_DAYS = 7; // Annual Touch-Up can be booked just 1 week out
 const GIFT_LEAD_DAYS = 7; // clients redeeming a gift certificate can book just 1 week out
+const CONSULT_SERVICE_NAMES = ["Video Consultation", "In-Studio Consultation"];
 const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
 function leadDaysFor(service) {
+  if (service && CONSULT_SERVICE_NAMES.includes(service.name)) return 0; // consultations: book any time, no minimum wait
   if (state.gift) return GIFT_LEAD_DAYS;
   return (service && service.name === "Annual Touch-Up") ? ANNUAL_TOUCHUP_LEAD_DAYS : MIN_LEAD_DAYS;
 }
