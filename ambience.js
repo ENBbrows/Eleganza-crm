@@ -37,7 +37,9 @@
   const style = document.createElement("style");
   style.textContent = `
     .amb-badge{
-      position:fixed;bottom:20px;right:20px;z-index:80;
+      /* bottom:90px (not 20px) stacks this above whatsapp-widget.js's
+         bubble, which always shares the page with this script */
+      position:fixed;bottom:90px;right:20px;z-index:80;
       width:60px;height:60px;border-radius:50%;
       background:#F7FAF5;border:1px solid #A8532F;
       display:flex;align-items:center;justify-content:center;
