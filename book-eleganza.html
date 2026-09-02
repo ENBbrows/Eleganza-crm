@@ -245,15 +245,15 @@ const CLIENTS_HEADERS = { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "
 const CLIENTS_REST = CONFIG.SUPABASE_URL + "/rest/v1/" + encodeURIComponent(CONFIG.TABLE);
 const RPC = CONFIG.SUPABASE_URL + "/rest/v1/rpc/";
 const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
-const MIN_LEAD_DAYS = 14; // clients must book at least 2 weeks ahead
-const ANNUAL_TOUCHUP_LEAD_DAYS = 7; // Annual Touch-Up can be booked just 1 week out
-const GIFT_LEAD_DAYS = 7; // clients redeeming a gift certificate can book just 1 week out
+const MIN_LEAD_DAYS = 2; // clients must book at least 2 days ahead
+const FOLLOWUP_LEAD_DAYS = 42; // Microblading/3D Follow-Up: healing takes ~28 days, so these need 6 weeks' notice
+const FOLLOWUP_SERVICE_NAMES = ["Microblading Follow-Up", "3D Follow-Up"];
 const CONSULT_SERVICE_NAMES = ["Video Consultation", "In-Studio Consultation"];
 const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
 function leadDaysFor(service) {
   if (service && CONSULT_SERVICE_NAMES.includes(service.name)) return 0; // consultations: book any time, no minimum wait
-  if (state.gift) return GIFT_LEAD_DAYS;
-  return (service && service.name === "Annual Touch-Up") ? ANNUAL_TOUCHUP_LEAD_DAYS : MIN_LEAD_DAYS;
+  if (service && FOLLOWUP_SERVICE_NAMES.includes(service.name)) return FOLLOWUP_LEAD_DAYS;
+  return MIN_LEAD_DAYS;
 }
 const params = new URLSearchParams(location.search);
 const PRESET_CATEGORY = params.get("category");
