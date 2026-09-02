@@ -248,12 +248,19 @@ const TZ_OFFSET = "-04:00"; // Trinidad & Tobago — fixed offset, no DST
 const MIN_LEAD_DAYS = 2; // clients must book at least 2 days ahead
 const FOLLOWUP_LEAD_DAYS = 42; // Microblading/3D Follow-Up: healing takes ~28 days, so these need 6 weeks' notice
 const FOLLOWUP_SERVICE_NAMES = ["Microblading Follow-Up", "3D Follow-Up"];
-const CONSULT_SERVICE_NAMES = ["Video Consultation", "In-Studio Consultation"];
+const ONLINE_CONSULT_LEAD_HOURS = 6; // Video Consultation: at least 6 hours' notice
+const CONSULT_SERVICE_NAMES = ["In-Studio Consultation"]; // book any time, no minimum wait
 const VISIBLE_DAYS = 28;  // how many days of choices to show once the lead time has passed
+function leadMsFor(service) {
+  if (service && service.name === "Video Consultation") return ONLINE_CONSULT_LEAD_HOURS * 3600 * 1000;
+  if (service && CONSULT_SERVICE_NAMES.includes(service.name)) return 0;
+  if (service && FOLLOWUP_SERVICE_NAMES.includes(service.name)) return FOLLOWUP_LEAD_DAYS * 24 * 3600 * 1000;
+  return MIN_LEAD_DAYS * 24 * 3600 * 1000;
+}
 function leadDaysFor(service) {
-  if (service && CONSULT_SERVICE_NAMES.includes(service.name)) return 0; // consultations: book any time, no minimum wait
-  if (service && FOLLOWUP_SERVICE_NAMES.includes(service.name)) return FOLLOWUP_LEAD_DAYS;
-  return MIN_LEAD_DAYS;
+  // day-level granularity for the date strip — floors sub-day leads (e.g.
+  // the 6-hour online-consult minimum) to 0 so today still shows up
+  return Math.floor(leadMsFor(service) / 86400000);
 }
 const params = new URLSearchParams(location.search);
 const PRESET_CATEGORY = params.get("category");
@@ -318,7 +325,7 @@ function generateSlots(schedule, service, dateStr) {
   const bufMs = (service.buffer_minutes||0) * 60000;
   const stepMs = 30 * 60000;
   const now = new Date();
-  const leadMs = leadDaysFor(service) * 24 * 3600 * 1000;
+  const leadMs = leadMsFor(service);
   const slots = [];
   for (const [rs, re] of ranges) {
     let t = new Date(Math.ceil(rs.getTime() / stepMs) * stepMs);
@@ -667,6 +674,19 @@ function renderDone(result, name, phone) {
 
   state.confirmToken = result.confirm_token;
   state.bookingId = result.booking_id;
+
+  // Consultations are free and never reach the payment step, so they'd
+  // otherwise never trigger any notification to Amii at all — fire one
+  // right at booking time instead, since these can now be booked with as
+  // little as 6 hours' notice (online) and she needs to know right away.
+  if (["Video Consultation", "In-Studio Consultation"].includes(state.service.name)) {
+    fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ token: result.confirm_token, method: "consultation_booked" })
+    }).catch(e => console.warn("notify-payment (consultation) failed:", e));
+  }
+
   $("paymentAck").style.display = "none";
   $("paymentFollowUp").style.display = "none";
   $("btnNotifyAmiiWa").style.display = "none";

@@ -127,6 +127,17 @@ Deno.serve(async (req) => {
           `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}\n\n` +
           `Check the gift_certificates table (or the CRM) for who purchased it.`
       );
+    } else if (method === "consultation_booked") {
+      // Consultations are free and skip the payment step entirely, so this
+      // is the ONLY automatic heads-up Amii gets — fired right at booking
+      // time rather than at payment confirmation.
+      await sendEmail(
+        OWNER_EMAIL,
+        `📞 New consultation booked — ${name}`,
+        `${b.client_name} booked a ${serviceName} for ${when}.\n\n` +
+          `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}\n\n` +
+          `This is a free consultation — no payment step, so this is your only automatic heads-up for it.`
+      );
     }
 
     return new Response(JSON.stringify({ ok: true }), { headers: { "Content-Type": "application/json" } });
