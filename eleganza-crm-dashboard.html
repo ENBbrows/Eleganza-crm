@@ -701,7 +701,7 @@ function renderDue(dayBefore, hourBefore) {
 async function loadWeek() {
   const weekEnd = new Date(weekStart.getTime() + 7*86400000);
   $("weekLabel").textContent = weekStart.toLocaleDateString("en-US",{month:'short',day:'numeric'}) + " – " + new Date(weekEnd.getTime()-86400000).toLocaleDateString("en-US",{month:'short',day:'numeric'});
-  bookings = await api(`/rest/v1/bookings?business=eq.${biz}&start_at=gte.${weekStart.toISOString()}&start_at=lt.${weekEnd.toISOString()}&status=neq.cancelled&select=*,services(name,duration_minutes)&order=start_at.asc`);
+  bookings = await api(`/rest/v1/bookings?business=eq.${biz}&start_at=gte.${weekStart.toISOString()}&start_at=lt.${weekEnd.toISOString()}&status=neq.cancelled&select=*,services(name,duration_minutes,price,category)&order=start_at.asc`);
   renderWeek();
 }
 
@@ -730,7 +730,7 @@ function renderWeek() {
 
 async function openBookingDrawer(id) {
   bookingSelectedId = id;
-  const b = bookings.find(x => x.id === id) || await api(`/rest/v1/bookings?id=eq.${id}&select=*,services(name,duration_minutes)`).then(r=>r[0]);
+  const b = bookings.find(x => x.id === id) || await api(`/rest/v1/bookings?id=eq.${id}&select=*,services(name,duration_minutes,price,category)`).then(r=>r[0]);
   let lead = null;
   if (biz === "enbfocus") {
     const leads = await api(`/rest/v1/enbfocus_leads?booking_id=eq.${id}&select=*`);
@@ -828,8 +828,93 @@ function openCompleteModal(b) {
   $("submitComplete").onclick = async () => {
     const amount = parseFloat($("amount").value) || 0;
     await rpc("log_receipt", { p_booking_id: b.id, p_business: biz, p_client_id: b.client_id || null, p_client_name: b.client_name, p_service_name: b.services?.name || "", p_amount: amount });
-    closeModal(); closeDrawer(); loadAllCalendar(); showToast("Completed — receipt logged");
+    showToast("Completed — receipt logged");
+    loadAllCalendar();
+    if (biz === "eleganza") renderThankYouLink(b, amount); else closeModal();
+    closeDrawer();
   };
+  $("modalOverlay").classList.add("show");
+}
+
+// Shown right after completing an Eleganza booking — a link with the
+// receipt, aftercare instructions, and the right follow-up CTA: a
+// self-serve 5-week follow-up link for first-timers, or (for returning/
+// maintenance clients) an optional tentative Annual Touch-Up she pre-books
+// right here, folded into the same link for the client to confirm.
+function renderThankYouLink(b, amount) {
+  const isTouchUp = b.services?.category === "touch_up";
+  const content = $("modalContent");
+  content.innerHTML = `
+    <div class="drawer-head"><h2>Send Thank You</h2><button class="icon-btn" id="closeModal">✕</button></div>
+    <div class="intake-box">
+      <strong>${esc(b.client_name)}</strong>${esc(b.services?.name||"")} · TT$${amount.toLocaleString()}
+    </div>
+    ${isTouchUp ? `
+    <label class="section-label">Pre-book their next Annual Touch-Up (optional)</label>
+    <input type="date" class="input-full" id="nextTouchUpDate">
+    <input type="time" class="input-full" id="nextTouchUpTime" value="10:00" style="margin-top:8px">
+    <button id="btnPrebook" style="width:100%;margin-top:8px">Pre-Book Their Annual Touch-Up</button>
+    <div class="login-msg" id="prebookMsg"></div>
+    ` : ""}
+    <label class="section-label" style="margin-top:16px">Send This To The Client</label>
+    <div style="font-size:12.5px;color:var(--dim);margin-bottom:8px">Their receipt, aftercare instructions, and follow-up link.</div>
+    <div class="action-row">
+      <button id="btnCopyThankYou">📋 Copy Link</button>
+      ${intlPhone(b.client_phone) ? `<a class="wa" id="btnThankYouWa" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;padding:9px 14px;border-radius:3px;border:1px solid var(--sage);color:#A8C3A0;font-size:13px">💬 Send via WhatsApp</a>` : ""}
+    </div>
+    <button class="btn-primary" id="doneThankYou" style="width:100%;margin-top:14px">Done</button>
+  `;
+  $("closeModal").onclick = () => { closeModal(); loadAllCalendar(); };
+  $("doneThankYou").onclick = () => { closeModal(); loadAllCalendar(); };
+
+  let followupToken = null;
+  function thankYouLink() {
+    let link = location.origin + location.pathname.replace(/eleganza-crm-dashboard\.html$/, "") + "thank-you.html?token=" + b.confirm_token;
+    if (followupToken) link += "&followupToken=" + followupToken;
+    return link;
+  }
+  function wireSendButtons() {
+    const link = thankYouLink();
+    $("btnCopyThankYou").onclick = async () => {
+      try { await navigator.clipboard.writeText(link); showToast("Link copied"); }
+      catch (e) { showToast("Couldn't copy — long-press to copy manually"); }
+    };
+    if ($("btnThankYouWa")) {
+      const first = (b.client_name || "there").split(" ")[0];
+      const msg = `Hi ${first}! Thank you for choosing Eleganza. Here's your receipt, aftercare guide, and what's next:\n${link}`;
+      $("btnThankYouWa").href = `https://wa.me/${intlPhone(b.client_phone)}?text=${encodeURIComponent(msg)}`;
+    }
+  }
+  wireSendButtons();
+
+  if (isTouchUp) {
+    $("btnPrebook").onclick = async () => {
+      const date = $("nextTouchUpDate").value, time = $("nextTouchUpTime").value;
+      if (!date || !time) { $("prebookMsg").textContent = "Pick a date and time first."; return; }
+      const btn = $("btnPrebook");
+      btn.disabled = true; btn.textContent = "Booking…";
+      try {
+        const svcRows = await api(`/rest/v1/services?business=eq.eleganza&name=eq.${encodeURIComponent("Annual Touch-Up")}&select=id`);
+        const svc = svcRows[0];
+        if (!svc) throw new Error("Annual Touch-Up service not found");
+        const result = await rpc("create_booking", {
+          p_business: "eleganza", p_service_id: svc.id,
+          p_start_at: new Date(`${date}T${time}:00-04:00`).toISOString(),
+          p_name: b.client_name, p_phone: b.client_phone || "", p_email: b.client_email || "",
+          p_client_id: b.client_id || null
+        });
+        const r = Array.isArray(result) ? result[0] : result;
+        followupToken = r.confirm_token;
+        $("prebookMsg").textContent = "✓ Held — the link below now includes their confirm link.";
+        btn.textContent = "Pre-Booked ✓";
+        wireSendButtons();
+      } catch (e) {
+        console.error(e);
+        $("prebookMsg").textContent = String(e.message||"").includes("slot_taken") ? "That time is already booked." : "Something went wrong.";
+        btn.disabled = false; btn.textContent = "Pre-Book Their Annual Touch-Up";
+      }
+    };
+  }
   $("modalOverlay").classList.add("show");
 }
 

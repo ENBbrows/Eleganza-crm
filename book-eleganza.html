@@ -205,10 +205,22 @@
         <button class="btn-ghost" type="button" id="btnUseGiftBalance" style="margin-top:10px">Book Something Else With It</button>
       </div>
     </div>
-    <div class="summary" id="wamPanel" style="display:none;border-color:var(--gold)">
+    <div class="summary" id="paymentPanel" style="display:none;border-color:var(--gold)">
       <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Secure Your Booking — Choose One</div>
       <div id="paymentIntro"></div>
-      <button class="btn-ghost" type="button" id="btnPayWam" style="margin-top:12px">Pay via WAM!</button>
+      <div id="transferBox" style="display:none;margin-top:12px">
+        <div class="summary" style="border-color:var(--line);margin-top:0">
+          <div>Bank <strong id="bankName"></strong></div>
+          <div>Account Name <strong id="bankAcctName"></strong></div>
+          <div>Account # <strong id="bankAcctNumber"></strong></div>
+          <div>Account Type <strong id="bankAcctType"></strong></div>
+        </div>
+        <label for="proofFile">Upload a screenshot of the transfer</label>
+        <input type="file" id="proofFile" accept="image/*" />
+        <div class="banner" id="proofError"></div>
+        <button class="btn" type="button" id="btnSubmitTransfer" style="margin-top:10px">I've Sent It — Submit Proof</button>
+      </div>
+      <button class="btn-ghost" type="button" id="btnShowTransfer" style="margin-top:12px">Pay by Bank Transfer</button>
       <p class="hint" style="text-align:center;margin:6px 0">— or —</p>
       <button class="btn-ghost" type="button" id="btnPayCash">I'll Pay the Full Amount in Cash at Check-In</button>
       <div id="paymentAck" style="display:none;margin-top:10px;color:var(--ok);font-size:.85rem"></div>
@@ -696,12 +708,15 @@ function renderDone(result, name, phone) {
   $("giftRedeemAck").style.display = "none";
   $("giftBalancePanel").style.display = "none";
   $("btnRedeemGift").disabled = false; $("btnRedeemGift").textContent = "Redeem My Gift Certificate";
-  $("wamPanel").style.display = "none";
-  $("btnPayWam").disabled = false; $("btnPayWam").textContent = "Pay via WAM!";
+  $("paymentPanel").style.display = "none";
+  $("transferBox").style.display = "none";
+  $("proofFile").value = "";
+  $("proofError").classList.remove("show");
+  $("btnShowTransfer").style.display = "block"; $("btnShowTransfer").disabled = false; $("btnShowTransfer").textContent = "Pay by Bank Transfer";
+  $("btnSubmitTransfer").disabled = false; $("btnSubmitTransfer").textContent = "I've Sent It — Submit Proof";
   $("btnPayCash").disabled = false; $("btnPayCash").textContent = "I'll Pay the Full Amount in Cash at Check-In";
 
-  // Every paid service must end at a checkout step — no silent dead ends,
-  // regardless of whether WAM! happens to be configured.
+  // Every paid service must end at a checkout step — no silent dead ends.
   // Gift certificates only apply to actual paid procedures, not to the
   // (already paid-for) consultations they route people to when they don't
   // qualify — that keeps the gift's balance untouched until it's used on
@@ -719,23 +734,17 @@ function renderDone(result, name, phone) {
     $("giftRedeemPanel").style.display = "block";
   } else if (state.service.price > 0) {
     const price = state.service.price;
-    const wamConfigured = CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0;
-    if (wamConfigured) {
-      const deposit = Math.min(500, price);
-      const remainder = price - deposit;
-      $("btnPayWam").style.display = "block";
-      $("btnPayWam").textContent = `Pay ${fmtMoney(deposit, state.service.currency)} via WAM!`;
-      $("paymentIntro").innerHTML = (remainder > 0
-        ? `Tap below to open WAM! and send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit to <strong>${esc(CONFIG.WAM_HANDLE)}</strong> — the remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
-        : `Tap below to open WAM! and send <strong>${fmtMoney(deposit, state.service.currency)}</strong> to <strong>${esc(CONFIG.WAM_HANDLE)}</strong>.`)
-        + ` You'll come right back here once it's sent.`;
-    } else {
-      // WAM! isn't configured — fall back to a cash-only checkout so there's
-      // still always somewhere for this to land.
-      $("btnPayWam").style.display = "none";
-      $("paymentIntro").innerHTML = `Total due: <strong>${fmtMoney(price, state.service.currency)}</strong>, payable in cash at check-in.`;
-    }
-    $("wamPanel").style.display = "block";
+    const deposit = Math.min(500, price);
+    const remainder = price - deposit;
+    $("bankName").textContent = CONFIG.BANK_NAME;
+    $("bankAcctName").textContent = CONFIG.BANK_ACCOUNT_NAME;
+    $("bankAcctNumber").textContent = CONFIG.BANK_ACCOUNT_NUMBER;
+    $("bankAcctType").textContent = CONFIG.BANK_ACCOUNT_TYPE;
+    $("paymentIntro").innerHTML = (remainder > 0
+      ? `Send a <strong>${fmtMoney(deposit, state.service.currency)}</strong> deposit by bank transfer — the remaining <strong>${fmtMoney(remainder, state.service.currency)}</strong> is due in cash at check-in.`
+      : `Send <strong>${fmtMoney(deposit, state.service.currency)}</strong> by bank transfer.`)
+      + ` Or pay the full amount in cash at check-in instead.`;
+    $("paymentPanel").style.display = "block";
   }
   if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0) {
     const wa = $("waButton");
@@ -747,7 +756,7 @@ function renderDone(result, name, phone) {
 }
 
 async function setPaymentMethod(method, ackText) {
-  $("btnPayWam").disabled = true;
+  $("btnSubmitTransfer").disabled = true;
   $("btnPayCash").disabled = true;
   try {
     await rpc("confirm_payment_intent", { p_token: state.confirmToken, p_method: method });
@@ -767,13 +776,57 @@ async function setPaymentMethod(method, ackText) {
   renderPaymentFollowUpButtons(method);
   renderReferralVoucher();
 }
-$("btnPayWam").onclick = () => {
-  // Opens WAM!'s real site in a new tab — this page stays open right where the
-  // receipt appears once they're back, per the request to "direct client to
-  // pay them back to this page where receipts are received."
-  window.open("https://wam.money", "_blank", "noopener");
-  setPaymentMethod("wam_deposit", "Thanks — we'll watch for your deposit and confirm you shortly.");
+
+async function uploadPaymentProof(file, bookingId) {
+  const path = `${bookingId}/${Date.now()}-${file.name}`;
+  const res = await fetch(`${CONFIG.SUPABASE_URL}/storage/v1/object/payment-proofs/${path}`, {
+    method: "POST",
+    headers: { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": file.type || "application/octet-stream" },
+    body: file
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return path;
+}
+
+$("btnShowTransfer").onclick = () => {
+  $("transferBox").style.display = "block";
+  $("btnShowTransfer").style.display = "none";
 };
+
+$("btnSubmitTransfer").onclick = async () => {
+  const file = $("proofFile").files[0];
+  $("proofError").classList.remove("show");
+  if (!file) {
+    $("proofError").textContent = "Please choose a screenshot first.";
+    $("proofError").classList.add("show");
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    $("proofError").textContent = "Please upload an image file.";
+    $("proofError").classList.add("show");
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    $("proofError").textContent = "That file's a bit large — please upload something under 8MB.";
+    $("proofError").classList.add("show");
+    return;
+  }
+  const btn = $("btnSubmitTransfer");
+  btn.disabled = true;
+  btn.textContent = "Uploading…";
+  try {
+    const path = await uploadPaymentProof(file, state.bookingId);
+    await rpc("set_payment_proof", { p_token: state.confirmToken, p_path: path });
+    await setPaymentMethod("bank_transfer", "Thanks — we'll verify your transfer and confirm you shortly.");
+  } catch (e) {
+    console.error(e);
+    $("proofError").textContent = "Something went wrong uploading that — please try again.";
+    $("proofError").classList.add("show");
+    btn.disabled = false;
+    btn.textContent = "I've Sent It — Submit Proof";
+  }
+};
+
 $("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
 
 $("btnRedeemGift").onclick = async () => {
@@ -833,9 +886,9 @@ function renderPaymentFollowUpButtons(method) {
   const clientPhone = $("d-phone").value.trim();
 
   let amiiMsg, receiptMsg;
-  if (method === "wam_deposit") {
-    amiiMsg = `Hi Amii! I just sent my ${fmtMoney(deposit, state.service.currency)} WAM! deposit for ${state.service.name} on ${when}. — ${clientName}`;
-    receiptMsg = `🧾 Eleganza Receipt\n${state.service.name} — ${when}\nWAM! deposit sent: ${fmtMoney(deposit, state.service.currency)}` +
+  if (method === "bank_transfer") {
+    amiiMsg = `Hi Amii! I just sent my ${fmtMoney(deposit, state.service.currency)} bank transfer deposit for ${state.service.name} on ${when}, and uploaded the screenshot. — ${clientName}`;
+    receiptMsg = `🧾 Eleganza Receipt\n${state.service.name} — ${when}\nBank transfer deposit sent: ${fmtMoney(deposit, state.service.currency)}` +
       (remainder > 0 ? `\nBalance due at check-in: ${fmtMoney(remainder, state.service.currency)}` : "");
   } else {
     amiiMsg = `Hi Amii! Booked ${state.service.name} on ${when} — paying ${fmtMoney(price, state.service.currency)} cash at check-in. — ${clientName}`;

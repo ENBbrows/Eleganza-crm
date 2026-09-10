@@ -1,18 +1,18 @@
 // ============================================================
 // notify-payment — Supabase Edge Function
 //
-// Fired immediately (not on a schedule) the moment a client taps
-// "I've Sent My Deposit via WAM!" or "I'll Pay Cash at Check-In" on
-// book-eleganza.html. Emails a receipt to the client and a heads-up
-// to Amii right away — no waiting on the 15-min reminder cron. The
-// receipt itself is already logged to the CRM by the confirm_payment_intent
-// RPC before this runs; this function is purely about the two emails.
+// Fired immediately (not on a schedule) the moment a client submits a
+// bank transfer screenshot or taps "I'll Pay Cash at Check-In" on
+// book-eleganza.html (or confirm.html). Emails a receipt to the client
+// and a heads-up to Amii right away — no waiting on the 15-min reminder
+// cron. The receipt itself is already logged to the CRM by the
+// confirm_payment_intent RPC before this runs; this function is purely
+// about the two emails.
 //
 // Required secrets (set with `supabase secrets set ...`):
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided by Supabase
 //   RESEND_API_KEY, RESEND_FROM_ELEGANZA      -- same as send-reminders
 //   OWNER_EMAIL                               -- Amii's own inbox for these alerts
-//   WAM_HANDLE                                -- shown in the owner alert as a reminder
 // ============================================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -20,7 +20,6 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_ELEGANZA = Deno.env.get("RESEND_FROM_ELEGANZA") || Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
 const OWNER_EMAIL = Deno.env.get("OWNER_EMAIL") || "";
-const WAM_HANDLE = Deno.env.get("WAM_HANDLE") || "";
 const TZ = "America/Port_of_Spain";
 
 const rest = (path: string, init: RequestInit = {}) =>
@@ -58,12 +57,30 @@ async function sendEmail(to: string, subject: string, body: string) {
   if (!res.ok) console.error("Resend error:", await res.text());
 }
 
+// Signed URL (server-side, service-role key only — never exposed to the
+// client) so Amii can open the screenshot straight from the email even
+// though the bucket is private.
+async function signedProofUrl(path: string): Promise<string | null> {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/payment-proofs/${path}`, {
+    method: "POST",
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ expiresIn: 60 * 60 * 24 * 7 }), // 7 days
+  });
+  if (!res.ok) {
+    console.error("signedProofUrl error:", await res.text());
+    return null;
+  }
+  const { signedURL } = (await res.json()) as { signedURL: string };
+  return signedURL ? `${SUPABASE_URL}/storage/v1${signedURL}` : null;
+}
+
 type BookingRow = {
   business: string;
   client_name: string;
   client_phone: string | null;
   client_email: string | null;
   start_at: string;
+  payment_proof_path: string | null;
   services: { name: string; price: number | null; currency: string | null } | null;
 };
 
@@ -75,7 +92,7 @@ Deno.serve(async (req) => {
     }
 
     const res = await rest(
-      `/rest/v1/bookings?confirm_token=eq.${token}&select=business,client_name,client_phone,client_email,start_at,services(name,price,currency)`
+      `/rest/v1/bookings?confirm_token=eq.${token}&select=business,client_name,client_phone,client_email,start_at,payment_proof_path,services(name,price,currency)`
     );
     const rows = (await res.json()) as BookingRow[];
     const b = Array.isArray(rows) ? rows[0] : rows;
@@ -89,22 +106,24 @@ Deno.serve(async (req) => {
     const currency = b.services?.currency ?? null;
     const serviceName = b.services?.name ?? "Appointment";
 
-    if (method === "wam_deposit") {
+    if (method === "bank_transfer") {
       const deposit = price ? Math.min(500, price) : 0;
       const remainder = price ? price - deposit : 0;
       const balanceLine = remainder > 0 ? ` The remaining ${fmtMoney(remainder, currency)} is due in cash at check-in.` : "";
+      const proofUrl = b.payment_proof_path ? await signedProofUrl(b.payment_proof_path) : null;
 
       await sendEmail(
         b.client_email || "",
         "Your Eleganza deposit receipt",
-        `Hi ${name},\n\nThis confirms your ${fmtMoney(deposit, currency)} WAM! deposit for ${serviceName} on ${when}.${balanceLine}\n\nSee you then,\nEleganza`
+        `Hi ${name},\n\nThis confirms your ${fmtMoney(deposit, currency)} bank transfer deposit for ${serviceName} on ${when}.${balanceLine}\n\nSee you then,\nEleganza`
       );
       await sendEmail(
         OWNER_EMAIL,
-        `💰 WAM! deposit received — ${name}`,
-        `${b.client_name} sent a ${fmtMoney(deposit, currency)} deposit via WAM! for ${serviceName} on ${when}.\n\n` +
+        `💳 Bank transfer received — ${name}`,
+        `${b.client_name} sent a ${fmtMoney(deposit, currency)} bank transfer for ${serviceName} on ${when}.\n\n` +
           `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}\n\n` +
-          `Check WAM! (${WAM_HANDLE || "your handle"}) to confirm it landed, then mark the booking confirmed in the CRM.`
+          (proofUrl ? `Screenshot: ${proofUrl}\n\n` : "") +
+          `Verify it landed in the JMMB account, then mark the booking confirmed in the CRM.`
       );
     } else if (method === "cash_full") {
       await sendEmail(

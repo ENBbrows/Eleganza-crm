@@ -47,7 +47,6 @@ const WHATSAPP_TEMPLATE_FOLLOWUP = Deno.env.get("WHATSAPP_TEMPLATE_FOLLOWUP") ||
 const WHATSAPP_TEMPLATE_TWO_WEEK = Deno.env.get("WHATSAPP_TEMPLATE_TWO_WEEK") || "pay_and_confirm_followup";
 const WHATSAPP_TEMPLATE_GIFT_RECEIVED = Deno.env.get("WHATSAPP_TEMPLATE_GIFT_RECEIVED") || "gift_certificate_received";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
-const WAM_HANDLE = Deno.env.get("WAM_HANDLE") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
 const TZ = "America/Port_of_Spain";
 
@@ -112,8 +111,8 @@ function twoWeekCopy(b: Booking) {
   const price = b.services?.price ?? null;
   const currency = b.services?.currency ?? null;
   const deposit = price ? Math.min(500, price) : null;
-  const instruction = deposit && WAM_HANDLE
-    ? `Please send a ${fmtMoney(deposit, currency)} deposit via WAM! to ${WAM_HANDLE} to secure it (balance due in cash at check-in), and confirm here:`
+  const instruction = deposit
+    ? `Please confirm and pay your ${fmtMoney(deposit, currency)} deposit (bank transfer or cash at check-in) here:`
     : "Please confirm here:";
   return {
     subject: "Confirm your follow-up appointment",
@@ -145,7 +144,7 @@ function dayBeforeCopy(b: Booking) {
     subject: `Your appointment — ${fmtDate(b.start_at)}`,
     body:
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
-      `Confirm, reschedule, or cancel here (let us know your reason if you cancel):\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
+      `Confirm, reschedule, cancel, or settle payment (bank transfer or cash) here:\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
 }
 

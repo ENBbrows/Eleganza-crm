@@ -26,6 +26,8 @@
   .msg.error{color:var(--error)}
   .msg.ok{color:var(--ok)}
   .hidden{display:none}
+  input[type=file]{width:100%;padding:10px 0;color:var(--ivory-dim);font-size:.85rem}
+  label{display:block;text-align:left;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:14px 0 6px}
 </style>
 </head>
 <body>
@@ -76,6 +78,7 @@ function render() {
   const brand = booking.business === "enbfocus" ? "ENBfocus" : "Eleganza";
   const statusLabel = { tentative: "Held — needs confirming", confirmed: "Confirmed", checked_in: "In the Chair", completed: "Completed", cancelled: "Cancelled" }[booking.status] || booking.status;
   const canAct = booking.status === "tentative" || booking.status === "confirmed";
+  const showPayment = booking.business === "eleganza" && Number(booking.price) > 0 && booking.status !== "cancelled";
   card.innerHTML = `
     <div class="brand">${brand}</div>
     <h1>Hi ${esc(booking.client_name.split(" ")[0])}</h1>
@@ -111,6 +114,30 @@ function render() {
       <button class="btn" id="btnSubmitCancel" style="width:100%;margin-top:10px;background:var(--error)">Confirm Cancellation</button>
     </div>
     ` : `<p class="msg ok" style="margin-top:20px">This appointment is ${esc(statusLabel).toLowerCase()} — no action needed.</p>`}
+    ${showPayment ? (booking.payment_method ? `
+    <div class="detail" style="border-color:var(--ok);text-align:center">
+      <div style="color:var(--ok)">✓ Payment received — see you then!</div>
+    </div>
+    ` : `
+    <div class="detail" id="paymentBox" style="border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Settle Payment — Choose One</div>
+      <div id="transferBox" class="hidden">
+        <div class="detail" style="border-color:var(--line);margin-top:10px">
+          <div>Bank <strong>${esc(CONFIG.BANK_NAME)}</strong></div>
+          <div>Account Name <strong>${esc(CONFIG.BANK_ACCOUNT_NAME)}</strong></div>
+          <div>Account # <strong>${esc(CONFIG.BANK_ACCOUNT_NUMBER)}</strong></div>
+          <div>Account Type <strong>${esc(CONFIG.BANK_ACCOUNT_TYPE)}</strong></div>
+        </div>
+        <label for="proofFile">Upload a screenshot of the transfer</label>
+        <input type="file" id="proofFile" accept="image/*" />
+        <p class="msg error hidden" id="proofError"></p>
+        <button class="btn" id="btnSubmitTransfer" style="width:100%;margin-top:10px">I've Sent It — Submit Proof</button>
+      </div>
+      <button class="btn-ghost" id="btnShowTransfer" style="width:100%">Pay by Bank Transfer</button>
+      <p class="sub" style="margin:8px 0">— or —</p>
+      <button class="btn-ghost" id="btnPayCash" style="width:100%">I'll Pay Cash at Check-In</button>
+    </div>
+    `) : ""}
     <div class="msg" id="msg"></div>
   `;
   if (canAct) {
@@ -119,6 +146,14 @@ function render() {
     $("btnSubmitReschedule").onclick = onReschedule;
     $("btnCancel").onclick = () => $("cancelBox").classList.remove("hidden");
     $("btnSubmitCancel").onclick = onCancel;
+  }
+  if (showPayment && !booking.payment_method) {
+    $("btnShowTransfer").onclick = () => {
+      $("transferBox").classList.remove("hidden");
+      $("btnShowTransfer").classList.add("hidden");
+    };
+    $("btnSubmitTransfer").onclick = onSubmitTransfer;
+    $("btnPayCash").onclick = () => setPaymentMethod("cash_full", "Noted — please bring the full amount in cash to check-in.");
   }
 }
 
@@ -179,6 +214,68 @@ async function onCancel() {
     $("msg").className = "msg error";
     btn.disabled = false;
     btn.textContent = "Confirm Cancellation";
+  }
+}
+
+async function uploadPaymentProof(file, bookingId) {
+  const path = `${bookingId}/${Date.now()}-${file.name}`;
+  const res = await fetch(`${CONFIG.SUPABASE_URL}/storage/v1/object/payment-proofs/${path}`, {
+    method: "POST",
+    headers: { "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY, "Content-Type": file.type || "application/octet-stream" },
+    body: file
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return path;
+}
+
+async function setPaymentMethod(method, ackText) {
+  try {
+    await rpc("confirm_payment_intent", { p_token: token, p_method: method });
+    booking.payment_method = method;
+  } catch (e) {
+    console.warn("confirm_payment_intent failed:", e);
+  }
+  fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+    body: JSON.stringify({ token, method })
+  }).catch(e => console.warn("notify-payment failed:", e));
+  render();
+  $("msg").textContent = ackText;
+  $("msg").className = "msg ok";
+}
+
+async function onSubmitTransfer() {
+  const file = $("proofFile").files[0];
+  $("proofError").classList.add("hidden");
+  if (!file) {
+    $("proofError").textContent = "Please choose a screenshot first.";
+    $("proofError").classList.remove("hidden");
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    $("proofError").textContent = "Please upload an image file.";
+    $("proofError").classList.remove("hidden");
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    $("proofError").textContent = "That file's a bit large — please upload something under 8MB.";
+    $("proofError").classList.remove("hidden");
+    return;
+  }
+  const btn = $("btnSubmitTransfer");
+  btn.disabled = true;
+  btn.textContent = "Uploading…";
+  try {
+    const path = await uploadPaymentProof(file, booking.booking_id);
+    await rpc("set_payment_proof", { p_token: token, p_path: path });
+    await setPaymentMethod("bank_transfer", "Thanks — we'll verify your transfer and confirm you shortly.");
+  } catch (e) {
+    console.error(e);
+    $("proofError").textContent = "Something went wrong uploading that — please try again.";
+    $("proofError").classList.remove("hidden");
+    btn.disabled = false;
+    btn.textContent = "I've Sent It — Submit Proof";
   }
 }
 

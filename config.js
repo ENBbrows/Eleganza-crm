@@ -25,9 +25,16 @@ const CONFIG = {
      WhatsApp number above wherever the site displays "call us". */
   CALL_NUMBER: "18684733030",
 
-  /* Your WAM! handle/number clients send payment to (personal WAM! account —
-     no merchant API, so this just displays instructions; you confirm receipt
-     yourself when completing the booking in the CRM's Calendar tab). */
+  /* Bank transfer details shown to clients paying for a booking online —
+     they send the transfer, then upload a screenshot as proof. You get an
+     emailed heads-up (with a link to the screenshot) the moment they do. */
+  BANK_NAME: "JMMB",
+  BANK_ACCOUNT_NUMBER: "007700009084",
+  BANK_ACCOUNT_NAME: "Eleganza Naturally Beautiful",
+  BANK_ACCOUNT_TYPE: "Savings",
+
+  /* Your WAM! handle/number — kept only for gift certificate purchases
+     below (a separate flow; bookings no longer use WAM). */
   WAM_HANDLE: "@amiileroux",
 
   /* Your WAM! Business handle — used for gift certificate purchases. Once

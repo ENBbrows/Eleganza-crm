@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Eleganza Naturally Beautiful — Microblading &amp; Brows, Trinidad</title>
-<meta name="description" content="Microblading, 3D brows, and touch-ups in Trincity, Trinidad. Book online, pay via WAM!, and see real availability." />
+<meta name="description" content="Microblading, 3D brows, and touch-ups in Trincity, Trinidad. Book online, pay by bank transfer or cash, and see real availability." />
 <link rel="apple-touch-icon" href="app-icon-black-v2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -254,7 +254,7 @@
         <div class="step-num">4</div>
         <div>
           <div class="step-title">Secure Your Spot</div>
-          <div class="step-desc">A WAM! deposit locks in your appointment (or pay the full amount in cash at check-in).</div>
+          <div class="step-desc">A bank transfer deposit locks in your appointment (or pay the full amount in cash at check-in).</div>
         </div>
       </div>
       <div class="step">
@@ -342,7 +342,7 @@
       </details>
       <details class="faq-item">
         <summary>How do I pay?</summary>
-        <p>A WAM! deposit secures your spot (or the full amount if it's $500 or less) — the balance is paid in cash at check-in.</p>
+        <p>A bank transfer deposit secures your spot (or the full amount if it's $500 or less) — the balance is paid in cash at check-in. Send the transfer, then upload a screenshot as proof.</p>
       </details>
       <details class="faq-item">
         <summary>What if I need to reschedule, or I'm running late?</summary>
@@ -400,7 +400,7 @@
     </div>
     <div class="info-box">
       <div class="k">Booking &amp; Payment</div>
-      <div class="v">Appointments are booked at least 2 weeks in advance. A <strong>WAM!</strong> deposit (or the full amount, whichever is less) secures your spot — the balance is paid in cash at check-in. Feel like leaving a tip? WAM! it to <strong id="tipHandle"></strong> — always appreciated, never expected.</div>
+      <div class="v">Appointments are booked at least 2 days in advance. A bank transfer deposit (or the full amount, whichever is less) secures your spot — send the transfer, upload a screenshot as proof, and the balance is paid in cash at check-in. Feel like leaving a tip? Always appreciated at check-in, never expected.</div>
     </div>
     <div class="info-box">
       <div class="k">Running Late?</div>
@@ -478,8 +478,6 @@ if (CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("
 } else {
   $("linkWhatsapp").style.display = "none";
 }
-
-$("tipHandle").textContent = (CONFIG.WAM_HANDLE && CONFIG.WAM_HANDLE.indexOf("PASTE_") !== 0) ? CONFIG.WAM_HANDLE : "our WAM! handle";
 
 /* "See the Work" — links straight to Instagram/TikTok instead of hosting
    before/after photos here, so it also drives traffic across platforms. */
