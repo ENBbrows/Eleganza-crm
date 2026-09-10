@@ -893,19 +893,56 @@ $("newBookingBtn").onclick = async () => {
       $("newBookingErr").textContent = `Please fill in: ${missing}.`;
       return;
     }
+    const phone = $("f_bphone").value.trim();
+    const service = services.find(s => s.id === $("f_bservice").value);
     try {
-      await rpc("create_booking", {
+      const result = await rpc("create_booking", {
         p_business: biz, p_service_id: $("f_bservice").value,
         p_start_at: new Date(`${date}T${time}:00-04:00`).toISOString(),
-        p_name: name, p_phone: $("f_bphone").value.trim(), p_email: $("f_bemail").value.trim()
+        p_name: name, p_phone: phone, p_email: $("f_bemail").value.trim()
       });
-      closeModal(); showToast("Booking created"); loadAllCalendar();
+      const r = Array.isArray(result) ? result[0] : result;
+      showToast("Booking created"); loadAllCalendar();
+      renderNewBookingLink(r, name, phone, service ? service.name : "", date, time);
     } catch (e) {
       $("newBookingErr").textContent = String(e.message||"").includes("slot_taken") ? "That time is already booked." : "Something went wrong.";
     }
   };
   $("modalOverlay").classList.add("show");
 };
+
+// Shown right after a manual booking is created (e.g. a client who booked
+// by phone/WhatsApp) — gives a link to forward them: pre-care, studio
+// location, and a button to confirm the appointment already booked for them.
+function renderNewBookingLink(r, name, phone, serviceName, date, time) {
+  const confirmLink = location.origin + location.pathname.replace(/eleganza-crm-dashboard\.html$/, "") + "confirm.html?token=" + r.confirm_token;
+  const content = $("modalContent");
+  content.innerHTML = `
+    <div class="drawer-head"><h2>Booking created</h2><button class="icon-btn" id="closeModal">✕</button></div>
+    <div class="intake-box">
+      <strong>${esc(name)}</strong>${esc(serviceName)} · ${esc(date)} ${esc(time)}
+    </div>
+    <div class="section-label">Send This To The Client</div>
+    <div style="font-size:12.5px;color:var(--dim);margin-bottom:8px">Pre-care info, the studio location, and a button for them to confirm the appointment you just booked.</div>
+    <div class="action-row">
+      <button id="btnCopyConfirmLink">📋 Copy Link</button>
+      ${intlPhone(phone) ? `<a class="wa" id="btnConfirmLinkWa" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;padding:9px 14px;border-radius:3px;border:1px solid var(--sage);color:#A8C3A0;font-size:13px">💬 Send via WhatsApp</a>` : ""}
+    </div>
+    <button class="btn-primary" id="doneNewBooking" style="width:100%;margin-top:14px">Done</button>
+  `;
+  $("closeModal").onclick = closeModal;
+  $("doneNewBooking").onclick = closeModal;
+  $("btnCopyConfirmLink").onclick = async () => {
+    try { await navigator.clipboard.writeText(confirmLink); showToast("Link copied"); }
+    catch (e) { showToast("Couldn't copy — long-press to copy manually"); }
+  };
+  if ($("btnConfirmLinkWa")) {
+    const first = (name || "there").split(" ")[0];
+    const when = new Date(`${date}T${time}:00-04:00`).toLocaleString("en-US", { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Port_of_Spain" });
+    const msg = `Hi ${first}! You're booked for ${serviceName} on ${when}. Tap this link for everything before your visit — pre-care info, our location, and to confirm:\n${confirmLink}`;
+    $("btnConfirmLinkWa").href = `https://wa.me/${intlPhone(phone)}?text=${encodeURIComponent(msg)}`;
+  }
+}
 
 /* ───────────────────── Shared drawer/modal/login ───────────────────── */
 function closeDrawer() { $("drawerOverlay").classList.remove("show"); clientSelectedId = null; bookingSelectedId = null; }

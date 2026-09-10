@@ -86,6 +86,16 @@ function render() {
       <div>When <strong>${fmt(booking.start_at)}</strong></div>
       <div>Status <strong>${esc(statusLabel)}</strong></div>
     </div>
+    ${booking.business === "eleganza" ? `
+    <div class="detail" style="border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Before You Come In</div>
+      <div>Please avoid, the day of your appointment: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments.</div>
+      <div style="margin-top:10px"><strong>In the 30 days before your appointment</strong> (for microblading/touch-up services), avoid: botox/fillers, chemical peels or fruit/milk acid treatments, laser treatments, and strong sun exposure or tanning.</div>
+      <div style="margin-top:10px">15-minute grace period for confirmed appointments. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.</div>
+      <div style="margin-top:10px"><strong>Studio location:</strong> 4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo &amp; Associates office.</div>
+      <div style="margin-top:10px"><a href="brow-education.html" style="color:var(--gold)">Want to read more first? Visit our Brow Education Library →</a></div>
+    </div>
+    ` : ""}
     ${canAct ? `
     <div class="actions">
       <button class="btn" id="btnConfirm">Confirm this time</button>
