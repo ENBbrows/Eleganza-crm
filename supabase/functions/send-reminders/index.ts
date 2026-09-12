@@ -17,11 +17,16 @@
 //   WHATSAPP_TEMPLATE_DAY_BEFORE              -- approved template name
 //   WHATSAPP_TEMPLATE_HOUR_BEFORE             -- approved template name
 //   BUSINESS_WHATSAPP_NUMBER                  -- Amii's own WhatsApp, e.g. "18685551234"
+//   OWNER_EMAIL                               -- Amii's own inbox (same as notify-payment)
 //   SITE_URL                                  -- e.g. "https://enbbrows.github.io/Eleganza-crm"
 //
 // Until the WhatsApp Cloud API + templates are approved, leave
 // WHATSAPP_TOKEN unset — the function will skip WhatsApp sends
-// and just log what *would* have gone out, so nothing crashes.
+// and just log what *would* have gone out, so nothing crashes. That
+// also means the day-before/2-week owner copy below can't reach her
+// via WhatsApp yet either (no approved template for it, and Cloud API
+// can't freeform-message a number that hasn't messaged first) — it
+// goes to OWNER_EMAIL instead, which works today.
 // Manual sending in the meantime happens from the CRM's Calendar tab
 // (eleganza-crm-dashboard.html?view=calendar).
 //
@@ -47,6 +52,7 @@ const WHATSAPP_TEMPLATE_FOLLOWUP = Deno.env.get("WHATSAPP_TEMPLATE_FOLLOWUP") ||
 const WHATSAPP_TEMPLATE_TWO_WEEK = Deno.env.get("WHATSAPP_TEMPLATE_TWO_WEEK") || "pay_and_confirm_followup";
 const WHATSAPP_TEMPLATE_GIFT_RECEIVED = Deno.env.get("WHATSAPP_TEMPLATE_GIFT_RECEIVED") || "gift_certificate_received";
 const BUSINESS_WHATSAPP_NUMBER = Deno.env.get("BUSINESS_WHATSAPP_NUMBER") || "";
+const OWNER_EMAIL = Deno.env.get("OWNER_EMAIL") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
 const TZ = "America/Port_of_Spain";
 
@@ -146,6 +152,22 @@ function dayBeforeCopy(b: Booking) {
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
       `Confirm, reschedule, cancel, or settle payment (bank transfer or cash) here:\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
+}
+
+// A copy of every "please confirm" reminder — day-before and the 2-week
+// pay-and-confirm nudge — also goes to Amii, so she knows exactly which
+// clients were just asked to confirm/reschedule/pay.
+async function notifyOwnerOfReminder(b: Booking, label: string) {
+  if (!OWNER_EMAIL) return;
+  const when = `${fmtDate(b.start_at)} at ${fmtTime(b.start_at)}`;
+  const bizLabel = b.business === "enbfocus" ? "ENBfocus" : "Eleganza";
+  await sendEmail(
+    OWNER_EMAIL,
+    `📨 ${label} reminder sent — ${firstName(b.client_name)} (${bizLabel})`,
+    `${b.client_name}'s ${label.toLowerCase()} reminder just went out for their ${when} appointment.\n\n` +
+      `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}`,
+    b.business
+  );
 }
 
 function hourBeforeCopy(b: Booking) {
@@ -393,6 +415,7 @@ Deno.serve(async () => {
         `${SITE_URL}/confirm.html?token=${b.confirm_token}`,
       ]);
     }
+    await notifyOwnerOfReminder(b, "Day-before");
     await markSent(b.id, "day_before_sent_at");
     results.day_before++;
   }
@@ -443,6 +466,7 @@ Deno.serve(async () => {
         fmtTime(b.start_at),
       ]);
     }
+    await notifyOwnerOfReminder(b, "2-week");
     await markSent(b.id, "two_week_sent_at");
     results.two_week++;
   }
