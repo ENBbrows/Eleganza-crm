@@ -122,6 +122,9 @@ function render() {
         : booking.payment_method === "cash_full" ? "✓ Noted — pay the full amount in cash at check-in."
         : "✓ Payment settled — see you then!"
       }</div>
+      ${CONFIG.BUSINESS_WHATSAPP_NUMBER && CONFIG.BUSINESS_WHATSAPP_NUMBER.indexOf("PASTE_") !== 0 ? `
+      <a class="btn-ghost" href="https://wa.me/${CONFIG.BUSINESS_WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage(booking))}" target="_blank" rel="noopener" style="margin-top:12px">📤 Let Amii Know on WhatsApp</a>
+      ` : ""}
     </div>
     ` : `
     <div class="detail" id="paymentBox" style="border-color:var(--gold)">
@@ -163,6 +166,20 @@ function render() {
 }
 
 function esc(s) { return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* One-tap WhatsApp fallback, same pattern as book-eleganza.html — real
+   automatic WhatsApp (Meta Cloud API) is still pending business
+   verification, so this lets the client send Amii the ping themselves. */
+function waMessage(b) {
+  const when = fmt(b.start_at);
+  if (b.payment_method === "bank_transfer") {
+    return `Hi Amii! I just sent my bank transfer and uploaded the screenshot for ${b.service_name} on ${when}. — ${b.client_name}`;
+  }
+  if (b.payment_method === "cash_full") {
+    return `Hi Amii! Just confirming — I'll pay cash at check-in for ${b.service_name} on ${when}. — ${b.client_name}`;
+  }
+  return `Hi Amii! Following up on my ${b.service_name} appointment on ${when}. — ${b.client_name}`;
+}
 
 async function onConfirm() {
   $("btnConfirm").disabled = true;
