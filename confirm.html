@@ -96,6 +96,7 @@ function render() {
       <div style="margin-top:10px"><strong>In the 30 days before your appointment</strong> (for microblading/touch-up services), avoid: botox/fillers, chemical peels or fruit/milk acid treatments, laser treatments, and strong sun exposure or tanning.</div>
       <div style="margin-top:10px">15-minute grace period for confirmed appointments. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.</div>
       <div style="margin-top:10px"><strong>Studio location:</strong> 4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago — ground floor, inside A. Rauseo &amp; Associates office.</div>
+      <a class="btn-ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("4 First Street East, deLa Marre Avenue, Trincity, Trinidad and Tobago")}" target="_blank" rel="noopener" style="margin-top:10px">📍 Get Directions</a>
       <div style="margin-top:10px"><a href="brow-education.html" style="color:var(--gold)">Want to read more first? Visit our Brow Education Library →</a></div>
     </div>
     ` : ""}
@@ -116,7 +117,11 @@ function render() {
     ` : `<p class="msg ok" style="margin-top:20px">This appointment is ${esc(statusLabel).toLowerCase()} — no action needed.</p>`}
     ${showPayment ? (booking.payment_method ? `
     <div class="detail" style="border-color:var(--ok);text-align:center">
-      <div style="color:var(--ok)">✓ Payment received — see you then!</div>
+      <div style="color:var(--ok)">${
+        booking.payment_method === "bank_transfer" ? "✓ Transfer submitted — we'll verify it and confirm you shortly."
+        : booking.payment_method === "cash_full" ? "✓ Noted — pay the full amount in cash at check-in."
+        : "✓ Payment settled — see you then!"
+      }</div>
     </div>
     ` : `
     <div class="detail" id="paymentBox" style="border-color:var(--gold)">
