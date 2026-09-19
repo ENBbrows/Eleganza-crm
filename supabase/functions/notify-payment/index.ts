@@ -20,6 +20,7 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_ELEGANZA = Deno.env.get("RESEND_FROM_ELEGANZA") || Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
 const OWNER_EMAIL = Deno.env.get("OWNER_EMAIL") || "";
+const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
 const TZ = "America/Port_of_Spain";
 
 const rest = (path: string, init: RequestInit = {}) =>
@@ -156,6 +157,18 @@ Deno.serve(async (req) => {
         `${b.client_name} booked a ${serviceName} for ${when}.\n\n` +
           `Phone: ${b.client_phone || "—"}\nEmail: ${b.client_email || "—"}\n\n` +
           `This is a free consultation — no payment step, so this is your only automatic heads-up for it.`
+      );
+    } else if (method === "followup_booked") {
+      // Any touch-up-family booking (Microblading/3D Follow-Up, Annual/
+      // Additional Touch-Up) still breaks the skin, so the aftercare guide
+      // goes out again automatically right at booking time — not just
+      // offered as a tap-to-send like the original procedure gets.
+      await sendEmail(
+        b.client_email || "",
+        "Your Eleganza aftercare guide",
+        `Hi ${name},\n\n🤍 Here's your aftercare guide again for ${serviceName} on ${when} — your ritual for the next 5 days:\n\n` +
+          `${SITE_URL}/aftercare.html\n\n` +
+          `What once was, is not all lost. ✨\n\nSee you soon,\nEleganza`
       );
     }
 

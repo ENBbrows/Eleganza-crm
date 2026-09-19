@@ -699,6 +699,17 @@ function renderDone(result, name, phone) {
     }).catch(e => console.warn("notify-payment (consultation) failed:", e));
   }
 
+  // Any touch-up-family booking (Microblading/3D Follow-Up, Annual/Additional
+  // Touch-Up) still breaks the skin, so the aftercare guide goes out again
+  // automatically right at booking time — not just offered as a tap-to-send.
+  if (state.service.category === "touch_up") {
+    fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ token: result.confirm_token, method: "followup_booked" })
+    }).catch(e => console.warn("notify-payment (followup aftercare) failed:", e));
+  }
+
   $("paymentAck").style.display = "none";
   $("paymentFollowUp").style.display = "none";
   $("btnNotifyAmiiWa").style.display = "none";

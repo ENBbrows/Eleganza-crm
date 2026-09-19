@@ -950,6 +950,11 @@ function renderThankYouLink(b, amount) {
         });
         const r = Array.isArray(result) ? result[0] : result;
         followupToken = r.confirm_token;
+        fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+          body: JSON.stringify({ token: r.confirm_token, method: "followup_booked" })
+        }).catch(e => console.warn("notify-payment (followup aftercare) failed:", e));
         $("prebookMsg").textContent = "✓ Held — the link below now includes their confirm link.";
         btn.textContent = "Pre-Booked ✓";
         wireSendButtons();
@@ -1033,6 +1038,13 @@ $("newBookingBtn").onclick = async () => {
       });
       const r = Array.isArray(result) ? result[0] : result;
       showToast("Booking created"); loadAllCalendar();
+      if (biz === "eleganza" && service && service.category === "touch_up") {
+        fetch(`${CONFIG.SUPABASE_URL}/functions/v1/notify-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": CONFIG.SUPABASE_ANON_KEY, "Authorization": "Bearer " + CONFIG.SUPABASE_ANON_KEY },
+          body: JSON.stringify({ token: r.confirm_token, method: "followup_booked" })
+        }).catch(e => console.warn("notify-payment (followup aftercare) failed:", e));
+      }
       renderNewBookingLink(r, name, phone, service ? service.name : "", date, time);
     } catch (e) {
       $("newBookingErr").textContent = String(e.message||"").includes("slot_taken") ? "That time is already booked." : "Something went wrong.";
