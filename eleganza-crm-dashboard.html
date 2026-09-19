@@ -731,6 +731,8 @@ function renderWeek() {
 async function openBookingDrawer(id) {
   bookingSelectedId = id;
   const b = bookings.find(x => x.id === id) || await api(`/rest/v1/bookings?id=eq.${id}&select=*,services(name,duration_minutes,price,category)`).then(r=>r[0]);
+  const editable = !['cancelled','completed'].includes(b.status);
+  const services = editable ? await api(`/rest/v1/services?business=eq.${biz}&active=eq.true&select=*&order=sort_order.asc`) : [];
   let lead = null;
   if (biz === "enbfocus") {
     const leads = await api(`/rest/v1/enbfocus_leads?booking_id=eq.${id}&select=*`);
@@ -750,7 +752,7 @@ async function openBookingDrawer(id) {
       ${['tentative','confirmed'].includes(b.status) ? `<button data-act="checkin">Mark checked-in</button>` : ""}
       ${['confirmed','checked_in'].includes(b.status) ? `<button data-act="complete">Complete + receipt</button>` : ""}
       ${b.status==='confirmed' ? `<button data-act="noshow">No-show</button>` : ""}
-      ${!['cancelled','completed'].includes(b.status) ? `<button class="danger" data-act="cancel">Cancel</button>` : ""}
+      ${editable ? `<button class="danger" data-act="cancel">Cancel</button>` : ""}
     </div>
     <div class="section-label">Calendar Link</div>
     <div class="action-row">
@@ -761,6 +763,23 @@ async function openBookingDrawer(id) {
     <input type="date" id="reDate" value="${fmtWhen(b.start_at,{year:'numeric',month:'2-digit',day:'2-digit'}).split('/').reverse().join('-')}">
     <input type="time" id="reTime" value="${fmtWhen(b.start_at,{hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}">
     <div class="action-row"><button id="btnReschedule">Save new time</button></div>
+    ${editable ? `
+    <div class="section-label">Edit Details</div>
+    <label class="section-label" style="margin-top:0">Client name</label>
+    <input class="input-full" id="editName" value="${esc(b.client_name)}">
+    <label class="section-label">Phone</label>
+    <input class="input-full" id="editPhone" value="${esc(b.client_phone||'')}">
+    <label class="section-label">Email</label>
+    <input class="input-full" id="editEmail" value="${esc(b.client_email||'')}">
+    <label class="section-label">Service</label>
+    <select class="input-full" id="editService" style="padding:9px 10px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:3px">
+      ${services.map(s => `<option value="${s.id}"${s.id===b.service_id?' selected':''}>${esc(s.name)} (${s.duration_minutes}min)</option>`).join("")}
+    </select>
+    <label class="section-label">Notes</label>
+    <textarea class="input-full" id="editNotes" rows="2">${esc(b.notes||'')}</textarea>
+    <div class="action-row"><button id="btnSaveDetails">Save Changes</button></div>
+    <div class="login-msg" id="editErr"></div>
+    ` : ""}
     ${lead ? `
       <div class="section-label">Discovery Call Intake</div>
       <div class="intake-box">
@@ -795,6 +814,32 @@ async function openBookingDrawer(id) {
       showToast("Rescheduled"); closeDrawer(); loadAllCalendar();
     } catch (e) { showToast("That time isn't available"); }
   };
+  if ($("btnSaveDetails")) {
+    $("btnSaveDetails").onclick = async () => {
+      const name = $("editName").value.trim();
+      if (!name) { $("editErr").textContent = "Client name can't be empty."; return; }
+      const btn = $("btnSaveDetails");
+      btn.disabled = true; btn.textContent = "Saving…";
+      $("editErr").textContent = "";
+      try {
+        const result = await rpc("update_booking_details", {
+          p_booking_id: b.id,
+          p_client_name: name,
+          p_client_phone: $("editPhone").value.trim(),
+          p_client_email: $("editEmail").value.trim(),
+          p_service_id: $("editService").value,
+          p_notes: $("editNotes").value.trim() || null
+        });
+        if (!result || !result.ok) throw new Error(result?.error || "failed");
+        showToast("Booking updated"); closeDrawer(); loadAllCalendar();
+      } catch (e) {
+        $("editErr").textContent = String(e.message||"").includes("slot_taken")
+          ? "That service doesn't fit in this slot — reschedule first, or pick a shorter service."
+          : "Something went wrong saving those changes.";
+        btn.disabled = false; btn.textContent = "Save Changes";
+      }
+    };
+  }
   if (lead) {
     drawer.querySelectorAll("[data-stage]").forEach(btn => btn.onclick = async () => {
       await api(`/rest/v1/enbfocus_leads?id=eq.${lead.id}`, { method:"PATCH", headers:{Prefer:"return=minimal"}, body: JSON.stringify({ stage: btn.dataset.stage }) });
