@@ -26,6 +26,7 @@
   .msg.error{color:var(--error)}
   .msg.ok{color:var(--ok)}
   .hidden{display:none}
+  .linkline{background:none;border:none;color:var(--ivory-dim);font-size:.85rem;text-decoration:underline;cursor:pointer;font-family:'Karla',sans-serif}
   input[type=file]{width:100%;padding:10px 0;color:var(--ivory-dim);font-size:.85rem}
   label{display:block;text-align:left;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:14px 0 6px}
 </style>
@@ -82,7 +83,7 @@ function render() {
   card.innerHTML = `
     <div class="brand">${brand}</div>
     <h1>Hi ${esc(booking.client_name.split(" ")[0])}</h1>
-    <p class="sub">Here's your appointment. Confirm it, or pick a new time if this no longer works.</p>
+    <p class="sub">Here's your appointment. Will you be there?</p>
     <div class="detail">
       <div>Service <strong>${esc(booking.service_name)}</strong></div>
       ${booking.price ? `<div>Price <strong>${esc(booking.currency || "TTD")}$${Number(booking.price).toLocaleString()}</strong></div>` : ""}
@@ -102,10 +103,10 @@ function render() {
     ` : ""}
     ${canAct ? `
     <div class="actions">
-      <button class="btn" id="btnConfirm">Confirm this time</button>
-      <button class="btn-ghost" id="btnReschedule">Pick a different time</button>
-      <button class="btn-ghost" id="btnCancel" style="color:var(--error);border-color:var(--error)">Cancel this appointment</button>
+      <button class="btn" id="btnConfirm">✅ Yes, I'll Be There</button>
+      <button class="btn-ghost" id="btnCancel" style="color:var(--error);border-color:var(--error)">❌ No, I Can't Make It</button>
     </div>
+    <button class="linkline" id="btnReschedule" style="display:block;margin:14px auto 0;text-align:center">Need a different time instead?</button>
     <div id="rescheduleBox" class="hidden">
       <input type="datetime-local" id="newTime" style="width:100%;padding:14px;background:var(--ink-soft);border:1px solid var(--line);color:var(--ivory);border-radius:8px;margin-top:14px" />
       <button class="btn" id="btnSubmitReschedule" style="width:100%;margin-top:10px">Save new time</button>

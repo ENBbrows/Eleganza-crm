@@ -147,10 +147,10 @@ function dayBeforeCopy(b: Booking) {
     "\n\nBefore you come in, avoid: alcohol, caffeine, aspirin/blood thinners, working out, sun bathing, and facials or laser treatments." +
     "\n\n15-minute grace period. After 15 min, a $200 late fee applies. After 30 min, you'll need to reschedule.";
   return {
-    subject: `Your appointment — ${fmtDate(b.start_at)}`,
+    subject: `Will you be there? — ${fmtDate(b.start_at)}`,
     body:
       `Hi ${name},\n\nThis is your reminder for tomorrow's appointment: ${when}.${tentativeNote}\n\n` +
-      `Confirm, reschedule, cancel, or settle payment (bank transfer or cash) here:\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
+      `Tap Yes if you'll be there, or No if you can't make it (you can also reschedule or settle payment there):\n${link}${prepNote}\n\nSee you soon,\nEleganza`,
   };
 }
 
