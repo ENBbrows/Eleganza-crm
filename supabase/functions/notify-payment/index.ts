@@ -13,6 +13,8 @@
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   -- auto-provided by Supabase
 //   RESEND_API_KEY, RESEND_FROM_ELEGANZA      -- same as send-reminders
 //   OWNER_EMAIL                               -- Amii's own inbox for these alerts
+//   SITE_URL                                  -- optional, defaults to the live site
+//   GOOGLE_REVIEW_URL, FACEBOOK_REVIEW_URL    -- optional, default to the real ones below
 // ============================================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -21,6 +23,8 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_ELEGANZA = Deno.env.get("RESEND_FROM_ELEGANZA") || Deno.env.get("RESEND_FROM") || "Eleganza <onboarding@resend.dev>";
 const OWNER_EMAIL = Deno.env.get("OWNER_EMAIL") || "";
 const SITE_URL = Deno.env.get("SITE_URL") || "https://enbbrows.github.io/Eleganza-crm";
+const GOOGLE_REVIEW_URL = Deno.env.get("GOOGLE_REVIEW_URL") || "https://g.page/r/CX5CbuaQjUY5EAE/review";
+const FACEBOOK_REVIEW_URL = Deno.env.get("FACEBOOK_REVIEW_URL") || "https://www.facebook.com/eleganzanaturallybeautiful";
 const TZ = "America/Port_of_Spain";
 
 const rest = (path: string, init: RequestInit = {}) =>
@@ -162,12 +166,17 @@ Deno.serve(async (req) => {
       // Any touch-up-family booking (Microblading/3D Follow-Up, Annual/
       // Additional Touch-Up) still breaks the skin, so the aftercare guide
       // goes out again automatically right at booking time — not just
-      // offered as a tap-to-send like the original procedure gets.
+      // offered as a tap-to-send like the original procedure gets. Bundled
+      // with the booking's own confirm/manage link and a review ask, so
+      // it's everything they need for this visit in one message.
+      const confirmLink = `${SITE_URL}/confirm.html?token=${token}`;
       await sendEmail(
         b.client_email || "",
-        "Your Eleganza aftercare guide",
+        "Your Eleganza aftercare guide + appointment link",
         `Hi ${name},\n\n🤍 Here's your aftercare guide again for ${serviceName} on ${when} — your ritual for the next 5 days:\n\n` +
           `${SITE_URL}/aftercare.html\n\n` +
+          `Manage this appointment (confirm, reschedule, or pay) here:\n${confirmLink}\n\n` +
+          `Loved your last visit? A review helps this small studio bloom:\nGoogle: ${GOOGLE_REVIEW_URL}\nFacebook: ${FACEBOOK_REVIEW_URL}\n\n` +
           `What once was, is not all lost. ✨\n\nSee you soon,\nEleganza`
       );
     }
