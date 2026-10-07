@@ -754,6 +754,12 @@ async function openBookingDrawer(id) {
       ${b.status==='confirmed' ? `<button data-act="noshow">No-show</button>` : ""}
       ${editable ? `<button class="danger" data-act="cancel">Cancel</button>` : ""}
     </div>
+    <div class="section-label">Confirmation Link</div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:6px">Pre-care, location, payment, and a button to confirm this appointment.</div>
+    <div class="action-row">
+      <button id="btnCopyConfirmLink">📋 Copy Link</button>
+      ${intlPhone(b.client_phone) ? `<a class="wa" id="btnConfirmLinkWa" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;padding:9px 14px;border-radius:3px;border:1px solid var(--sage);color:#A8C3A0;font-size:13px">💬 Send via WhatsApp</a>` : ""}
+    </div>
     <div class="section-label">Calendar Link</div>
     <div class="action-row">
       <button id="btnCopyCalLink">📋 Copy Link</button>
@@ -795,6 +801,17 @@ async function openBookingDrawer(id) {
   `;
   $("closeDrawer").onclick = closeDrawer;
   drawer.querySelectorAll("[data-act]").forEach(btn => btn.onclick = () => handleBookingAction(b, btn.dataset.act));
+  const confirmLink = location.origin + location.pathname.replace(/eleganza-crm-dashboard\.html$/, "") + "confirm.html?token=" + b.confirm_token;
+  $("btnCopyConfirmLink").onclick = async () => {
+    try { await navigator.clipboard.writeText(confirmLink); showToast("Link copied"); }
+    catch (e) { showToast("Couldn't copy — long-press to copy manually"); }
+  };
+  if ($("btnConfirmLinkWa")) {
+    const first = (b.client_name || "there").split(" ")[0];
+    const when = fmtWhen(b.start_at, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" });
+    const msg = `Hi ${first}! Following up on your ${b.services?.name||"appointment"} on ${when} — tap here for pre-care, location, and to confirm:\n${confirmLink}`;
+    $("btnConfirmLinkWa").href = `https://wa.me/${intlPhone(b.client_phone)}?text=${encodeURIComponent(msg)}`;
+  }
   const calLink = `${CALENDAR_EVENT_BASE}?event=${b.confirm_token}`;
   $("btnCopyCalLink").onclick = async () => {
     try { await navigator.clipboard.writeText(calLink); showToast("Calendar link copied"); }
