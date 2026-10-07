@@ -101,6 +101,17 @@ function render() {
       <div style="margin-top:10px"><a href="brow-education.html" style="color:var(--gold)">Want to read more first? Visit our Brow Education Library →</a></div>
     </div>
     ` : ""}
+    ${booking.category === "touch_up" ? `
+    <div class="detail" style="border-color:var(--gold)">
+      <div style="color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:8px">Your Aftercare — Days 1–5</div>
+      <div><strong>1.</strong> Gently wash or wipe your brows 3–5 times a day with cool water and a gentle, fragrance-free soap. Soft fingertips only — no scrubbing.</div>
+      <div style="margin-top:8px"><strong>2.</strong> After each wash, apply the cream provided at your appointment across both brows.</div>
+      <div style="margin-top:8px"><strong>3.</strong> Repeat this ritual for the next 5 days — consistency is what heals your color soft, even, and true.</div>
+      <div style="margin-top:12px"><strong>While you heal, avoid:</strong> sweating/the gym, pool/beach/river water or steamy hot showers, direct sunlight on your brows, makeup or other products on the brow area, and rubbing, scratching, or picking.</div>
+      <div style="margin-top:10px"><strong>The 4-week rule:</strong> no procedures or applications to the brows until your 4-week healing process is complete.</div>
+      <a class="btn-ghost" href="aftercare.html" style="margin-top:10px">View The Full Aftercare Guide</a>
+    </div>
+    ` : ""}
     ${canAct ? `
     <div class="actions">
       <button class="btn" id="btnConfirm">✅ Yes, I'll Be There</button>
