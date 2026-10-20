@@ -18,8 +18,12 @@ const CONFIG = {
      Used for the "message me on WhatsApp" links shown to local clients
      before their appointment and after booking. e.g. "18685551234"
      This is the WhatsApp Business number — separate from the studio's
-     regular call number (see CALL_NUMBER below). */
-  BUSINESS_WHATSAPP_NUMBER: "18684856301",
+     regular call number (see CALL_NUMBER below).
+     Left blank on purpose — every place that reads this already checks
+     for a real value first and simply hides the WhatsApp button/link
+     (the floating chat bubble, "message us" links, etc.) when it's
+     empty, so removing the number here turns those off sitewide. */
+  BUSINESS_WHATSAPP_NUMBER: "",
 
   /* Your regular phone number for calls — shown separately from the
      WhatsApp number above wherever the site displays "call us". */
